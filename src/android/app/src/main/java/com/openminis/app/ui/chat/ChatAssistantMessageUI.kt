@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -48,7 +47,6 @@ import androidx.compose.material3.DropdownMenuItem
 import com.openminis.app.R
 import com.openminis.app.ui.settings.autoExpandThinkingEnabled
 import com.openminis.app.ui.components.MinisMenu
-import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -72,7 +70,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -91,7 +88,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.sp
 import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.theme.m3Icon
-import com.openminis.app.ui.components.MinisTextButton
 import com.openminis.app.ui.theme.decorLinearSweep
 
 @Composable
@@ -180,7 +176,7 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
             .widthIn(min = 200.dp)
             .padding(top = 4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFFF3B30).copy(alpha = 0.12f))
+            .background(RawC.systemRed.tc.copy(alpha = 0.12f))
             .combinedClickable(
                 onClick = {},
                 onLongClick = {
@@ -193,13 +189,13 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
         Icon(
             imageVector = m3Icon(Icons.Default.Error),
             contentDescription = null,
-            tint = Color(0xFFFF3B30),
+            tint = RawC.systemRed.tc,
             modifier = Modifier.size(14.dp),
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = error,
-            color = Color(0xFFFF3B30),
+            color = RawC.systemRed.tc,
             fontSize = 12.sp,
             lineHeight = 16.sp,
             maxLines = 3,
@@ -212,7 +208,7 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
                 modifier = Modifier
                     .minimumInteractiveComponentSize()
                     .clip(RoundedCornerShape(50))
-                    .background(Color(0xFFFF3B30).copy(alpha = 0.15f))
+                    .background(RawC.systemRed.tc.copy(alpha = 0.15f))
                     .clickable(onClick = onRetry)
                     .padding(horizontal = 10.dp, vertical = 3.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -220,11 +216,11 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
                 Icon(
                     imageVector = m3Icon(Icons.Default.Refresh),
                     contentDescription = null,
-                    tint = Color(0xFFFF3B30),
+                    tint = RawC.systemRed.tc,
                     modifier = Modifier.size(10.dp),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(stringResource(R.string.chat_longpress_retry), color = Color(0xFFFF3B30), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.chat_longpress_retry), color = RawC.systemRed.tc, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -269,7 +265,7 @@ private fun ToolStopButton(
                 modifier = Modifier
                     .size(10.dp)
                     .clip(RoundedCornerShape(2.dp))
-                    .background(Color(0xFFFF3B30)),
+                    .background(RawC.systemRed.tc),
             )
         }
     }
@@ -628,7 +624,7 @@ internal fun ThinkingBlock(block: AssistantBlock, isStreaming: Boolean, isLast: 
         }
         wasStreaming = isStreaming
     }
-    val thinkingBlue = Color(0xFF007AFF)
+    val thinkingBlue = RawC.systemBlue.tc
     val charCount = block.content.length
     val charLabel = when {
         charCount >= 1000 -> "${charCount / 1000}K"
@@ -816,7 +812,7 @@ internal fun ProcessSummaryBar(
     // not a visual break: same blue, same 12dp radius, same 6%/15% tint and
     // 0.5dp hairline, same 12×8 padding as ThinkingBlock. The old 22dp
     // backgroundless capsule looked nothing like the blocks it replaced.
-    val thinkingBlue = Color(0xFF007AFF)
+    val thinkingBlue = RawC.systemBlue.tc
     val shape = RoundedCornerShape(12.dp)
     // [P-process-card] Failure tints ONLY the failed tool rows inside the
     // card (user direction): the header keeps its normal blue title — the
@@ -937,7 +933,7 @@ internal fun ProcessSummaryBar(
  */
 @Composable
 private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
-    val thinkingBlue = Color(0xFF007AFF)
+    val thinkingBlue = RawC.systemBlue.tc
     val muted = MaterialTheme.colorScheme.onSurfaceVariant
     val isThinking = step.kind == "thinking"
     val isFailed = !isThinking && step.status == ToolBlockStatus.FAILED

@@ -194,21 +194,21 @@ internal fun categoryStyle(category: String?): CategoryStyle {
     return when (category?.lowercase()) {
         "code"         -> CategoryStyle(Icons.Outlined.Code, Color(0xFFF09A37))
         "writing"      -> CategoryStyle(Icons.Outlined.Description, Color(0xFF3478F6))
-        "research"     -> CategoryStyle(Icons.Outlined.Language, Color(0xFF30B0C7))
-        "analysis"     -> CategoryStyle(Icons.Outlined.BarChart, Color(0xFF5856D6))
-        "creative"     -> CategoryStyle(Icons.Outlined.Brush, Color(0xFFFF2D55))
-        "chat"         -> CategoryStyle(Icons.Outlined.Forum, Color(0xFF34C759))
+        "research"     -> CategoryStyle(Icons.Outlined.Language, RawC.systemTealAlt.tc)
+        "analysis"     -> CategoryStyle(Icons.Outlined.BarChart, RawC.systemPurple.tc)
+        "creative"     -> CategoryStyle(Icons.Outlined.Brush, RawC.systemPink.tc)
+        "chat"         -> CategoryStyle(Icons.Outlined.Forum, RawC.systemGreen.tc)
         "math"         -> CategoryStyle(Icons.Outlined.Calculate, Color(0xFF9B59B6))
         "translation"  -> CategoryStyle(Icons.Outlined.Translate, Color(0xFF00BCD4))
-        "health"       -> CategoryStyle(Icons.Outlined.Favorite, Color(0xFFFF3B30))
+        "health"       -> CategoryStyle(Icons.Outlined.Favorite, RawC.systemRed.tc)
         "finance"      -> CategoryStyle(Icons.Outlined.Payments, Color(0xFF00C7BE))
         "travel"       -> CategoryStyle(Icons.Outlined.Map, Color(0xFFF09A37))
         "education"    -> CategoryStyle(Icons.Outlined.Book, Color(0xFF3478F6))
-        "design"       -> CategoryStyle(Icons.Outlined.Palette, Color(0xFFFF2D55))
-        "productivity" -> CategoryStyle(Icons.Outlined.CalendarMonth, Color(0xFFFFCC00))
+        "design"       -> CategoryStyle(Icons.Outlined.Palette, RawC.systemPink.tc)
+        "productivity" -> CategoryStyle(Icons.Outlined.CalendarMonth, RawC.systemYellow.tc)
         "support"      -> CategoryStyle(Icons.Outlined.Settings, Color(0xFF8B6914))
-        "other"        -> CategoryStyle(Icons.Outlined.GridView, Color(0xFF8E8E93))
-        else           -> CategoryStyle(Icons.Outlined.Forum, Color(0xFF8E8E93))
+        "other"        -> CategoryStyle(Icons.Outlined.GridView, RawC.systemGray.tc)
+        else           -> CategoryStyle(Icons.Outlined.Forum, RawC.systemGray.tc)
     }
 }
 
@@ -2773,7 +2773,7 @@ private fun SessionBadgeOverlay(
                     .background(
                         // Solid system-orange. Picked over yellow so the
                         // alert reads as "attention" rather than "info".
-                        color = Color(0xFFFF9500),
+                        color = RawC.systemOrange.tc,
                         shape = CircleShape,
                     )
                     .border(
@@ -2918,7 +2918,7 @@ private fun SetupStepCard(
             modifier = Modifier
                 .size(32.dp)
                 .background(
-                    color = if (isDone) Color(0xFF34C759) else MaterialTheme.colorScheme.primary,
+                    color = if (isDone) RawC.systemGreen.tc else MaterialTheme.colorScheme.primary,
                     shape = CircleShape,
                 ),
             contentAlignment = Alignment.Center,
