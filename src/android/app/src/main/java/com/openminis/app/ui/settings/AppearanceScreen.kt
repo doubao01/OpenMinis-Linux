@@ -4,10 +4,7 @@ import com.openminis.app.config.KEY_LANGUAGE
 import com.openminis.app.config.PREF_APPEARANCE
 import com.openminis.app.R
 import com.openminis.app.ui.theme.*
-import com.openminis.app.ui.theme.IosBlue
-import com.openminis.app.ui.theme.IosGreen
-import com.openminis.app.ui.theme.IosIndigo
-import com.openminis.app.ui.theme.IosOrange
+import com.openminis.app.ui.tokens.MinisTypography
 import com.openminis.app.data.repository.AppIconRepository
 import com.openminis.app.ui.components.MinisTextButton
 
@@ -766,7 +763,7 @@ fun AppearanceScreen(
                         }
                     },
                     leading = {
-                        Text(lang.flag, fontSize = 22.sp, modifier = Modifier.width(30.dp))
+                        Text(lang.flag, fontSize = 22.sp, modifier = Modifier.width(30.dp))  // token-literal-ok: 旗帜 emoji 字形，字号即图形尺寸
                     },
                     showDivider = idx < languageOptions.size - 1,
                 )
@@ -802,7 +799,7 @@ private fun FontScaleSliderRow(
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Text("A", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("A", fontSize = MinisTypography.foot, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Slider(
                 value = sliderPos,
                 onValueChange = { sliderPos = it },
@@ -817,7 +814,7 @@ private fun FontScaleSliderRow(
                     .weight(1f)
                     .padding(horizontal = 8.dp),
             )
-            Text("A", fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("A", fontSize = MinisTypography.type.display.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
     if (showDivider) {

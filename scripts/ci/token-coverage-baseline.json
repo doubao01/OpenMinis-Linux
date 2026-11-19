@@ -603,8 +603,8 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/AppearanceScreen.kt": {
       "color": 1,
-      "sp": 3,
-      "dp": 22
+      "sp": 0,
+      "dp": 21
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/BackgroundSettingsScreen.kt": {
       "color": 0,
@@ -980,6 +980,9 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/CodeEditorField.kt": {
       "163": "20"
+    },
+    "src/android/app/src/main/java/com/openminis/app/ui/settings/AppearanceScreen.kt": {
+      "766": "22 30"
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulEmojiPickerSheet.kt": {
       "62": "17",
