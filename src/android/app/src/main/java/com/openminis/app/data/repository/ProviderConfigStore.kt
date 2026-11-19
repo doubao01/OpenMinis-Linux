@@ -60,10 +60,10 @@ internal class ProviderConfigStore(
         coerceInputValues = true
     }
 
-    // 这个字段是 SharedPreferences 而不是 PrefsHandle，因为三个外部组件把它
-    // 当 SharedPreferences 直接拿去用（ModelCatalogCache / ModelGrouping /
-    // ProviderRepository）。本类内部的读写已全部走 Prefs.file("provider_config")。
-    internal val prefs: SharedPreferences = context.getSharedPreferences("provider_config", Context.MODE_PRIVATE)
+    // 三个外部组件（ModelCatalogCache / ModelGrouping / ProviderRepository）都用它。
+    // 它们现在也收 PrefsHandle，所以这里终于是类型化句柄 —— 之前为了兼容它们
+    // 保留 SharedPreferences，是过渡状态，现在收口了。
+    internal val prefs: com.openminis.app.config.PrefsHandle = com.openminis.app.config.Prefs.file("provider_config")
 
     // [T-android-provider-room-store] Per-row provider config DB. Lives in
     // its own provider.db file so a downgrade to a build that doesn't know

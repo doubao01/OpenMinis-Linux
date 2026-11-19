@@ -4,7 +4,7 @@ package com.openminis.app.config
  * 自动生成 —— 不要手改。
  * 生成器: refactor/tools/gen_prefs_registry.py
  * 源目录: /tmp/oml/src/android/app/src/main/java/com/openminis/app
- * 规模:   90 个 prefs 文件（加密 8）/ 已归属键常量 161 / 166 处使用
+ * 规模:   90 个 prefs 文件（加密 8）/ 已归属键常量 161 / 165 处使用
  *
  * 目的: 把「SharedPreferences 文件名 + 键名」从 93 个文件里的裸字符串收敛为一处
  * 可枚举、可校验、可审计的数据表。设计见 refactor/docs/01-config-unification.md。
@@ -117,7 +117,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "plugin_online_flags", module = "plugins", scope = PrefsScope.PLAIN, openKeySpace = true, note = "3 usages across 1 file(s)"),
         PrefsFileSpec(name = "plugin_online_keys", module = "plugins", scope = PrefsScope.ENCRYPTED, openKeySpace = true, note = "3 usages across 1 file(s)"),
         PrefsFileSpec(name = "plugin_registry", module = "plugins", scope = PrefsScope.PLAIN, keys = mapOf("CACHE_KEY" to "plugin_registry_cache"), note = "3 usages across 2 file(s)"),
-        PrefsFileSpec(name = "provider_config", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("LITERAL_last_used" to "lastUsedModelEntryId", "LITERAL_voice_in" to "voice.input.overrideEntryId", "LITERAL_voice_out" to "voice.output.overrideEntryId"), dynamicPrefixes = listOf("keypool_"), note = "9 usages across 1 file(s)"),
+        PrefsFileSpec(name = "provider_config", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("LITERAL_last_used" to "lastUsedModelEntryId", "LITERAL_voice_in" to "voice.input.overrideEntryId", "LITERAL_voice_out" to "voice.output.overrideEntryId"), dynamicPrefixes = listOf("keypool_", "modelsLastFetchAt_", "voiceShadowDisabled."), note = "8 usages across 1 file(s)"),
         PrefsFileSpec(name = "provider_refresh_marks", module = "data", scope = PrefsScope.EPHEMERAL, openKeySpace = true, note = "3 usages across 1 file(s)"),
         PrefsFileSpec(name = "provider_secrets", module = "data", scope = PrefsScope.ENCRYPTED, note = "2 usages across 2 file(s)"),
         PrefsFileSpec(name = "sandbox_firewall", module = "sandbox", scope = PrefsScope.PLAIN, keys = mapOf("KEY_POLICY" to "policy"), note = "2 usages across 1 file(s)"),

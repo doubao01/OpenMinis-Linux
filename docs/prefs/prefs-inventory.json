@@ -1170,7 +1170,7 @@
         "data"
       ],
       "encrypted": false,
-      "usage_count": 9,
+      "usage_count": 8,
       "usage_files": [
         "data/repository/ProviderConfigStore.kt"
       ],
@@ -1180,7 +1180,9 @@
         "LITERAL_voice_out": "voice.output.overrideEntryId"
       },
       "dyn_keys": [
-        "keypool_"
+        "keypool_",
+        "modelsLastFetchAt_",
+        "voiceShadowDisabled."
       ],
       "open_key_space": false,
       "ephemeral": false
@@ -5903,7 +5905,7 @@
     "prefs_encrypted": 8,
     "key_constants_attributed": 161,
     "orphan_keys": 32,
-    "usage_sites": 166,
+    "usage_sites": 165,
     "usage_files": 96,
     "constant_conflicts": 459
   }
