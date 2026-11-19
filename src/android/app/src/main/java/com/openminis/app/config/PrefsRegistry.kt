@@ -4,7 +4,7 @@ package com.openminis.app.config
  * 自动生成 —— 不要手改。
  * 生成器: refactor/tools/gen_prefs_registry.py
  * 源目录: /tmp/oml/src/android/app/src/main/java/com/openminis/app
- * 规模:   91 个 prefs 文件（加密 8）/ 已归属键常量 153 / 166 处使用
+ * 规模:   90 个 prefs 文件（加密 8）/ 已归属键常量 153 / 165 处使用
  *
  * 目的: 把「SharedPreferences 文件名 + 键名」从 93 个文件里的裸字符串收敛为一处
  * 可枚举、可校验、可审计的数据表。设计见 refactor/docs/01-config-unification.md。
@@ -103,7 +103,6 @@ object PrefsRegistry {
         PrefsFileSpec(name = "minis_quick", module = "quick", scope = PrefsScope.PLAIN, keys = mapOf("KEY_PANEL_AT" to "panel_session_at", "KEY_PANEL_SESSION" to "panel_session_id"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_scheduled_notifications", module = "offload", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "scheduled"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_scheduled_tasks_prefs", module = "scheduled", scope = PrefsScope.PLAIN, keys = mapOf("KEY_TASKS" to "tasks_json"), note = "1 usages across 1 file(s)"),
-        PrefsFileSpec(name = "minis_settings", module = "config", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_storage_scan", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ROOTFS_BYTES" to "ubuntu_rootfs_bytes"), note = "2 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_tool_limits", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_CHARS" to "fileReadMaxChars", "KEY_LINES" to "fileReadMaxLines", "KEY_MAIN_TURNS" to "mainSessionMaxTurns", "KEY_SHELL" to "shellTimeoutSec", "KEY_TURNS" to "subagentMaxTurns", "LITERAL_autoConcurrency" to "autoConcurrency", "LITERAL_toolCallConcurrency" to "toolCallConcurrency"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_unread_registry", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_PREFIX" to "lastReadAt:"), dynamicPrefixes = listOf("lastReadAt:"), note = "1 usages across 1 file(s)"),

@@ -874,22 +874,6 @@
       "ephemeral": false
     },
     {
-      "name": "minis_settings",
-      "module": "config",
-      "modules": [
-        "config"
-      ],
-      "encrypted": false,
-      "usage_count": 1,
-      "usage_files": [
-        "config/ConfigBuiltins.kt"
-      ],
-      "keys": {},
-      "dyn_keys": [],
-      "open_key_space": false,
-      "ephemeral": false
-    },
-    {
       "name": "minis_storage_scan",
       "module": "data",
       "modules": [
@@ -5897,11 +5881,11 @@
     "UNKNOWN_MODEL_KEY"
   ],
   "totals": {
-    "prefs_files": 91,
+    "prefs_files": 90,
     "prefs_encrypted": 8,
     "key_constants_attributed": 153,
     "orphan_keys": 33,
-    "usage_sites": 166,
+    "usage_sites": 165,
     "usage_files": 96,
     "constant_conflicts": 459
   }

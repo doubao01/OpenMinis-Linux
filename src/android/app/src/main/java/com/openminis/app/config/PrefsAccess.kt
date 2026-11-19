@@ -27,6 +27,41 @@ class PrefsHandle internal constructor(
 ) {
     val name: String get() = spec.name
 
+    /**
+     * 把句柄内部的 backend 交给配置字段用。
+     *
+     * `PrefsBoolField` 等字段的主构造函数收 `PrefsBackend`，但那是**不带守卫**的
+     * 原始后端 —— 直接传进去等于绕开了本句柄的键校验。这里返回的是一个在每次
+     * 读写时先过 [check] 的包装。
+     *
+     * `keys()` / `snapshot()` 不校验：它们本来就是给诊断和迁移用的全量视图，
+     * 注册表里没登记的键也得看得见，否则永远查不出漏登记。
+     *
+     * **`write { }` 内部的 put/remove 不过守卫** —— `Writer` 是纯接口，
+     * 没有拦截点。走这条路的调用点必须自己确认键已登记。目前只有
+     * `ConfigBuiltins` 的字段绑定用它，那些键都在注册表里。
+     */
+    fun guardedBackend(): PrefsBackend = object : PrefsBackend {
+        override val name: String get() = spec.name
+        override fun contains(key: String): Boolean = backend.contains(check(key))
+        override fun keys(): Set<String> = backend.keys()
+        override fun snapshot(): Map<String, Any?> = backend.snapshot()
+        override fun readBoolean(key: String, defaultValue: Boolean): Boolean =
+            backend.readBoolean(check(key), defaultValue)
+        override fun readInt(key: String, defaultValue: Int): Int =
+            backend.readInt(check(key), defaultValue)
+        override fun readLong(key: String, defaultValue: Long): Long =
+            backend.readLong(check(key), defaultValue)
+        override fun readFloat(key: String, defaultValue: Float): Float =
+            backend.readFloat(check(key), defaultValue)
+        override fun readString(key: String, defaultValue: String?): String? =
+            backend.readString(check(key), defaultValue)
+        override fun readStringSet(key: String, defaultValue: Set<String>?): Set<String>? =
+            backend.readStringSet(check(key), defaultValue)
+        override fun write(block: PrefsBackend.Writer.() -> Unit) =
+            backend.write(block)
+    }
+
     fun string(key: String, default: String = ""): String = backend.readString(check(key), default) ?: default
 
     fun stringOrNull(key: String): String? = backend.readString(check(key), null)
