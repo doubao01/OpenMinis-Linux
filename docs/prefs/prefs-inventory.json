@@ -158,7 +158,7 @@
       ],
       "keys": {},
       "dyn_keys": [],
-      "open_key_space": false,
+      "open_key_space": true,
       "ephemeral": false
     },
     {
@@ -174,7 +174,7 @@
       ],
       "keys": {},
       "dyn_keys": [],
-      "open_key_space": false,
+      "open_key_space": true,
       "ephemeral": false
     },
     {
@@ -557,7 +557,11 @@
       "usage_files": [
         "mcp/server/McpServerConfigStore.kt"
       ],
-      "keys": {},
+      "keys": {
+        "KEY_ENABLED": "enabled",
+        "KEY_PORT": "port",
+        "KEY_TOKEN": "token"
+      },
       "dyn_keys": [],
       "open_key_space": false,
       "ephemeral": false
@@ -765,7 +769,9 @@
       "usage_files": [
         "network/NetworkSettings.kt"
       ],
-      "keys": {},
+      "keys": {
+        "KEY": "network.settings.v1"
+      },
       "dyn_keys": [],
       "open_key_space": false,
       "ephemeral": false
@@ -1164,7 +1170,7 @@
         "data"
       ],
       "encrypted": false,
-      "usage_count": 8,
+      "usage_count": 9,
       "usage_files": [
         "data/repository/ProviderConfigStore.kt"
       ],
@@ -1260,7 +1266,9 @@
         "notification/SandboxNotifyActions.kt"
       ],
       "keys": {},
-      "dyn_keys": [],
+      "dyn_keys": [
+        "dyn:"
+      ],
       "open_key_space": false,
       "ephemeral": false
     },
@@ -1650,7 +1658,7 @@
       ],
       "keys": {},
       "dyn_keys": [],
-      "open_key_space": false,
+      "open_key_space": true,
       "ephemeral": false
     },
     {
@@ -5893,9 +5901,9 @@
   "totals": {
     "prefs_files": 90,
     "prefs_encrypted": 8,
-    "key_constants_attributed": 157,
+    "key_constants_attributed": 161,
     "orphan_keys": 32,
-    "usage_sites": 165,
+    "usage_sites": 166,
     "usage_files": 96,
     "constant_conflicts": 459
   }

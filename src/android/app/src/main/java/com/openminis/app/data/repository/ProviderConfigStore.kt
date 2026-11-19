@@ -60,6 +60,9 @@ internal class ProviderConfigStore(
         coerceInputValues = true
     }
 
+    // 这个字段是 SharedPreferences 而不是 PrefsHandle，因为三个外部组件把它
+    // 当 SharedPreferences 直接拿去用（ModelCatalogCache / ModelGrouping /
+    // ProviderRepository）。本类内部的读写已全部走 Prefs.file("provider_config")。
     internal val prefs: SharedPreferences = context.getSharedPreferences("provider_config", Context.MODE_PRIVATE)
 
     // [T-android-provider-room-store] Per-row provider config DB. Lives in

@@ -642,12 +642,12 @@ class MinisApp : Application(), ImageLoaderFactory {
 
     // T268: replay pre-T266 alarms/timers from prefs through SET_ALARM/SET_TIMER, then clear the blob (idempotent, past-dated dropped).
     private fun migrateGhostAlarms() {
-        val prefs = getSharedPreferences("minis_alarms_prefs", Context.MODE_PRIVATE)
-        val raw = prefs.getString("alarms_json", null) ?: return
+        val prefs = com.openminis.app.config.Prefs.file("minis_alarms_prefs")
+        val raw = prefs.stringOrNull("alarms_json") ?: return
         if (raw.isBlank() || raw == "[]") return
         val arr = org.json.JSONArray(raw)
         if (arr.length() == 0) {
-            prefs.edit().remove("alarms_json").apply()
+            prefs.remove("alarms_json")
             return
         }
         val now = System.currentTimeMillis()
@@ -692,7 +692,7 @@ class MinisApp : Application(), ImageLoaderFactory {
         // Clear the blob unconditionally — entries we couldn't replay are
         // still useless ghosts, and leaving the blob would re-trigger
         // migration on every launch.
-        prefs.edit().remove("alarms_json").apply()
+        prefs.remove("alarms_json")
         Log.i("MinisApp", "T268 ghost alarm migration: migrated=$migrated skipped=$skipped (prefs cleared)")
     }
 

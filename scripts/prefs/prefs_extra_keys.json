@@ -151,6 +151,38 @@
       "keys": {
         "KEY_DEAD": "dead_ids"
       }
+    },
+    "vscreen": {
+      "openKeySpace": true,
+      "reason": "open-key-space: VscreensStore 是通用 KV 接口（getString/putString/remove/all），键由脚本任意指定"
+    },
+    "backup_rclone_remotes": {
+      "openKeySpace": true,
+      "reason": "open-key-space: 键是用户自定义的 remote 名称"
+    },
+    "backup_rclone_secrets": {
+      "openKeySpace": true,
+      "reason": "open-key-space + encrypted: 加密文件，键是 remote 名称，值是对应的 secret"
+    },
+    "mcp_server": {
+      "keys": {
+        "KEY_ENABLED": "enabled",
+        "KEY_PORT": "port",
+        "KEY_TOKEN": "token"
+      },
+      "reason": "literal-key: 三个常量名不符合 KEY_* 归属规则（KEY_ENABLED 等），扫描器漏抓"
+    },
+    "minis_network": {
+      "keys": {
+        "KEY": "network.settings.v1"
+      },
+      "reason": "literal-key: 常量名叫 KEY（不带前缀），RE_KEY_CONST 要求 KEY* 或 *_KEY 开头"
+    },
+    "sandbox_notify_dyn": {
+      "dynPrefixes": [
+        "dyn:"
+      ],
+      "reason": "dynamic-prefix: 键是 \"dyn:<uuid16>\"，每次注册通知动作生成一个新键，用过即弃"
     }
   }
 }

@@ -25,12 +25,12 @@ class PhoneBackupFolderStore(private val context: Context) {
         val enabled: Boolean = true,
     )
 
-    private val prefs: SharedPreferences =
-        context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private val prefs: com.openminis.app.config.PrefsHandle =
+        com.openminis.app.config.Prefs.file(PREFS)
 
     val folders: List<Folder>
         get() = runCatching {
-            val raw = prefs.getString(KEY, null) ?: return emptyList()
+            val raw = prefs.stringOrNull(KEY) ?: return emptyList()
             json.decodeFromString(ListSerializer(Folder.serializer()), raw)
         }.getOrDefault(emptyList())
 
@@ -83,9 +83,7 @@ class PhoneBackupFolderStore(private val context: Context) {
     }
 
     private fun save(list: List<Folder>) {
-        prefs.edit()
-            .putString(KEY, json.encodeToString(ListSerializer(Folder.serializer()), list))
-            .apply()
+        prefs.set(KEY, json.encodeToString(ListSerializer(Folder.serializer()), list))
     }
 
     companion object {

@@ -139,7 +139,7 @@ internal suspend fun ProviderRepository.loadConfigSuspending(): ProviderConfig {
                         .firstOrNull { it.uuid == legacyLastUsed }
                         ?.let { compositeEntryKey(it.providerInstanceId, it.baseModel.id) }
                     if (rewritten != null) {
-                        prefs.edit().putString(ProviderRepository.KEY_LAST_USED_ENTRY, rewritten).apply()
+                        prefs.set(ProviderRepository.KEY_LAST_USED_ENTRY, rewritten)
                         android.util.Log.i(
                             "ProviderRepo",
                             "[ProviderStore] lastUsedEntryId rewritten ${legacyLastUsed.take(8)} → $rewritten",

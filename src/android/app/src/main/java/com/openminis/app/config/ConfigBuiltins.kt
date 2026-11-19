@@ -481,7 +481,7 @@ internal object ConfigBuiltins {
                     "extraLarge" -> 3
                     else -> throw ConfigError.InvalidValue("Unknown font scale: $token")
                 }
-                prefs.edit().putInt(key, level).apply()
+                prefs.set(key, level)
             },
         )
     }

@@ -21,5 +21,5 @@ internal fun SessionListViewModel.loadCollapsedFolderIds() {
 
 internal fun SessionListViewModel.setCollapsedFolders(ids: Set<String>) {
     collapsedFolderIds.value = ids
-    uiPrefs.edit().putStringSet("collapsedFolderIds", ids).apply()
+    uiPrefs.set("collapsedFolderIds", ids)
 }

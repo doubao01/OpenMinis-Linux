@@ -79,7 +79,7 @@ internal class ProviderCredentialPool(private val context: Context) {
             return
         }
         val raw = json.encodeToString(ListSerializer(String.serializer()), keys)
-        encryptedPrefs.edit().putString(prefsKey(instanceId), raw).apply()
+        encryptedPrefs.set(prefsKey(instanceId), raw)
         // The stored list changed — reset the cursor so rotation restarts
         // from position 0 with the fresh set.
         cursors.remove(instanceId)

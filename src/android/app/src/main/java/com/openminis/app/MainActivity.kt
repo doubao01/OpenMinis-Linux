@@ -733,7 +733,7 @@ class MainActivity : ComponentActivity() {
 
     private fun applySavedLanguage() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
-        val code = getSharedPreferences(PREF_APPEARANCE, MODE_PRIVATE).getString(KEY_LANGUAGE, "") ?: ""
+        val code = com.openminis.app.config.Prefs.file(PREF_APPEARANCE).string(KEY_LANGUAGE, "")
         val localeManager = getSystemService(LocaleManager::class.java) ?: return
         val desired = if (code.isEmpty()) LocaleList.getEmptyLocaleList() else LocaleList.forLanguageTags(code)
         if (localeManager.applicationLocales.toLanguageTags() != desired.toLanguageTags()) {

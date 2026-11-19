@@ -574,7 +574,7 @@ abstract class OAuthManager(
     }
 
     protected fun saveOAuthString(key: String, value: String) {
-        getEncryptedPrefs().edit().putString("oauth_${key}_$instanceId", value).apply()
+        getEncryptedPrefs().set("oauth_${key}_$instanceId", value)
         // A new token bundle supersedes any needs-re-login mark (Claude /
         // Gemini / Kimi persist their bundles through this path).
         if (key == "tokens") {

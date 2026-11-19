@@ -278,7 +278,7 @@ fun AppearanceScreen(
                     selected = themeMode == idx,
                     onSelect = {
                         themeMode = idx
-                        prefs.value.edit().putInt(KEY_THEME_MODE, idx).apply()
+                        prefs.value.set(KEY_THEME_MODE, idx)
                         onThemeChanged(idx)
                     },
                     leading = {
@@ -300,7 +300,7 @@ fun AppearanceScreen(
                 checked = dynamicColor && monetSupported,
                 onCheckedChange = {
                     dynamicColor = it
-                    prefs.value.edit().putBoolean(KEY_DYNAMIC_COLOR, it).apply()
+                    prefs.value.set(KEY_DYNAMIC_COLOR, it)
                 },
                 enabled = monetSupported,
                 showDivider = false,
@@ -326,7 +326,7 @@ fun AppearanceScreen(
                     selected = launchSession == idx,
                     onSelect = {
                         launchSession = idx
-                        prefs.value.edit().putInt(KEY_LAUNCH_SESSION, idx).apply()
+                        prefs.value.set(KEY_LAUNCH_SESSION, idx)
                     },
                     leading = {
                         androidx.compose.material3.Icon(
@@ -357,7 +357,7 @@ fun AppearanceScreen(
                     selected = returnKeyBehavior == row.value,
                     onSelect = {
                         returnKeyBehavior = row.value
-                        prefs.value.edit().putInt(KEY_RETURN_KEY_BEHAVIOR, row.value).apply()
+                        prefs.value.set(KEY_RETURN_KEY_BEHAVIOR, row.value)
                     },
                     leading = {
                         androidx.compose.material3.Icon(
@@ -384,7 +384,7 @@ fun AppearanceScreen(
                 checked = keepScreenAwake,
                 onCheckedChange = {
                     keepScreenAwake = it
-                    prefs.value.edit().putBoolean(KEY_KEEP_SCREEN_AWAKE, it).apply()
+                    prefs.value.set(KEY_KEEP_SCREEN_AWAKE, it)
                 },
                 showDivider = false,
             )
@@ -421,7 +421,7 @@ fun AppearanceScreen(
                 checked = showFloatingToolBar,
                 onCheckedChange = {
                     showFloatingToolBar = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_FLOATING_TOOL_BAR, it).apply()
+                    prefs.value.set(KEY_SHOW_FLOATING_TOOL_BAR, it)
                 },
             )
             // [P0-4] "Tool Preview Window" switch removed (ToolActivityPill has no preview); KEY_TOOL_PREVIEW stays for compat.
@@ -433,7 +433,7 @@ fun AppearanceScreen(
                 checked = showCompletedToolCards,
                 onCheckedChange = {
                     showCompletedToolCards = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_COMPLETED_TOOL_CARDS, it).apply()
+                    prefs.value.set(KEY_SHOW_COMPLETED_TOOL_CARDS, it)
                 },
             )
             SettingsSwitchRow(
@@ -443,7 +443,7 @@ fun AppearanceScreen(
                 checked = showSubAgentBar,
                 onCheckedChange = {
                     showSubAgentBar = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_SUBAGENT_BAR, it).apply()
+                    prefs.value.set(KEY_SHOW_SUBAGENT_BAR, it)
                 },
             )
             SettingsSwitchRow(
@@ -454,7 +454,7 @@ fun AppearanceScreen(
                 checked = showMicButton,
                 onCheckedChange = {
                     showMicButton = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_MIC_BUTTON, it).apply()
+                    prefs.value.set(KEY_SHOW_MIC_BUTTON, it)
                 },
                 showDivider = true,
             )
@@ -467,7 +467,7 @@ fun AppearanceScreen(
                 checked = showMessageUsage,
                 onCheckedChange = {
                     showMessageUsage = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_MESSAGE_TOKEN_USAGE, it).apply()
+                    prefs.value.set(KEY_SHOW_MESSAGE_TOKEN_USAGE, it)
                 },
             )
             // [T-android-composer-context-glow] Composer edge glow near the context cap.
@@ -479,7 +479,7 @@ fun AppearanceScreen(
                 checked = composerContextGlow,
                 onCheckedChange = {
                     composerContextGlow = it
-                    prefs.value.edit().putBoolean(KEY_COMPOSER_CONTEXT_GLOW, it).apply()
+                    prefs.value.set(KEY_COMPOSER_CONTEXT_GLOW, it)
                 },
                 showDivider = false,
             )
@@ -498,11 +498,11 @@ fun AppearanceScreen(
                 checked = autoExpandThinking,
                 onCheckedChange = {
                     autoExpandThinking = it
-                    prefs.value.edit().putBoolean(KEY_AUTO_EXPAND_THINKING, it).apply()
+                    prefs.value.set(KEY_AUTO_EXPAND_THINKING, it)
                 },
                 showDivider = true,
             )
-            ShowFullThinkingRow(showFullThinking) { showFullThinking = it; prefs.value.edit().putBoolean(KEY_SHOW_FULL_THINKING, it).apply() }
+            ShowFullThinkingRow(showFullThinking) { showFullThinking = it; prefs.value.set(KEY_SHOW_FULL_THINKING, it) }
             SettingsSwitchRow(
                 icon = Icons.Outlined.ViewAgenda,
                 iconColor = tilePurple,
@@ -511,7 +511,7 @@ fun AppearanceScreen(
                 checked = foldAiProcess,
                 onCheckedChange = {
                     foldAiProcess = it
-                    prefs.value.edit().putBoolean(KEY_FOLD_AI_PROCESS, it).apply()
+                    prefs.value.set(KEY_FOLD_AI_PROCESS, it)
                 },
                 showDivider = false,
             )
@@ -530,7 +530,7 @@ fun AppearanceScreen(
                 checked = autoFocusAfterReply,
                 onCheckedChange = {
                     autoFocusAfterReply = it
-                    prefs.value.edit().putBoolean(KEY_AUTO_FOCUS_AFTER_REPLY, it).apply()
+                    prefs.value.set(KEY_AUTO_FOCUS_AFTER_REPLY, it)
                 },
                 showDivider = false,
             )
@@ -550,7 +550,7 @@ fun AppearanceScreen(
                 checked = showChatTitle,
                 onCheckedChange = {
                     showChatTitle = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_CHAT_TITLE, it).apply()
+                    prefs.value.set(KEY_SHOW_CHAT_TITLE, it)
                 },
                 showDivider = false,
             )
@@ -570,7 +570,7 @@ fun AppearanceScreen(
                 checked = autoGrouping,
                 onCheckedChange = {
                     autoGrouping = it
-                    prefs.value.edit().putBoolean(KEY_AUTO_GROUPING, it).apply()
+                    prefs.value.set(KEY_AUTO_GROUPING, it)
                 },
                 showDivider = false,
             )
@@ -595,7 +595,7 @@ fun AppearanceScreen(
                 level = chatInputLevel,
                 onLevelChange = {
                     chatInputLevel = it
-                    prefs.value.edit().putInt(KEY_FONT_CHAT_INPUT, it).apply()
+                    prefs.value.set(KEY_FONT_CHAT_INPUT, it)
                 },
                 showDivider = true,
             )
@@ -604,7 +604,7 @@ fun AppearanceScreen(
                 level = messageLevel,
                 onLevelChange = {
                     messageLevel = it
-                    prefs.value.edit().putInt(KEY_FONT_MESSAGE, it).apply()
+                    prefs.value.set(KEY_FONT_MESSAGE, it)
                 },
                 showDivider = true,
             )
@@ -613,7 +613,7 @@ fun AppearanceScreen(
                 level = appBaseLevel,
                 onLevelChange = {
                     appBaseLevel = it
-                    prefs.value.edit().putInt(KEY_FONT_APP_BASE, it).apply()
+                    prefs.value.set(KEY_FONT_APP_BASE, it)
                 },
                 showDivider = fontsModified,
             )
@@ -626,11 +626,10 @@ fun AppearanceScreen(
                 ) {
                     MinisTextButton(onClick = {
                         chatInputLevel = 0; messageLevel = 0; appBaseLevel = 0
-                        prefs.value.edit()
-                            .putInt(KEY_FONT_CHAT_INPUT, 0)
-                            .putInt(KEY_FONT_MESSAGE, 0)
-                            .putInt(KEY_FONT_APP_BASE, 0)
-                            .apply()
+                        // 三个字号同事务：分开写会让界面短暂显示「聊天恢复、消息没恢复」
+                        prefs.value.write {
+                            putInt(KEY_FONT_CHAT_INPUT, 0); putInt(KEY_FONT_MESSAGE, 0); putInt(KEY_FONT_APP_BASE, 0)
+                        }
                     }) {
                         Text(stringResource(R.string.appearance_font_reset), color = MaterialTheme.colorScheme.error)
                     }
@@ -753,7 +752,7 @@ fun AppearanceScreen(
                     selected = selectedLanguage == lang.code,
                     onSelect = {
                         selectedLanguage = lang.code
-                        prefs.value.edit().putString(KEY_LANGUAGE, lang.code).apply()
+                        prefs.value.set(KEY_LANGUAGE, lang.code)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             val lm = context.getSystemService(LocaleManager::class.java)
                             lm?.applicationLocales = if (lang.code.isEmpty()) {
