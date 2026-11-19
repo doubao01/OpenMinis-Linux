@@ -62,6 +62,7 @@ import com.openminis.app.data.repository.ProviderRepository
 import com.openminis.app.data.repository.MemoryRepository
 import com.openminis.app.data.repository.SkillRepository
 import com.openminis.app.data.repository.MCPRepository
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * ChatScreen top bar TITLE column: session title + model/group/provider rows
@@ -143,7 +144,7 @@ internal fun ChatTopBarTitle(
                             Text(
                                 text = displayTitle,
                                 fontSize = 16.sp,
-                                lineHeight = 19.sp,
+                                lineHeight = MinisTypography.type.lineHeightTight(16f).sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = ChatColors.primaryText,
                                 maxLines = 1,
@@ -235,7 +236,7 @@ internal fun ChatTopBarTitle(
                                         Text(
                                             text = groupNameDisplay,
                                             fontSize = 12.sp,
-                                            lineHeight = 14.sp,
+                                            lineHeight = MinisTypography.type.lineHeightTight(12f).sp,
                                             fontWeight = FontWeight.Medium,
                                             color = ChatColors.secondaryText,
                                             maxLines = 1,
@@ -305,7 +306,7 @@ internal fun ChatTopBarTitle(
                                         Text(
                                             text = modelName.ifEmpty { providerName },
                                             fontSize = 11.sp,
-                                            lineHeight = 13.sp,
+                                            lineHeight = MinisTypography.type.lineHeightTight(11f).sp,
                                             color = ChatColors.tertiaryText,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis,

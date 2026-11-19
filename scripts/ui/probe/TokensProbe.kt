@@ -211,6 +211,30 @@ fun main() {
         "16=%.3f 57=%.3f".format(lh(16f) / 16f, lh(57f) / 57f))
     check("未知字号有兜底（不为 0）", lh(200f) > 0f, "%.1f".format(lh(200f)))
 
+    // 13. 锚点插值：中间字号必须落在相邻实测值之间。
+    // 旧版 when 阶梯在 16 之后直接跳到 1.27，16.5/17/18/19/20 全被压平 ——
+    // 16.5sp 输入框（实测 24）被算成 20.9，比 16sp 正文的 24 还紧。
+    check("16.5sp 输入框行高应为 24（与正文同高，不能更紧）",
+        lh(16.5f) in 23.5f..24.5f, "%.2f".format(lh(16.5f)))
+    check("17sp 行高应介于 16 与 22 之间", lh(17f) > lh(16f) && lh(17f) < lh(22f),
+        "17=%.2f 16=%.2f 22=%.2f".format(lh(17f), lh(16f), lh(22f)))
+    check("18sp 行高应低于 22sp", lh(18f) < lh(22f),
+        "18=%.2f 22=%.2f".format(lh(18f), lh(22f)))
+    var monotone = true
+    var prevH = 0f
+    var sz = 8f
+    while (sz <= 72f) {
+        val h = lh(sz)
+        if (h < prevH) monotone = false
+        if (h <= sz) monotone = false
+        prevH = h
+        sz += 0.5f
+    }
+    check("行高随字号半档步进单调且恒大于字号", monotone)
+    // 锚点处必须精确命中实测值，不能靠插值近似
+    check("锚点 11sp = 14.5", lh(11f) in 14.4f..14.6f, "%.2f".format(lh(11f)))
+    check("锚点 14sp = 20", lh(14f) in 19.9f..20.1f, "%.2f".format(lh(14f)))
+
     println()
     println("通过 $pass 项，失败 $fail 项")
     if (fail > 0) {

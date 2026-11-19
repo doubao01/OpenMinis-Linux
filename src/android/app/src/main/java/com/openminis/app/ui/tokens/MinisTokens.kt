@@ -4,7 +4,7 @@ package com.openminis.app.ui.tokens
  * 自动生成 —— 不要手改。生成器: refactor/tools/gen_tokens.py
  *
  * 扫描事实：420 个 ui 下的 .kt 文件 -> Color(0x...): 284 处 / 131 个不同色值；
- * dp 字面量 3515 处 / 83 个不同值；sp 362 处。
+ * dp 字面量 3515 处 / 83 个不同值；sp 347 处。
  * 本文件命名 25 个色值，当前覆盖 123/284 = 43% 的颜色使用点；
  * 未命名的色值留在原地，由 refactor/tools/check_ui_tokens.py 的棘轮逐步压制。
  *
@@ -128,17 +128,6 @@ object RawSpace {
     const val touchTargetMin: Float = 48f  // 无障碍硬要求，不是审美
 }
 
-/** 字号原语。实测只有 8 个不同值，集中度极高，直接命名。 */
-object RawType {
-    const val cap2: Float = 9f  // x 13
-    const val cap: Float = 11f  // x 70
-    const val foot: Float = 12f  // x 64
-    const val body: Float = 13f  // x 56
-    const val bodyLg: Float = 14f  // x 36
-    const val title: Float = 15f  // x 18
-    const val titleLg: Float = 16f  // x 25
-    const val head: Float = 18f  // x 12
-}
 
 /**
  * 语义色。取值来自 RawColors，但每个字段回答的是"用在哪"，而不是"是什么颜色"。
@@ -366,51 +355,103 @@ data class MinisDimens(
     }
 }
 
-/** 字号 + 行高。行高按 1.35 比例生成 —— 单点定义，改一处全站一致。 */
+/** 字号 + 行高。字号是离散档位，行高是连续插值 —— 两者性质不同，别混用。 */
 data class MinisType(
     val cap2: Float = 9f, val cap: Float = 11f, val foot: Float = 12f,
     val body: Float = 13f, val bodyLg: Float = 14f, val title: Float = 15f,
     val titleLg: Float = 16f, val head: Float = 18f,
+    /** 输入框 / 用户气泡 / 代码编辑器。这三处都是多行可编辑区，16.5 是字宽与
+     *  可读性的折中：再小输入时看不住，再大又把气泡撑宽、一行塞不下几个字。 */
+    val bodyInput: Float = 16.5f,
 ) {
     /**
-     * 行高。**不是** 字号 × 单一比例 —— 真实设计不这样。
+     * 行高 = 字号代入实测曲线。**不是** 字号 × 单一比例 —— 真实设计不这样。
      *
-     * 全仓实测 57 组多行 fontSize/lineHeight 配对（已排除 2 组单行标签，
-     * 那些把 lineHeight 压到等于 fontSize 是为消除行间空隙，属于刻意做法）：
+     * 全仓实测 59 组多行 fontSize/lineHeight 配对（已排除单行标签，那些把
+     * lineHeight 压到等于 fontSize 是为消除行间空隙，属于刻意做法），按字号
+     * 取行高中位数得到锚点（字号 → 行高）：
      *
-     *   字号 9-11  → 比值 1.20-1.32（小字紧凑，否则一屏放不下几条）
-     *   字号 12-16 → 比值 1.38-1.50（正文需要松，这是可读性的主体）
-     *   字号 22+   → 比值 1.12-1.33（显示字号反而收紧，否则行间裂开）
+     *    9 → 11    12 → 17    16 → 24   28 → 36
+     *   10 → 12    13 → 18   16.5 → 24   32 → 40
+     *   11 → 14.5  14 → 20    22 → 28   36 → 44
+     *   15 → 22                          45 → 52
+     *                                    57 → 64
      *
-     * 呈倒 U 形，不是单调的。旧版写死 `size * 1.35f`，把这条曲线压成一个点：
-     * 9sp 会被拉松到 12.2（实际 11），16sp 会被压紧到 21.6（实际 24）。
+     * 16 与 16.5 都是 24：16.5 是输入框/气泡，它不能比正文更松，否则输入时
+     * 光标与文字的相对位置看起来是飘的。这一段是平台，不是断档。
      *
-     * 未知字号退回 1.35（旧行为），保证调用方不会拿到 0。
+     * 比值呈倒 U 形（1.20 → 1.50 → 1.12）：小字要紧凑、正文要松、显示字号
+     * 要收紧。这是三条不同曲线，不是一条按比例缩放的线。
+     *
+     * 前两版都是错的，错法不同：
+     *   1. `size * 1.35f` 单点 —— 把曲线压成一个点。9sp 拉松到 12.2（实际 11），
+     *      16sp 压紧到 21.6（实际 24），正文最挤、注脚最松，正好反了。
+     *   2. `when` 阶梯 —— 16 之后直接 `size <= 22f -> 1.27f`，于是
+     *      16.5/17/18/19/20 全拿到 1.27。16.5sp 输入框（实测 24）被算成 20.9，
+     *      比 16sp 正文的 24 还紧；17-20 的 20 处调用点一并被压平。
+     *      阶梯本质是分段常数，跨档必然跳变，档与档之间一律错。
+     *
+     * 现在按锚点线性插值：任何字号都落在相邻两个实测值之间，不存在跨档跳变，
+     * 也不再需要「未知字号」兜底分支。超出实测范围按端点比值外推（9→11 和
+     * 57→64 的比值），调用方拿到的是有限正值。
+     *
+     * 插值取相邻锚点连直线，比真实曲线略保守：拐点附近宁可松一点也不挤。
+     * 挤压是看得见的排版 bug，松一点只浪费几像素。
      */
     fun lineHeight(size: Float): Float {
-        val ratio = when {
-            size <= 9f -> 1.22f
-            size <= 10f -> 1.20f
-            size <= 11f -> 1.32f
-            size <= 12f -> 1.42f
-            size <= 13f -> 1.38f
-            size <= 14f -> 1.43f
-            size <= 15f -> 1.47f
-            size <= 16f -> 1.50f
-            size <= 22f -> 1.27f
-            size <= 24f -> 1.33f
-            size <= 28f -> 1.29f
-            size <= 32f -> 1.25f
-            size <= 36f -> 1.22f
-            size <= 45f -> 1.16f
-            size <= 57f -> 1.12f
-            else -> 1.35f
+        val first = LH_SIZES[0]
+        val last = LH_SIZES[LH_SIZES.size - 1]
+        return when {
+            size <= first -> size * (LH_HEIGHTS[0] / first)
+            size >= last -> size * (LH_HEIGHTS[LH_HEIGHTS.size - 1] / last)
+            else -> {
+                var i = 0
+                while (i < LH_SIZES.size - 2 && size > LH_SIZES[i + 1]) i++
+                val x0 = LH_SIZES[i]
+                val y0 = LH_HEIGHTS[i]
+                val x1 = LH_SIZES[i + 1]
+                val y1 = LH_HEIGHTS[i + 1]
+                y0 + (y1 - y0) * ((size - x0) / (x1 - x0))
+            }
         }
-        return size * ratio
     }
+
+    /**
+     * 单行标签行高系数。maxLines=1 + noFontPad 的文本用它，**不要**用 [lineHeight]。
+     *
+     * 为什么单独给：单行文本的高度直接决定栏高、胶囊高度、列表行高。这类文本
+     * 处处被刻意压紧（实测系数 1.14–1.23，中位 1.188），目的是让 6dp/8dp 的
+     * padding 上下均匀。用多行曲线给它们会让 16sp 标题的栏高从 19 撑到 24，
+     * 顶栏立刻高出一截 —— 这不是排版宽松，是布局错位。
+     *
+     * 实测覆盖（系数 1.18 与真实值的偏差）：
+     *   11sp → 13（-0.02）   14sp → 16（+0.52）
+     *   12sp → 14（+0.16）   15sp → 18（-0.30）
+     *   13sp → 16（-0.66）   16sp → 19（-0.12）
+     * 全部落在 ±0.7sp 内，比任何一条统一曲线都准。
+     */
+    fun lineHeightTight(size: Float): Float = size * 1.18f
+
+    /**
+     * 等宽文本行高系数（日志、代码块、路径显示）。
+     *
+     * 等宽字体的字形高度与比例字体不同，同字号需要更大行距才不粘连；这类文本
+     * 是给人逐行扫的，行距偏大反而好读。实测 11sp→16（1.455）、12sp→16（1.333），
+     * 取 1.35 居中：11sp 得 14.85（比实测紧 1.15，日志要一屏塞更多行），
+     * 12sp 得 16.2（几乎命中 16）。
+     */
+    fun lineHeightMono(size: Float): Float = size * 1.35f
 
     companion object {
         val Default = MinisType()
+
+        /** 实测行高锚点，必须与 [LH_HEIGHTS] 等长、严格递增。守卫会校验。 */
+        val LH_SIZES = floatArrayOf(
+            9f, 10f, 11f, 12f, 13f, 14f, 15f, 16f, 16.5f, 22f, 24f, 28f, 32f, 36f, 45f, 57f,
+        )
+        val LH_HEIGHTS = floatArrayOf(
+            11f, 12f, 14.5f, 17f, 18f, 20f, 22f, 24f, 24f, 28f, 32f, 36f, 40f, 44f, 52f, 64f,
+        )
     }
 }
 

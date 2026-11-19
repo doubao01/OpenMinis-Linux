@@ -91,6 +91,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.sp
 import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.theme.m3Icon
+import com.openminis.app.ui.tokens.MinisTypography
 /**
  * The page URL a `browser_use` block points at: [block]'s live `browserURL` →
  * its own `url` argument ([argsUrl]) → the nearest PRECEDING `browser_use`
@@ -869,7 +870,7 @@ internal fun ToolDetailSheet(
                                         fontSize = 13.sp,
                                         fontFamily = FontFamily.Monospace,
                                         color = ChatColors.primaryText,
-                                        lineHeight = 16.sp,
+                                        lineHeight = MinisTypography.type.lineHeightMono(13f).sp,
                                         modifier = Modifier.padding(14.dp),
                                     )
                                 }
@@ -1047,12 +1048,11 @@ internal fun ToolDetailSheet(
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    // Title + subtitle
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = toolTitleLabel(block.toolName),
                             fontSize = 14.sp,
-                            lineHeight = 16.sp,
+                            lineHeight = MinisTypography.type.lineHeightTight(14f).sp,
                             fontWeight = FontWeight.SemiBold,
                             color = ChatColors.primaryText,
                             maxLines = 1,
@@ -1061,7 +1061,7 @@ internal fun ToolDetailSheet(
                         Text(
                             text = block.toolTitle.ifEmpty { block.toolName },
                             fontSize = 12.sp,
-                            lineHeight = 14.sp,
+                            lineHeight = MinisTypography.type.lineHeightTight(12f).sp,
                             color = ChatColors.secondaryText,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

@@ -267,38 +267,98 @@ def check_dimens_monotonic(src: str) -> list:
 
 
 def check_lineheight_ladder(src: str) -> list:
-    """MinisType.lineHeight 的比值表必须让**实际行高**随字号严格递增。
+    """MinisType.lineHeight 的实测锚点必须让**实际行高**随字号严格递增，且插值无缝。
 
-    这条曲线是倒 U 形：9sp 紧（1.22）、16sp 最松（1.50）、57sp 又收紧（1.12）。
-    比值本身不是单调的，所以不能直接校验比值 —— 要代入字号算出实际行高再比。
-    真实会犯的错是把某一档的比值手滑写错（例如 16sp 的 1.50 写成 1.05），
-    这时 16sp 的行高 16.8 会低于 15sp 的 22.05，两档倒挂而编译、渲染都不报错。
+    这条曲线是倒 U 形：9sp 紧（11）、16sp 最松（24）、57sp 又收紧（64）。
+    比值本身不单调，所以不能比比值 —— 要代入字号算实际行高再比。
+
+    真会犯的错有三类，编译和渲染都不报错：
+      1. 锚点数组长度不一致 → 插值越界或错位取点。
+      2. 某个锚点行高手滑（16sp 的 24 写成 16.8）→ 相邻字号行高倒挂。
+      3. 回退成 `when` 分段常数阶梯 → 档与档之间跨 1sp 就跳变，16.5/17/18
+         这类中间字号一律错（历史上真发生过：16.5sp 输入框被算成 20.9，
+         比 16sp 正文的 24 还紧）。
+    所以第三条也要守：lineHeight 里出现 `size <= ... ->` 就是退回阶梯了。
     """
     m = re.search(r'fun lineHeight\(size: Float\): Float \{(.*?)\n    \}', src, re.S)
     if not m:
         return ['MinisType.lineHeight 未找到 —— 正则失效或函数被重写']
-
     body = m.group(1)
-    steps = [(float(a), float(b)) for a, b in
-             re.findall(r'size <= ([0-9.]+)f -> ([0-9.]+)f', body)]
-    if len(steps) < 5:
-        return [f'MinisType.lineHeight 只解析到 {len(steps)} 档，少于 5 档 —— 正则失效']
 
     fails = []
-    probes = [(s, s * r) for s, r in steps]
-    for (s1, h1), (s2, h2) in zip(probes, probes[1:]):
-        if h2 < h1:
-            fails.append(f'MinisType.lineHeight: {s2:g}sp 行高 {h2:.1f} < '
-                         f'{s1:g}sp 的 {h1:.1f}（越大字行距越紧，读起来会挤成一坨）')
-        elif abs(h2 - h1) < 0.05:
-            fails.append(f'MinisType.lineHeight: {s1:g}sp 与 {s2:g}sp 行高塌成同值'
-                         f' {h1:.1f}（阶梯断档）')
 
-    # 正文必须比标题松、比小字松 —— 这是这条曲线存在的理由。
-    r16 = next((r for s, r in steps if s == 16.0), None)
-    r9 = next((r for s, r in steps if s == 9.0), None)
-    if r16 and r9 and r16 <= r9:
-        fails.append(f'MinisType.lineHeight: 16sp 比值 {r16} 未高于 9sp 的 {r9}，'
+    # 3. 不许退回分段常数阶梯
+    if re.search(r'size <= [0-9.]+f ->', body):
+        fails.append('MinisType.lineHeight 退回 when 阶梯（分段常数）：'
+                     '跨档跳变，16.5/17/18 这类中间字号会被算错。应改为锚点插值')
+
+    def anchors(name: str):
+        mm = re.search(rf'val {name} = floatArrayOf\((.*?)\)', src, re.S)
+        if not mm:
+            return None
+        vals = [float(v) for v in re.findall(r'([0-9.]+)f', mm.group(1))]
+        return vals or None
+
+    sizes = anchors('LH_SIZES')
+    heights = anchors('LH_HEIGHTS')
+    if sizes is None or heights is None:
+        return fails + ['MinisType 缺少 LH_SIZES / LH_HEIGHTS 锚点数组']
+
+    if len(sizes) != len(heights):
+        fails.append(f'LH_SIZES({len(sizes)}) 与 LH_HEIGHTS({len(heights)}) 长度不一致，'
+                     '插值会取错点或越界')
+        return fails
+    if len(sizes) < 5:
+        return fails + [f'行高锚点只解析到 {len(sizes)} 个，少于 5 个 —— 正则失效']
+
+    for a, b in zip(sizes, sizes[1:]):
+        if b <= a:
+            fails.append(f'LH_SIZES 未严格递增：{a:g} → {b:g}（插值分母为 0 或负）')
+    for a, b in zip(heights, heights[1:]):
+        if b < a:
+            fails.append(f'LH_HEIGHTS 倒挂：{a:g} → {b:g}'
+                         f'（越大字行距越紧，读起来会挤成一坨）')
+    if fails:
+        return fails
+    # 允许相等但只允许一段：16/16.5 是刻意压平的平台（输入框不能比正文松）。
+    # 连续两段相等说明表被填坏了，不是有意为之。
+    flat = sum(1 for a, b in zip(heights, heights[1:]) if b == a)
+    if flat > 1:
+        fails.append(f'LH_HEIGHTS 有 {flat} 段相邻相等（只允许 16→16.5 一段平台），'
+                     '其余档次被压平了')
+
+    # 在真实字号上验插值结果：必须无跳变、且始终大于字号本身
+    def interp(size: float) -> float:
+        if size <= sizes[0]:
+            return size * (heights[0] / sizes[0])
+        if size >= sizes[-1]:
+            return size * (heights[-1] / sizes[-1])
+        for i in range(len(sizes) - 1):
+            if size <= sizes[i + 1]:
+                x0, y0, x1, y1 = sizes[i], heights[i], sizes[i + 1], heights[i + 1]
+                return y0 + (y1 - y0) * ((size - x0) / (x1 - x0))
+        return heights[-1]
+
+    probes = [8, 9, 10, 11, 12, 13, 14, 15, 16, 16.5, 17, 18, 19, 20, 22, 24, 28, 32, 36, 45, 52, 57, 64]
+    prev = None
+    for s in probes:
+        h = interp(float(s))
+        if h <= s:
+            fails.append(f'{s:g}sp 插值行高 {h:.2f} 未大于字号本身（行会重叠）')
+        if prev is not None:
+            ps, ph = prev
+            plateau = (ps, s) == (16, 16.5)  # 唯一允许的平台段
+            if h < ph or (h == ph and not plateau):
+                fails.append(f'{s:g}sp 行高 {h:.2f} 不高于 {ps:g}sp 的 {ph:.2f}'
+                             f'（行高必须随字号单调递增）')
+            elif s - ps <= 0.6 and h - ph > (s - ps) * 2.2:
+                fails.append(f'{ps:g}→{s:g}sp 行高从 {ph:.2f} 跳到 {h:.2f}'
+                             f'（跨档跳变，中间字号会被压平）')
+        prev = (s, h)
+
+    # 正文必须比小字松 —— 这是这条曲线存在的理由
+    if interp(16.0) <= interp(9.0):
+        fails.append(f'16sp 行高 {interp(16):.2f} 未高于 9sp 的 {interp(9):.2f}，'
                      f'正文该比注脚松')
     return fails
 

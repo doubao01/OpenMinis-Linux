@@ -40,6 +40,7 @@ import com.openminis.app.quota.QuotaStore
 import com.openminis.app.quota.QuotaTone
 import com.openminis.app.quota.QuotaToneRules
 import com.openminis.app.ui.theme.LocalChatPalette
+import com.openminis.app.ui.tokens.MinisTypography
 
 // [T-provider-quota P2] Lightweight quota hints for the model picker, the
 // Model Group rows and the chat nav bar. Port of iOS QuotaPickerHints.swift.
@@ -114,7 +115,7 @@ fun QuotaSectionHeaderBadge(instanceId: String, onTap: (() -> Unit)?) {
         Text(
             text,
             fontSize = 11.sp,
-            lineHeight = 13.sp,
+            lineHeight = MinisTypography.type.lineHeightTight(11f).sp,
             fontWeight = FontWeight.Medium,
             color = fg,
             maxLines = 1,

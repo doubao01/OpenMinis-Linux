@@ -53,6 +53,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.verticalScroll
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * A compact code editor surface: line-number gutter, monospace text, syntax
@@ -115,8 +116,8 @@ fun CodeEditorField(
             // transition does not visually jump between typefaces.
             TextStyle(
                 fontFamily = FontFamily.Default,
-                fontSize = 16.5.sp,
-                lineHeight = 24.sp,
+                fontSize = MinisTypography.type.bodyInput.sp,
+                lineHeight = MinisTypography.type.lineHeightMono(MinisTypography.type.bodyInput).sp,
                 color = baseColor,
                 platformStyle = PlatformTextStyle(includeFontPadding = false),
             )

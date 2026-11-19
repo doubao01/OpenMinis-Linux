@@ -4323,7 +4323,7 @@ fun ChatScreen(
                         // enabling the screen reader mid-session takes effect.
                         val screenReaderEnabled = rememberScreenReaderEnabled()
                         val mergedTextStyle = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 16.5.sp * chatInputFontScale,
+                            fontSize = composerFontSize(chatInputFontScale).sp, lineHeight = composerLineHeight(chatInputFontScale).sp,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         // [T-android-enter-to-send-broken] Live read of the
@@ -4749,7 +4749,7 @@ fun ChatScreen(
                                             Text(
                                                 stringResource(R.string.chat_input_placeholder_group),
                                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
-                                                fontSize = 16.5.sp * chatInputFontScale,
+                                                fontSize = composerFontSize(chatInputFontScale).sp,
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis,
                                             )
@@ -4768,7 +4768,7 @@ fun ChatScreen(
                                             Text(
                                                 composerPlaceholderText(idx, soulName.name),
                                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
-                                                fontSize = 16.5.sp * chatInputFontScale,
+                                                fontSize = composerFontSize(chatInputFontScale).sp,
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis,
                                             )
