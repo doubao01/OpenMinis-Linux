@@ -85,6 +85,25 @@ class PrefsHandle internal constructor(
     fun snapshot(): Map<String, Any?> = backend.snapshot()
 
     /**
+     * 清空本文件全部键，返回删掉的个数。
+     *
+     * 用于清理已退休功能的遗留数据 —— `ProviderConfigStore.purgeRetiredBuiltInLaneFiles`
+     * 就是这么清 `"a2a_gateway"` 的。
+     *
+     * 只在开放键空间上允许：对已登记的文件调 clear() 等于静默删掉用户配置，
+     * 那必须由更明确的调用点负责，不该是一个通用方法顺手做到的事。
+     */
+    fun clear(): Int {
+        require(spec.openKeySpace) {
+            "clear() only allowed on open-key-space files; ${spec.name} has a fixed registry"
+        }
+        val victims = backend.keys()
+        if (victims.isEmpty()) return 0
+        backend.write { victims.forEach { remove(it) } }
+        return victims.size
+    }
+
+    /**
      * 删除命中 [prefix] 的全部键，返回删掉的个数。
      *
      * 这是 `prefs.all.keys.filter { it.startsWith(prefix) }` 的类型化版本 ——

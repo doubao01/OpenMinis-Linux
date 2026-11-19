@@ -49,11 +49,41 @@
     },
     "provider_refresh_marks": {
       "ephemeral": true,
-      "reason": "ephemeral: 刷新时间戳，过期即失效"
+      "reason": "open-key-space + ephemeral: 键是 provider instanceId；刷新结果过期即失效",
+      "openKeySpace": true
     },
     "update_download_prefs": {
       "ephemeral": true,
       "reason": "ephemeral: 下载进度，进程重启即废弃"
+    },
+    "minis_tool_limits": {
+      "keys": {
+        "LITERAL_toolCallConcurrency": "toolCallConcurrency",
+        "LITERAL_autoConcurrency": "autoConcurrency"
+      },
+      "reason": "literal-key: 源码直接写字面量（无 const），扫描器抓不到"
+    },
+    "skill_user_disabled": {
+      "keys": {
+        "LITERAL_seeded_from_db": "seeded_from_db",
+        "LITERAL_ids": "ids"
+      },
+      "reason": "literal-key: 源码用 private val/直接字面量（seeded_from_db、ids）"
+    },
+    "a2a_gateway": {
+      "openKeySpace": true,
+      "reason": "open-key-space: 已退休功能的遗留文件，只做清空（legacy.all / clear）"
+    },
+    "provider_config": {
+      "keys": {
+        "LITERAL_voice_in": "voice.input.overrideEntryId",
+        "LITERAL_voice_out": "voice.output.overrideEntryId",
+        "LITERAL_last_used": "lastUsedModelEntryId"
+      },
+      "reason": "literal-key + dynamic-prefix: voice.*.overrideEntryId 与 lastUsedModelEntryId 直接写字面量（后者常量在 ProviderRepository 里）；keypool_<instanceId> 由 purgeLegacy 按前缀扫描",
+      "dynPrefixes": [
+        "keypool_"
+      ]
     }
   }
 }

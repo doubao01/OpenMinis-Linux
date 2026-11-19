@@ -32,7 +32,7 @@
       ],
       "keys": {},
       "dyn_keys": [],
-      "open_key_space": false,
+      "open_key_space": true,
       "ephemeral": false
     },
     {
@@ -913,7 +913,9 @@
         "KEY_LINES": "fileReadMaxLines",
         "KEY_MAIN_TURNS": "mainSessionMaxTurns",
         "KEY_SHELL": "shellTimeoutSec",
-        "KEY_TURNS": "subagentMaxTurns"
+        "KEY_TURNS": "subagentMaxTurns",
+        "LITERAL_autoConcurrency": "autoConcurrency",
+        "LITERAL_toolCallConcurrency": "toolCallConcurrency"
       },
       "dyn_keys": [],
       "open_key_space": false,
@@ -1161,12 +1163,18 @@
         "data"
       ],
       "encrypted": false,
-      "usage_count": 1,
+      "usage_count": 8,
       "usage_files": [
         "data/repository/ProviderConfigStore.kt"
       ],
-      "keys": {},
-      "dyn_keys": [],
+      "keys": {
+        "LITERAL_last_used": "lastUsedModelEntryId",
+        "LITERAL_voice_in": "voice.input.overrideEntryId",
+        "LITERAL_voice_out": "voice.output.overrideEntryId"
+      },
+      "dyn_keys": [
+        "keypool_"
+      ],
       "open_key_space": false,
       "ephemeral": false
     },
@@ -1183,7 +1191,7 @@
       ],
       "keys": {},
       "dyn_keys": [],
-      "open_key_space": false,
+      "open_key_space": true,
       "ephemeral": true
     },
     {
@@ -1355,7 +1363,10 @@
       "usage_files": [
         "data/repository/SkillRepository.kt"
       ],
-      "keys": {},
+      "keys": {
+        "LITERAL_ids": "ids",
+        "LITERAL_seeded_from_db": "seeded_from_db"
+      },
       "dyn_keys": [],
       "open_key_space": false,
       "ephemeral": false
@@ -5878,9 +5889,9 @@
   "totals": {
     "prefs_files": 91,
     "prefs_encrypted": 8,
-    "key_constants_attributed": 143,
+    "key_constants_attributed": 150,
     "orphan_keys": 33,
-    "usage_sites": 159,
+    "usage_sites": 166,
     "usage_files": 96,
     "constant_conflicts": 459
   }

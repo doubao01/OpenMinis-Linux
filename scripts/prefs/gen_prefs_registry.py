@@ -169,6 +169,10 @@ def scan(src_root):
                 e['encrypted'] = True
             if decl.get('ephemeral'):
                 e['ephemeral'] = True
+            # 扫描器只认 `getX("prefix" + v)` 形态。`prefs.all.keys.filter { it.startsWith("keypool_") }`
+            # 这种「按前缀扫描再逐个删」的写法它看不见，必须由清单声明。
+            for dp in (decl.get('dynPrefixes') or []):
+                e.setdefault('dyn_keys', set()).add(dp)
 
     out = []
     for name, e in sorted(prefs.items()):
