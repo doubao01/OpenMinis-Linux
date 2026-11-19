@@ -1,4 +1,5 @@
 package com.openminis.app.ui.settings
+import com.openminis.app.ui.tokens.MinisTypography
 import com.openminis.app.ui.theme.m3Icon
 
 import androidx.compose.foundation.background
@@ -59,7 +60,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.openminis.app.data.model.ModelGroup
 import com.openminis.app.data.repository.ProviderRepository
@@ -445,7 +445,7 @@ private fun BadgeLabel(text: String, color: androidx.compose.ui.graphics.Color) 
             style = MaterialTheme.typography.labelSmall,
             color = color,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 11.sp,
+            fontSize = MinisTypography.cap,
         )
     }
 }

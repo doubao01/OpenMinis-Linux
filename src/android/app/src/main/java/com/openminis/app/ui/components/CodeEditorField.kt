@@ -160,7 +160,7 @@ fun CodeEditorField(
 }
 
 /** Line height shared by gutter rows and editor lines — must stay identical. */
-private val EditorLineHeightSp = 20.sp
+private val EditorLineHeightSp = 20.sp  // token-literal-ok: 编辑行高=滚动定位除数，须精确等高
 
 /** Lines composed beyond the viewport on each side of the gutter window (#14). */
 private const val GUTTER_OVERSCAN_LINES = 8

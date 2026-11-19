@@ -100,8 +100,23 @@ def strip_comments(src):
 EXEMPT = re.compile(r'token-literal-ok\s*:\s*(\S.*)?$')
 
 
+
+def literal_values(line):
+    """该行出现的全部字面量值（去重、保序），如 ['57','64']。
+
+    豁免行要做「数值指纹」：把这一行实际写了哪些值记进 baseline。值一变指纹
+    就对不上，必须人工确认并改 baseline —— 棘轮的本义是「只许往下」，而按行
+    放行的豁口恰好把它变成「随便改都不报警」。
+    """
+    seen = []
+    for m in list(RE_HEX.finditer(line)) + list(RE_SP.finditer(line)) + list(RE_DP.finditer(line)):
+        if m.group(1) not in seen:
+            seen.append(m.group(1))
+    return seen
+
+
 def count_file(path):
-    """返回 {color,sp,dp} 未命名数与豁免行号列表。
+    """返回 (计数, 豁免行号, 空理由行号, {豁免行号: 数值指纹})。
 
     豁免必须在原始行上判断（strip_comments 会把注释删掉，而豁免标记就写在
     注释里），所以这里同时读原文和去注释文本。
@@ -111,7 +126,8 @@ def count_file(path):
     counts = {'color': len(RE_HEX.findall(clean)),
               'sp': len(RE_SP.findall(clean)),
               'dp': len(RE_DP.findall(clean))}
-    exempt, blank = [], []
+    exempt, blank, prints = [], [], {}
+    clean_lines = clean.split('\n')
     for i, line in enumerate(raw.split('\n'), 1):
         m = EXEMPT.search(line)
         if not m:
@@ -119,18 +135,16 @@ def count_file(path):
         reason = (m.group(1) or '').strip()
         if len(reason) < 6:
             blank.append(i)
-        else:
-            exempt.append(i)
-    if exempt:
-        # 豁免行里的字面量从计数里扣掉：该行单独重新计数
-        clean_lines = clean.split('\n')
-        for ln in exempt:
-            if ln - 1 >= len(clean_lines):
-                continue
-            c_cln = count_line(clean_lines[ln - 1])
+            continue
+        exempt.append(i)
+        if i - 1 < len(clean_lines):
+            c_cln = count_line(clean_lines[i - 1])
             for k in counts:
                 counts[k] -= c_cln[k]
-    return counts, exempt, blank
+            vals = literal_values(clean_lines[i - 1])
+            if vals:
+                prints[str(i)] = ' '.join(vals)
+    return counts, exempt, blank, prints
 
 
 def count_line(line):
@@ -144,19 +158,21 @@ def survey():
 
 
 def survey_root(root):
-    """返回 (per_file_counts, 空理由豁免列表)。root 可注入，便于自测。"""
-    out, bad = {}, []
+    """返回 (per_file_counts, 问题列表, {文件: {行号: 数值指纹}})。root 可注入，便于自测。"""
+    out, bad, exemps = {}, [], {}
     for p in sorted(Path(root).rglob('*.kt')):
         try:
             rel = p.relative_to(ROOT).as_posix()
         except ValueError:
             rel = str(p)
-        c, _exempt, blank = count_file(p)
+        c, _exempt, blank, prints = count_file(p)
         if blank:
             bad.extend('%s:%d 豁免理由为空或过短' % (rel, ln) for ln in blank)
+        if prints:
+            exemps[rel] = prints
         if any(c.values()):
             out[rel] = c
-    return out, bad
+    return out, bad, exemps
 
 
 def totals(per_file):
@@ -177,39 +193,52 @@ def selftest():
         f = ui / 'A.kt'
 
         f.write_text('val a = 1.dp\nval b = 2.dp\n', encoding='utf-8')
-        now, _ = survey_root(ui)
+        now, _bad, _pr = survey_root(ui)
         got = now.get(str(f), {'dp': 0})
         if got['dp'] != 2:
             fails.append('计数失效：期望 dp=2，实际 %s' % got['dp'])
 
         f.write_text('val a = 1.dp // token-literal-ok: 这是测试用的理由\nval b = 2.dp\n',
                      encoding='utf-8')
-        now, _ = survey_root(ui)
+        now, _bad, _pr = survey_root(ui)
         if now[str(f)]['dp'] != 1:
             fails.append('豁免未生效：期望 dp=1，实际 %s' % now[str(f)]['dp'])
 
         f.write_text('val a = 1.dp // token-literal-ok:\n', encoding='utf-8')
-        _now, bad = survey_root(ui)
+        _now, bad, _pr = survey_root(ui)
         if not bad:
             fails.append('空理由豁免未被拒绝')
 
         f.write_text('val s = "16.dp"\n', encoding='utf-8')
-        now, _ = survey_root(ui)
+        now, _bad, _pr = survey_root(ui)
         if now.get(str(f), {'dp': 0})['dp'] != 0:
             fails.append('字符串内容被计入 dp')
 
         # 块注释里的字面量不算，且行号要对齐
         f.write_text('/*\n16.dp\n*/\nval b = 3.dp\n', encoding='utf-8')
-        now, _ = survey_root(ui)
+        now, _bad, _pr = survey_root(ui)
         if now.get(str(f), {'dp': 0})['dp'] != 1:
             fails.append('块注释里的 dp 被计入')
+
+        # 数值指纹：豁免行必须报出它豁免了哪个值。这条对应真实事故 ——
+        # 豁免按行放行时，把 8.sp 改成 13.sp 而注释不动，预算照旧通过，
+        # 棘轮被直接绕开。指纹是唯一能拦住它的东西。
+        f.write_text('val a = 8.sp // token-literal-ok: 环心极限尺寸\n', encoding='utf-8')
+        _now, _bad, pr = survey_root(ui)
+        if pr.get(str(f), {}).get('1') != '8':
+            fails.append('豁免行数值指纹缺失或错误：%s' % pr.get(str(f)))
+
+        f.write_text('val a = 13.sp // token-literal-ok: 环心极限尺寸\n', encoding='utf-8')
+        _now, _bad, pr2 = survey_root(ui)
+        if pr2.get(str(f), {}).get('1') == pr.get(str(f), {}).get('1'):
+            fails.append('8.sp 改成 13.sp 后指纹没变，改值将无法被发现')
 
     if fails:
         print('token coverage selftest: FAIL')
         for x in fails:
             print('  - %s' % x)
         return 1
-    print('token coverage selftest: PASS（计数/豁免/空理由/字符串/块注释 5 项）')
+    print('token coverage selftest: PASS（计数/豁免/空理由/字符串/块注释/豁免指纹 6 项）')
     return 0
 
 
@@ -227,7 +256,7 @@ def main():
         print('token coverage: SKIP (%s not found)' % UI)
         return 0
 
-    now, bad_exempt = survey()
+    now, bad_exempt, prints = survey()
 
     if bad_exempt:
         print('token coverage: 豁免标记无效（理由必填且不少于 6 字）：')
@@ -253,8 +282,12 @@ def main():
             if f not in now:
                 merged[f] = {k: 0 for k in ('color', 'sp', 'dp')}
         BASELINE.write_text(json.dumps(
-            {'note': '未命名字面量预算，只许下调。由 --update-baseline 生成。',
-             'files': dict(sorted(merged.items()))},
+            {'note': '未命名字面量预算，只许下调。由 --update-baseline 生成。'
+                     ' exempt 记录每个豁免行的数值指纹：值变了必须重新登记，'
+                     '否则按行放行的豁免就成了绕过棘轮的洞。',
+             'files': dict(sorted(merged.items())),
+             'exempt': dict(sorted((f, dict(sorted(v.items(), key=lambda x: int(x[0]))))
+                                   for f, v in prints.items()))},
             ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
         print('token coverage: baseline 写入 %s' % BASELINE.relative_to(ROOT))
         print('  合计预算 color/sp/dp = %s' % totals(merged))
@@ -270,7 +303,29 @@ def main():
         return 0
 
     base = json.loads(BASELINE.read_text(encoding='utf-8')).get('files', {})
+    base_ex = json.loads(BASELINE.read_text(encoding='utf-8')).get('exempt', {})
     fails = []
+
+    # 豁免行的数值指纹必须与 baseline 一致：把 8.sp 改成 13.sp 而注释原封不动
+    # 是最省事、也最隐蔽的绕过方式，指纹一变就必须有人来确认。
+    for f, lines in prints.items():
+        prev = base_ex.get(f)
+        if prev is None:
+            fails.append('%s: 新增豁免行 %s（首次需 --update-baseline 登记）'
+                         % (f, ', '.join(str(x) for x in sorted(lines))))
+            continue
+        for ln, fp in lines.items():
+            want = prev.get(str(ln))
+            if want is None:
+                fails.append('%s:%s 新增豁免（数值 %s），需 --update-baseline 登记'
+                             % (f, ln, fp))
+            elif want != fp:
+                fails.append('%s:%s 豁免行数值 %s -> %s（豁免不跟随数值变化，'
+                             '改值必须重新登记）' % (f, ln, want, fp))
+        for ln in prev:
+            if str(ln) not in {str(x) for x in lines}:
+                fails.append('%s:%s baseline 里的豁免行已消失（豁免被挪走或删除）'
+                             % (f, ln))
     for f, c in now.items():
         prev = base.get(f)
         if prev is None:

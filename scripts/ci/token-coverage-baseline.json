@@ -1,5 +1,5 @@
 {
-  "note": "未命名字面量预算，只许下调。由 --update-baseline 生成。",
+  "note": "未命名字面量预算，只许下调。由 --update-baseline 生成。 exempt 记录每个豁免行的数值指纹：值变了必须重新登记，否则按行放行的豁免就成了绕过棘轮的洞。",
   "files": {
     "src/android/app/src/main/java/com/openminis/app/ui/DatabaseQuarantineDialog.kt": {
       "color": 0,
@@ -53,12 +53,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatAssistantMessageUI.kt": {
       "color": 0,
-      "sp": 18,
+      "sp": 0,
       "dp": 75
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatComposerSection.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 0,
       "dp": 54
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatComposerWidgets.kt": {
@@ -93,12 +93,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatMiscViews.kt": {
       "color": 2,
-      "sp": 8,
+      "sp": 0,
       "dp": 35
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatModelPickerSheet.kt": {
       "color": 8,
-      "sp": 2,
+      "sp": 0,
       "dp": 79
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatRevertBanner.kt": {
@@ -153,7 +153,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ContextRing.kt": {
       "color": 4,
-      "sp": 1,
+      "sp": 0,
       "dp": 3
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/GoalSheet.kt": {
@@ -238,7 +238,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/SessionMemorySheet.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 13
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/SessionSkillsSheet.kt": {
@@ -288,12 +288,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownTable.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 7
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownText.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 0,
       "dp": 5
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/SupervisorStatusBar.kt": {
@@ -338,7 +338,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/CodeEditorField.kt": {
       "color": 3,
-      "sp": 1,
+      "sp": 0,
       "dp": 6
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/DialogTextField.kt": {
@@ -448,7 +448,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/markdown/MarkdownText.kt": {
       "color": 1,
-      "sp": 1,
+      "sp": 0,
       "dp": 41
     },
     "src/android/app/src/main/java/com/openminis/app/ui/markdown/SyntaxHighlighter.kt": {
@@ -508,7 +508,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/sandbox/FilePreviewScreen.kt": {
       "color": 0,
-      "sp": 4,
+      "sp": 0,
       "dp": 46
     },
     "src/android/app/src/main/java/com/openminis/app/ui/sandbox/MirrorSettingsScreen.kt": {
@@ -708,7 +708,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/ModelGroupsScreen.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 41
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/ModelSlotPicker.kt": {
@@ -965,6 +965,47 @@
       "color": 1,
       "sp": 0,
       "dp": 0
+    }
+  },
+  "exempt": {
+    "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatComposerWidgets.kt": {
+      "240": "8"
+    },
+    "src/android/app/src/main/java/com/openminis/app/ui/chat/ContextRing.kt": {
+      "92": "8"
+    },
+    "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownText.kt": {
+      "184": "16",
+      "185": "24"
+    },
+    "src/android/app/src/main/java/com/openminis/app/ui/components/CodeEditorField.kt": {
+      "163": "20"
+    },
+    "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulEmojiPickerSheet.kt": {
+      "62": "17",
+      "79": "30",
+      "100": "22"
+    },
+    "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulSettingsScreen.kt": {
+      "367": "24 30",
+      "407": "17"
+    },
+    "src/android/app/src/main/java/com/openminis/app/ui/theme/Theme.kt": {
+      "330": "57 64",
+      "331": "45 52",
+      "332": "36 44",
+      "333": "32 40",
+      "334": "28 36",
+      "335": "24 32",
+      "336": "22 28",
+      "337": "16 24",
+      "338": "14 20",
+      "339": "16 24",
+      "340": "14 20",
+      "341": "12 16",
+      "342": "14 20",
+      "343": "12 16",
+      "344": "11"
     }
   }
 }

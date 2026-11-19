@@ -147,6 +147,10 @@ DEAD_CODE_EXEMPT_OBJECTS = {'RawColors', 'RawSpace', 'RawType', 'MinisColors',
                             'MinisDimens', 'MinisType'}
 DEAD_CODE_MIN_MEMBERS = 3   # 少于此数的对象不判（可能是纯常量表）
 
+# 只排除生成物（scripts/ui/gen_tokens.py 产出）。手写的适配层必须算调用方，
+# 否则「object 无人使用」这条永远对着 ComposeAdapters 里的真实引用报错。
+GENERATED_TOKEN_FILES = {'MinisTokens.kt'}
+
 
 def check_token_dead_code(src: str) -> list:
     """令牌定义了但全仓没人读 —— 与「有消费者没提供点」互为镜像的那种空转。
@@ -161,10 +165,16 @@ def check_token_dead_code(src: str) -> list:
     root = ROOT / 'src/android/app/src/main/java/com/openminis/app'
     if not root.exists():
         return []
-    # 收集 ui/ 下所有非 tokens 目录的源码
+    # 收集除**生成物**以外的全部源码。
+    #
+    # 这里排除的是生成文件，不是整个 ui/tokens/ 目录：ComposeAdapters.kt 是
+    # 手写适配层（Composable 属性 + line* 常量映射），它才是这些 object 的
+    # 真正消费者。早先按目录整块排除，MinisLineHeight 的 13 个成员明明全被
+    # ComposeAdapters 引用，检查器却报「全部零引用」—— 漏报比误报更糟：
+    # 一份永远叫的狼来了清单，reviewer 看两轮就整个跳过死代码段了。
     others = []
     for p in root.rglob('*.kt'):
-        if '/ui/tokens/' in p.as_posix() or p.name == 'TokenBridge.kt':
+        if p.name in GENERATED_TOKEN_FILES or p.name == 'TokenBridge.kt':
             continue
         try:
             others.append(p.read_text(encoding='utf-8', errors='replace'))

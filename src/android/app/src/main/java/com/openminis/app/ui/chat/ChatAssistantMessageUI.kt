@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.DropdownMenuItem
+import com.openminis.app.ui.tokens.MinisTypography
 import com.openminis.app.R
 import com.openminis.app.ui.settings.autoExpandThinkingEnabled
 import com.openminis.app.ui.components.MinisMenu
@@ -85,7 +86,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import kotlinx.coroutines.delay
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.sp
 import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.theme.m3Icon
 import com.openminis.app.ui.theme.decorLinearSweep
@@ -133,7 +133,7 @@ internal fun AssistantHeader(speakerName: String? = null, speakerVendor: String?
         Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = displayName,
-            fontSize = 16.sp,
+            fontSize = MinisTypography.titleLg,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -196,8 +196,8 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
         Text(
             text = error,
             color = RawC.systemRed.tc,
-            fontSize = 12.sp,
-            lineHeight = com.openminis.app.ui.tokens.MinisTypography.lineNote,
+            fontSize = MinisTypography.foot,
+            lineHeight = MinisTypography.lineNote,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
@@ -220,7 +220,7 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
                     modifier = Modifier.size(10.dp),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(stringResource(R.string.chat_longpress_retry), color = RawC.systemRed.tc, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.chat_longpress_retry), color = RawC.systemRed.tc, fontSize = MinisTypography.cap, fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -479,7 +479,7 @@ internal fun ToolCallPill(
             ) {
                 Text(
                     text = block.toolTitle.ifEmpty { block.toolName },
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     fontWeight = FontWeight.Medium,
                     // [P-process-card] A failed call tints its OWN row's title
                     // (matching the icon) — the reference card colours the
@@ -503,7 +503,7 @@ internal fun ToolCallPill(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = durationText,
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontFamily = FontFamily.Monospace,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     softWrap = false,
@@ -682,7 +682,7 @@ internal fun ThinkingBlock(block: AssistantBlock, isStreaming: Boolean, isLast: 
             }
             Text(
                 text = stringResource(R.string.chat_thinking_header),
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
                 fontWeight = FontWeight.SemiBold,
                 color = thinkingBlue,
             )
@@ -694,7 +694,7 @@ internal fun ThinkingBlock(block: AssistantBlock, isStreaming: Boolean, isLast: 
             formatProcessDuration(block.durationMs)?.let { dur ->
                 Text(
                     text = dur,
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontWeight = FontWeight.Medium,
                     fontFamily = FontFamily.Monospace,
                     color = thinkingBlue.copy(alpha = 0.6f),
@@ -704,7 +704,7 @@ internal fun ThinkingBlock(block: AssistantBlock, isStreaming: Boolean, isLast: 
             if (charCount > 0) {
                 Text(
                     text = charLabel,
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontWeight = FontWeight.Medium,
                     fontFamily = FontFamily.Monospace,
                     color = thinkingBlue.copy(alpha = 0.6f),
@@ -717,7 +717,7 @@ internal fun ThinkingBlock(block: AssistantBlock, isStreaming: Boolean, isLast: 
                 // Offer the native full-content viewer instead.
                 Text(
                     text = stringResource(R.string.thinking_view_full),
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontWeight = FontWeight.Medium,
                     color = thinkingBlue,
                 )
@@ -763,16 +763,16 @@ internal fun ThinkingBlock(block: AssistantBlock, isStreaming: Boolean, isLast: 
                             displayContent.length / 1000,
                             charCount / 1000,
                         ),
-                        fontSize = 11.sp,
+                        fontSize = MinisTypography.cap,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f),
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                     )
                 }
                 Text(
                     text = displayContent,
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
-                    lineHeight = com.openminis.app.ui.tokens.MinisTypography.lineBody,
+                    lineHeight = MinisTypography.lineBody,
                 )
             }
         }
@@ -875,7 +875,7 @@ internal fun ProcessSummaryBar(
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = header,
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
                 fontWeight = FontWeight.SemiBold,
                 color = thinkingBlue,
                 modifier = Modifier.weight(1f),
@@ -982,7 +982,7 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
             Text(
                 text = if (isThinking) stringResource(R.string.chat_thinking_header)
                     else block.toolTitle.ifEmpty { block.toolName },
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
                 fontWeight = FontWeight.Medium,
                 color = if (isFailed) ToolErrorColor else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f),
@@ -994,7 +994,7 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
                 if (charCount > 0) {
                     Text(
                         text = if (charCount >= 1000) "${charCount / 1000}K" else "$charCount",
-                        fontSize = 11.sp,
+                        fontSize = MinisTypography.cap,
                         fontFamily = FontFamily.Monospace,
                         color = muted,
                     )
@@ -1004,7 +1004,7 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
             formatProcessDuration(step.durationMs)?.let { dur ->
                 Text(
                     text = dur,
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontFamily = FontFamily.Monospace,
                     color = muted,
                 )
@@ -1013,7 +1013,7 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
             if (!isThinking) {
                 Text(
                     text = stringResource(R.string.chat_process_step_view),
-                    fontSize = 12.sp,
+                    fontSize = MinisTypography.foot,
                     color = thinkingBlue,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -1054,14 +1054,14 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
                                 displayContent.length / 1000,
                                 block.content.length / 1000,
                             ),
-                            fontSize = 11.sp,
+                            fontSize = MinisTypography.cap,
                             color = muted.copy(alpha = 0.75f),
                         )
                     }
                     Text(
                         text = displayContent,
-                        fontSize = 12.sp,
-                        lineHeight = com.openminis.app.ui.tokens.MinisTypography.lineCaption,
+                        fontSize = MinisTypography.foot,
+                        lineHeight = MinisTypography.lineCaption,
                         color = muted,
                     )
                 }

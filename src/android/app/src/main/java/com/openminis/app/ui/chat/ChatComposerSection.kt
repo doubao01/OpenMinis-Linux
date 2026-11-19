@@ -108,8 +108,12 @@ private val SLASH_PICKER_MAX_HEIGHT: Dp = 280.dp
  */
 @Composable
 private fun slashPickerHeight(
-    titleSp: TextUnit = 14.sp,
-    subtitleSp: TextUnit = 11.sp,
+    // 这里的两档默认值必须对应「无参调用方」渲染的真实字号：
+    // ChatComposerSection:240 的 slash 菜单行用 bodyLg(14sp) 标题 + cap(11sp)
+    // 副标题（见 238 行注释），所以默认 14sp 是对的，不能改成 13sp。
+    // 另两个调用方（427/568）显式传 body(13sp)，那是它们自己的行。
+    titleSp: TextUnit = MinisTypography.bodyLg,
+    subtitleSp: TextUnit = MinisTypography.cap,
     verticalPadding: Dp = 7.dp,
     iconSize: Dp = 18.dp,
 ): Dp {

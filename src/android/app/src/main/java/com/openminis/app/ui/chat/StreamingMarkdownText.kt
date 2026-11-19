@@ -181,8 +181,8 @@ val LocalMarkdownImageTapHandler =
  */
 val LocalMarkdownSessionId = compositionLocalOf<String?> { null }
 
-private val BaseFontSizeDefault = 16.sp
-private val BaseLineHeightDefault = 24.sp
+private val BaseFontSizeDefault = 16.sp  // token-literal-ok: markdown 基准，随用户缩放
+private val BaseLineHeightDefault = 24.sp  // token-literal-ok: markdown 基准行高，随缩放
 
 internal val BaseFontSize: TextUnit
     @Composable get() = BaseFontSizeDefault * LocalMarkdownFontScale.current
