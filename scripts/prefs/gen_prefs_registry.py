@@ -161,6 +161,14 @@ def scan(src_root):
             e.setdefault('keys', {})
             for kn, kl in (decl.get('keys') or {}).items():
                 e['keys'][kn] = kl
+            if decl.get('openKeySpace'):
+                e['open_key_space'] = True
+            # 迁移到 Prefs.file 之后，源码里不再有 EncryptedPrefsFactory 字面量，
+            # 扫描器看不到该文件是加密的。必须由清单显式声明，否则会静默退化成明文。
+            if decl.get('encrypted'):
+                e['encrypted'] = True
+            if decl.get('ephemeral'):
+                e['ephemeral'] = True
 
     out = []
     for name, e in sorted(prefs.items()):
@@ -176,6 +184,8 @@ def scan(src_root):
             'usage_files': sorted({u['file'] for u in e['usages']}),
             'keys': dict(sorted(e.get('keys', {}).items())),
             'dyn_keys': sorted(e.get('dyn_keys', set())),
+            'open_key_space': bool(e.get('open_key_space')),
+            'ephemeral': bool(e.get('ephemeral')),
         })
 
     orphan = sorted(prefs.get('__orphan_keys__', {}).get('keys', {}).items())
@@ -237,13 +247,19 @@ data class PrefsFileSpec(
     val scope: PrefsScope,
     val keys: Map<String, String> = emptyMap(),
     val dynamicPrefixes: List<String> = emptyList(),
+    /**
+     * 键空间是否开放：键名本身就是数据（插件 id、组件 id、session id），
+     * 无法静态枚举。这类文件只能整体放行 —— 但必须在注册表里显式声明，
+     * 不能靠 keys 为空来推断（keys 为空更可能是扫描器没抓到，那是 bug）。
+     */
+    val openKeySpace: Boolean = false,
     val note: String = "",
 ) {{
     fun isEncrypted(): Boolean = scope == PrefsScope.ENCRYPTED
 
-    /** 该键是否可以出现在本文件里（静态登记 or 命中动态前缀）。 */
+    /** 该键是否可以出现在本文件里（静态登记 or 命中动态前缀 or 开放键空间）。 */
     fun accepts(key: String): Boolean =
-        keys.containsValue(key) || dynamicPrefixes.any {{ key.startsWith(it) }}
+        openKeySpace || keys.containsValue(key) || dynamicPrefixes.any {{ key.startsWith(it) }}
 }}
 
 object PrefsRegistry {{
@@ -288,14 +304,18 @@ object PrefsRegistry {{
 }}
 '''
 
-EPHEMERAL_HINTS = ('retry', 'asked', 'health', 'flag', 'dummy', 'cache', 'mark', 'state', 'download')
-
-
 def scope_of(f):
+    """存储性质只由**证据**决定，不从文件名猜。
+
+    曾经按名字子串猜（retry/flag/state/cache…），结果 `dev_suite_state` 被判成
+    EPHEMERAL —— 那是持久安装状态，装完就靠它恢复 UI，猜错会导致迁移时被当成
+    一次性标记丢弃。`plugin_online_flags` 同理，那是用户装过哪些插件的持久记录。
+
+    EPHEMERAL 现在只能由清单显式声明（prefs_extra_keys.json 的 scope 字段）。
+    """
     if f['encrypted']:
         return 'PrefsScope.ENCRYPTED'
-    low = f['name'].lower()
-    if any(h in low for h in EPHEMERAL_HINTS):
+    if f.get('ephemeral'):
         return 'PrefsScope.EPHEMERAL'
     return 'PrefsScope.PLAIN'
 
@@ -304,6 +324,8 @@ def render(inv):
     entries = []
     for f in inv['prefs_files']:
         parts = [f'name = "{f["name"]}"', f'module = "{f["module"]}"', f'scope = {scope_of(f)}']
+        if f.get('open_key_space'):
+            parts.append('openKeySpace = true')
         ks = f['keys']
         if ks:
             body = ', '.join(f'"{k}" to "{v}"' for k, v in ks.items())
@@ -325,6 +347,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--src', required=True)
     ap.add_argument('--out', required=True)
+    ap.add_argument('--inventory-out', default=None,
+                    help='prefs-inventory.json 输出目录（默认与 --out 相同）')
     ap.add_argument('--check', action='store_true', help='只比对，不写盘；不一致 exit 2')
     a = ap.parse_args()
 
@@ -337,11 +361,27 @@ def main():
         if old != kt:
             print('STALE: PrefsRegistry.kt 与源码不一致，请重跑生成器', file=sys.stderr)
             return 2
+        # inventory 也是生成物：它记录每个 prefs 文件的键清单，是审计与迁移的依据，
+        # 过期同样会误导人。两处一起校验，不要只查 .kt。
+        inv_path = os.path.join(a.inventory_out or a.out, 'prefs-inventory.json')
+        if os.path.exists(inv_path):
+            with open(inv_path, encoding='utf-8') as fh:
+                disk = json.load(fh)
+            # src_root 是绝对路径，换机器必然不同，比较时排除
+            for d in (disk, inv):
+                d.pop('src_root', None)
+            if disk != inv:
+                print('STALE: prefs-inventory.json 与源码不一致，请重跑生成器',
+                      file=sys.stderr)
+                return 2
         print('OK: PrefsRegistry.kt 与源码一致')
         return 0
 
     os.makedirs(a.out, exist_ok=True)
-    with open(os.path.join(a.out, 'prefs-inventory.json'), 'w', encoding='utf-8') as f:
+    inv_dir = a.inventory_out or a.out
+    if inv_dir:
+        os.makedirs(inv_dir, exist_ok=True)
+    with open(os.path.join(inv_dir, 'prefs-inventory.json'), 'w', encoding='utf-8') as f:
         json.dump(inv, f, ensure_ascii=False, indent=2)
     with open(kt_path, 'w', encoding='utf-8') as f:
         f.write(kt)

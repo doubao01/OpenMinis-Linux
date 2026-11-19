@@ -22,6 +22,13 @@ interface PrefsBackend {
     val name: String
     fun contains(key: String): Boolean
     fun keys(): Set<String>
+
+    /**
+     * 全部键值快照。用于「按内容算指纹」—— OnlinePluginStore 用
+     * `.all.hashCode()` 判断插件标志位是否变化，只比字符串值就够了。
+     * 返回的 Map 是不可变副本，读它不会看到后续写入。
+     */
+    fun snapshot(): Map<String, Any?>
     fun readBoolean(key: String, defaultValue: Boolean): Boolean
     fun readInt(key: String, defaultValue: Int): Int
     fun readLong(key: String, defaultValue: Long): Long
@@ -54,6 +61,8 @@ class SharedPrefsBackend(
     override fun contains(key: String): Boolean = prefs.contains(key)
 
     override fun keys(): Set<String> = prefs.all.keys.toSet()
+
+    override fun snapshot(): Map<String, Any?> = HashMap<String, Any?>(prefs.all)
 
     override fun readBoolean(key: String, defaultValue: Boolean): Boolean =
         if (!prefs.contains(key)) defaultValue
@@ -114,7 +123,7 @@ class InMemoryPrefsBackend(
     /** Test hook: simulate a corrupt value of the wrong primitive type. */
     fun corrupt(key: String, raw: Any?) { data[key] = raw }
 
-    fun snapshot(): Map<String, Any?> = data.toMap()
+    override fun snapshot(): Map<String, Any?> = HashMap<String, Any?>(data)
 
     override fun contains(key: String): Boolean = data.containsKey(key)
 

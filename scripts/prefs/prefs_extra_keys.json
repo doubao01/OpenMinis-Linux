@@ -5,7 +5,9 @@
     "  1) literal-key      —— 源码直接写字符串，没有 const val",
     "  2) shared-file      —— 一个文件同时用了多个 prefs 文件，扫描器无法判定归属",
     "  3) migrated-inline  —— 迁移后键由调用点拼接，静态扫描看不出完整形态",
-    "这份清单只进不退：删掉一条会让守卫开始拒绝活代码。"
+    "这份清单只进不退：删掉一条会让守卫开始拒绝活代码。",
+    "  4) open-key-space   —— 键名本身是数据（插件 id/组件 id），无法静态枚举，声明后整体放行",
+    "  5) encrypted        —— 迁移后源码不再出现 EncryptedPrefsFactory，加密属性必须显式声明"
   ],
   "files": {
     "mirror_settings": {
@@ -18,13 +20,40 @@
       "keys": {
         "KEY_STRIKES": "strikes"
       },
-      "reason": "literal-key + shared-file: RootfsManager 单文件用了 4 个 prefs 文件，strikes 是单段字面量键，无法被归属规则抓到。"
+      "reason": "literal-key + shared-file: RootfsManager 单文件用了 4 个 prefs 文件，strikes 是单段字面量键，无法被归属规则抓到。",
+      "ephemeral": true
     },
     "pip_world_retry": {
       "keys": {
         "KEY_STRIKES": "strikes"
       },
-      "reason": "同上：RootfsManager 的 pip 侧重试计数，单段字面量键。"
+      "reason": "同上：RootfsManager 的 pip 侧重试计数，单段字面量键。",
+      "ephemeral": true
+    },
+    "dev_suite_state": {
+      "openKeySpace": true,
+      "reason": "open-key-space: 键是组件 id（jdk/python/node/rust…），DevSuiteStore 用 p.all.keys 遍历全部键，无法静态枚举"
+    },
+    "plugin_online_flags": {
+      "openKeySpace": true,
+      "reason": "open-key-space: 键是插件 id，OnlinePluginStore 读取 .all 全量标志位"
+    },
+    "plugin_online_keys": {
+      "openKeySpace": true,
+      "reason": "open-key-space + encrypted: 键是插件 id；迁移到 Prefs.file 后源码里不再有 EncryptedPrefsFactory 字面量，加密属性必须在此显式声明，否则会退化成明文",
+      "encrypted": true
+    },
+    "offload_permissions_asked": {
+      "ephemeral": true,
+      "reason": "ephemeral: 「已经问过用户权限」的一次性标记"
+    },
+    "provider_refresh_marks": {
+      "ephemeral": true,
+      "reason": "ephemeral: 刷新时间戳，过期即失效"
+    },
+    "update_download_prefs": {
+      "ephemeral": true,
+      "reason": "ephemeral: 下载进度，进程重启即废弃"
     }
   }
 }

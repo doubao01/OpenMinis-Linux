@@ -77,6 +77,35 @@ class PrefsHandle internal constructor(
     /** 本文件已落盘的全部键（不校验，用于诊断/迁移）。 */
     fun rawKeys(): Set<String> = backend.keys()
 
+    /**
+     * 全部键值快照（不校验）。用于「按内容算指纹」这类场景 ——
+     * OnlinePluginStore.toolDefinitionsStamp 就用 `.all.hashCode()` 判断
+     * 插件标志位有没有变。键空间必须是开放的或已登记的。
+     */
+    fun snapshot(): Map<String, Any?> = backend.snapshot()
+
+    /**
+     * 删除命中 [prefix] 的全部键，返回删掉的个数。
+     *
+     * 这是 `prefs.all.keys.filter { it.startsWith(prefix) }` 的类型化版本 ——
+     * ConnectorNetworkPolicy 清理插件配置时就是这么做的，一次事务里删掉
+     * `allow_private_<pluginId>` 和它的所有 scope 变体。
+     *
+     * 前缀本身必须是被接受的（登记过的键前缀或动态前缀），否则这个方法会
+     * 变成一个绕过守卫的批量删除后门。
+     */
+    fun removeAllWithPrefix(prefix: String): Int {
+        require(prefix.isNotEmpty()) { "prefix must not be empty" }
+        require(spec.accepts(prefix) || spec.keys.values.any { it.startsWith(prefix) } ||
+            spec.dynamicPrefixes.any { it.startsWith(prefix) || prefix.startsWith(it) }) {
+            "prefix '$prefix' is not covered by PrefsRegistry for ${spec.name}"
+        }
+        val victims = backend.keys().filter { it.startsWith(prefix) }
+        if (victims.isEmpty()) return 0
+        backend.write { victims.forEach { remove(it) } }
+        return victims.size
+    }
+
     fun boolProp(key: String, default: Boolean = false): ReadWriteProperty<Any?, Boolean> =
         object : ReadWriteProperty<Any?, Boolean> {
             override fun getValue(thisRef: Any?, property: KProperty<*>) = bool(key, default)
@@ -108,15 +137,18 @@ class PrefsHandle internal constructor(
         }
 
     /**
-     * 键名守卫，两条规则见类注释。
+     * 键名守卫，规则见类注释。
      * 登记清单用 [PrefsFileSpec.keys] 的**值**（真实字符串键），不是常量名。
      *
-     * 动态键（`"lastReadAt:" + sessionId`、`"mirror.selected.${x}"`）由
-     * [PrefsFileSpec.dynamicPrefixes] 声明；只要命中前缀即放行。
+     * 三条放行路径，按优先级：
+     *   1. [PrefsFileSpec.accepts] —— 静态登记 / 动态前缀 / 开放键空间
+     *   2. keys 与 dynamicPrefixes 都为空 —— 扫描器没抓到清单，退回最弱的
+     *      「前缀.名字」约定（这本身是扫描器缺陷，但守卫不能因此崩溃）
+     *   3. 其余 —— 明确的错
      */
     private fun check(key: String): String {
         require(key.isNotBlank()) { "prefs key must not be blank" }
-        // 1. 静态登记或动态前缀命中 —— 一定放行
+        // 1. 静态登记、动态前缀、开放键空间 —— 一定放行
         if (spec.accepts(key)) return key
         // 2. 该文件没有任何登记清单（历史遗留，扫描器没抓到键常量）——
         //    退回最弱约定：必须带 '前缀.名字' 形态，挡住裸键即可。

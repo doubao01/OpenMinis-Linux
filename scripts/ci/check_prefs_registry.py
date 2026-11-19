@@ -28,7 +28,10 @@ def main() -> int:
         return 0
 
     proc = subprocess.run(
-        [sys.executable, str(GEN), "--src", str(SRC), "--out", str(SRC / "config"), "--check"],
+        [sys.executable, str(GEN), "--src", str(SRC),
+         "--out", str(SRC / "config"),
+         "--inventory-out", str(ROOT / "docs/prefs"),
+         "--check"],
         capture_output=True,
         text=True,
     )
@@ -43,7 +46,8 @@ def main() -> int:
     print()
     print("Regenerate and commit:")
     print(f"  python3 {GEN.relative_to(ROOT)} --src {SRC.relative_to(ROOT)} "
-          f"--out {(SRC / 'config').relative_to(ROOT)}")
+          f"--out {(SRC / 'config').relative_to(ROOT)} "
+          f"--inventory-out docs/prefs")
     return 1
 
 

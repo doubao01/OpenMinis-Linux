@@ -39,13 +39,19 @@ data class PrefsFileSpec(
     val scope: PrefsScope,
     val keys: Map<String, String> = emptyMap(),
     val dynamicPrefixes: List<String> = emptyList(),
+    /**
+     * 键空间是否开放：键名本身就是数据（插件 id、组件 id、session id），
+     * 无法静态枚举。这类文件只能整体放行 —— 但必须在注册表里显式声明，
+     * 不能靠 keys 为空来推断（keys 为空更可能是扫描器没抓到，那是 bug）。
+     */
+    val openKeySpace: Boolean = false,
     val note: String = "",
 ) {
     fun isEncrypted(): Boolean = scope == PrefsScope.ENCRYPTED
 
-    /** 该键是否可以出现在本文件里（静态登记 or 命中动态前缀）。 */
+    /** 该键是否可以出现在本文件里（静态登记 or 命中动态前缀 or 开放键空间）。 */
     fun accepts(key: String): Boolean =
-        keys.containsValue(key) || dynamicPrefixes.any { key.startsWith(it) }
+        openKeySpace || keys.containsValue(key) || dynamicPrefixes.any { key.startsWith(it) }
 }
 
 object PrefsRegistry {
@@ -66,14 +72,14 @@ object PrefsRegistry {
         PrefsFileSpec(name = "composer_input_prefs", module = "ui", scope = PrefsScope.PLAIN, keys = mapOf("KEY_MODE" to "composer_input_mode_pref"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "crash_freq_prefs", module = "crash", scope = PrefsScope.PLAIN, keys = mapOf("KEY_DISMISSED_AT" to "dismissed_at", "KEY_FORCE_HOME_UNTIL" to "force_home_until", "KEY_SUPPRESS_UNTIL" to "suppress_until"), note = "6 usages across 1 file(s)"),
         PrefsFileSpec(name = "debug_server_prefs", module = "debug", scope = PrefsScope.PLAIN, keys = mapOf("LAN_LISTEN_KEY" to "lan_listen"), note = "1 usages across 1 file(s)"),
-        PrefsFileSpec(name = "dev_suite_state", module = "plugins", scope = PrefsScope.EPHEMERAL, note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "dev_suite_state", module = "plugins", scope = PrefsScope.PLAIN, openKeySpace = true, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "display_prefs", module = "ui", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "high_refresh"), note = "2 usages across 1 file(s)"),
         PrefsFileSpec(name = "dpkg_world_retry", module = "sandbox", scope = PrefsScope.EPHEMERAL, keys = mapOf("KEY_STRIKES" to "strikes"), note = "2 usages across 1 file(s)"),
-        PrefsFileSpec(name = "dummy", module = "auth", scope = PrefsScope.EPHEMERAL, note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "dummy", module = "auth", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "env_var_values", module = "data", scope = PrefsScope.ENCRYPTED, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "envvar_privacy", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "privacy_mode_enabled"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "file_browser_prefs", module = "ui", scope = PrefsScope.PLAIN, note = "2 usages across 1 file(s)"),
-        PrefsFileSpec(name = "free_lane_health", module = "provider", scope = PrefsScope.EPHEMERAL, note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "free_lane_health", module = "provider", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "hang_detector_prefs", module = "diagnostics", scope = PrefsScope.PLAIN, keys = mapOf("KEY_HANG_COUNT" to "hang_count", "KEY_LAST_HANG_AT" to "last_hang_at_ms"), note = "4 usages across 1 file(s)"),
         PrefsFileSpec(name = "host_event_hooks", module = "sandbox", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "hooks_json"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "local_tool_plugins", module = "plugins", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "tools_json"), note = "3 usages across 1 file(s)"),
@@ -85,7 +91,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "minis_auto_compact_prefs", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "autoCompactOnThreshold", "KEY_THRESHOLD" to "autoCompactThresholdPercent"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_config_permission", module = "config", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "minis_config_enabled"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_context_saver", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_MODE" to "mode"), note = "1 usages across 1 file(s)"),
-        PrefsFileSpec(name = "minis_enhanced_cache_prefs", module = "data", scope = PrefsScope.EPHEMERAL, keys = mapOf("KEY_CONFIRMED" to "enhancedCacheConfirmed"), note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "minis_enhanced_cache_prefs", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_CONFIRMED" to "enhancedCacheConfirmed"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_evolution_prefs", module = "evolution", scope = PrefsScope.PLAIN, keys = mapOf("KEY_DAILY_CAP" to "evolution.daily_cap", "KEY_ENABLED" to "evolution.enabled", "KEY_LAST_HARVEST" to "evolution.last_harvest_at", "KEY_LAST_REFLECT" to "evolution.last_reflect_at", "KEY_LLM_COUNT" to "evolution.llm_count", "KEY_LLM_DAY" to "evolution.llm_day", "KEY_LLM_FAILS" to "evolution.llm_fails"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_fast_mode_prefs", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "codexFastModeEnabled"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_group_chat", module = "ui", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),
@@ -109,8 +115,8 @@ object PrefsRegistry {
         PrefsFileSpec(name = "pending_update", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "pending", "KEY_INTENT" to "pending_intent"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "pip_world_retry", module = "sandbox", scope = PrefsScope.EPHEMERAL, keys = mapOf("KEY_STRIKES" to "strikes"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "plugin_network_policy", module = "plugins", scope = PrefsScope.PLAIN, dynamicPrefixes = listOf("allow_private_"), note = "3 usages across 1 file(s)"),
-        PrefsFileSpec(name = "plugin_online_flags", module = "plugins", scope = PrefsScope.EPHEMERAL, note = "3 usages across 1 file(s)"),
-        PrefsFileSpec(name = "plugin_online_keys", module = "plugins", scope = PrefsScope.ENCRYPTED, note = "3 usages across 1 file(s)"),
+        PrefsFileSpec(name = "plugin_online_flags", module = "plugins", scope = PrefsScope.PLAIN, openKeySpace = true, note = "3 usages across 1 file(s)"),
+        PrefsFileSpec(name = "plugin_online_keys", module = "plugins", scope = PrefsScope.ENCRYPTED, openKeySpace = true, note = "3 usages across 1 file(s)"),
         PrefsFileSpec(name = "plugin_registry", module = "plugins", scope = PrefsScope.PLAIN, keys = mapOf("CACHE_KEY" to "plugin_registry_cache"), note = "3 usages across 2 file(s)"),
         PrefsFileSpec(name = "provider_config", module = "data", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "provider_refresh_marks", module = "data", scope = PrefsScope.EPHEMERAL, note = "3 usages across 1 file(s)"),
@@ -141,7 +147,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "vscreen", module = "vscreen", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "web_search_prefs", module = "tools", scope = PrefsScope.PLAIN, keys = mapOf("KEY_BING_KEY" to "bing_key", "KEY_BOCHA" to "bocha_key", "KEY_BRAVE" to "brave_key", "KEY_CUSTOM_KEY" to "custom_key", "KEY_CUSTOM_KEY_HEADER" to "custom_key_header", "KEY_CUSTOM_URL" to "custom_url", "KEY_ENGINE" to "engine", "KEY_ENGINE_EXPLICIT" to "engine_explicit", "KEY_EXA" to "exa_key", "KEY_FALLBACK" to "fallback_ddg", "KEY_JINA" to "jina_key", "KEY_KEYLESS_CN" to "keyless_cn", "KEY_SEARXNG_URL" to "searxng_url", "KEY_TAVILY" to "tavily_key", "KEY_ZHIPU" to "zhipu_key"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "workspace_layout", module = "sandbox", scope = PrefsScope.PLAIN, keys = mapOf("KEY_DONE" to "legacy_v1_done", "KEY_DONE_V2" to "legacy_v2_filed"), note = "1 usages across 1 file(s)"),
-        PrefsFileSpec(name = "zen_free_lane_health", module = "provider", scope = PrefsScope.EPHEMERAL, note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "zen_free_lane_health", module = "provider", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),
     )
 
     private val byName: Map<String, PrefsFileSpec> = files.associateBy { it.name }
