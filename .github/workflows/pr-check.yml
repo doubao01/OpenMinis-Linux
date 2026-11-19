@@ -153,6 +153,12 @@ jobs:
       - name: Prefs registry matches source
         run: python3 scripts/ci/check_prefs_registry.py
 
+      # [T-ui-tokens] MinisTokens.kt aggregates every Color(0x...) literal in
+      # ui/. Stale tokens fail at the call site (unresolved reference), which
+      # reads like a normal typo rather than "the generator was not re-run".
+      - name: UI design tokens are regenerable
+        run: python3 scripts/ci/check_ui_tokens.py
+
       # [T-announced-tools-core] The plan board fragment told the model to
       # "advance items with agent_plan" while agent_plan was long-tail, so the
       # board the user watched could never move (and could never be created:

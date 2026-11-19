@@ -3,7 +3,7 @@ package com.openminis.app.ui.tokens
 /**
  * 自动生成 —— 不要手改。生成器: refactor/tools/gen_tokens.py
  *
- * 扫描事实：416 个 ui 下的 .kt 文件 -> Color(0x...): 308 处 / 148 个不同色值；
+ * 扫描事实：420 个 ui 下的 .kt 文件 -> Color(0x...): 308 处 / 148 个不同色值；
  * dp 字面量 3522 处 / 83 个不同值；sp 363 处。
  * 本文件命名 25 个色值，当前覆盖 123/308 = 40% 的颜色使用点；
  * 未命名的色值留在原地，由 refactor/tools/check_ui_tokens.py 的棘轮逐步压制。
