@@ -359,7 +359,7 @@ internal fun ModelPickerSheet(
                                 Text(
                                     stringResource(R.string.model_picker_default_badge),
                                     fontSize = 9.sp,
-                                    lineHeight = 11.sp,
+                                    lineHeight = com.openminis.app.ui.tokens.MinisTypography.lineBadge,
                                     fontWeight = FontWeight.Medium,
                                     color = Color(0xFF007AFF),
                                     modifier = Modifier

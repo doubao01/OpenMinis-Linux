@@ -425,7 +425,7 @@ internal fun ToolDetailSheet(
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = FontFamily.Monospace,
                                         color = Color.White,
-                                        lineHeight = 18.sp,
+                                        lineHeight = MinisTypography.lineCode,
                                     )
                                     if (block.content.isNotEmpty()) {
                                         // T38: linkify http/https URLs in shell output so the user can
@@ -446,7 +446,7 @@ internal fun ToolDetailSheet(
                                             fontSize = MinisTypography.code,
                                             fontFamily = FontFamily.Monospace,
                                             color = RawC.systemGreen.tc,  // iOS .green
-                                            lineHeight = 18.sp,
+                                            lineHeight = MinisTypography.lineCode,
                                         )
                                     }
                                 }
@@ -600,7 +600,7 @@ internal fun ToolDetailSheet(
                                                 fontSize = MinisTypography.code,
                                                 fontFamily = FontFamily.Monospace,
                                                 color = redText,
-                                                lineHeight = 17.sp,
+                                                lineHeight = MinisTypography.lineCodeDiff,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .background(redBg)
@@ -615,7 +615,7 @@ internal fun ToolDetailSheet(
                                                 fontSize = MinisTypography.code,
                                                 fontFamily = FontFamily.Monospace,
                                                 color = greenText,
-                                                lineHeight = 17.sp,
+                                                lineHeight = MinisTypography.lineCodeDiff,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .background(greenBg)
@@ -953,7 +953,7 @@ internal fun ToolDetailSheet(
                                     fontSize = MinisTypography.code,
                                     fontFamily = FontFamily.Monospace,
                                     color = ChatColors.primaryText,
-                                    lineHeight = 18.sp,
+                                    lineHeight = MinisTypography.lineCode,
                                 )
                             }
                         }
@@ -1303,7 +1303,7 @@ private fun LazyRevealToolText(
             fontSize = MinisTypography.code,
             fontFamily = FontFamily.Monospace,
             color = color,
-            lineHeight = 18.sp,
+            lineHeight = MinisTypography.lineCode,
             modifier = Modifier.fillMaxWidth(),
         )
         if (revealed < total) {

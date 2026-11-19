@@ -485,7 +485,7 @@ private fun MessageUsageFooterLine(stats: MessageUsageStats) {
     Text(
         text = parts.joinToString(" · "),
         fontSize = MinisTypography.cap,
-        lineHeight = 14.sp,
+        lineHeight = MinisTypography.lineCap,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(start = 6.dp, top = 3.dp),
     )

@@ -92,7 +92,7 @@ fun MemoryFileViewerBody(
                     fontSize = MinisTypography.codeFoot,
                     fontFamily = FontFamily.Monospace,
                     color = ChatColors.primaryText,
-                    lineHeight = 18.sp,
+                    lineHeight = MinisTypography.lineCode,
                 )
             }
         }
@@ -169,7 +169,7 @@ fun MemoryWriteDetailBody(
                             fontSize = MinisTypography.codeFoot,
                             fontFamily = FontFamily.Monospace,
                             color = ChatColors.primaryText,
-                            lineHeight = 18.sp,
+                            lineHeight = MinisTypography.lineCode,
                         )
                     }
                 }
@@ -181,7 +181,7 @@ fun MemoryWriteDetailBody(
                         fontSize = MinisTypography.codeFoot,
                         fontFamily = FontFamily.Monospace,
                         color = ChatColors.secondaryText,
-                        lineHeight = 18.sp,
+                        lineHeight = MinisTypography.lineCode,
                     )
                 }
             }
@@ -229,7 +229,7 @@ fun MemoryGetDetailBody(record: MemoryToolRecord) {
                 fontSize = MinisTypography.codeFoot,
                 fontFamily = FontFamily.Monospace,
                 color = ChatColors.primaryText,
-                lineHeight = 18.sp,
+                lineHeight = MinisTypography.lineCode,
             )
         }
     }

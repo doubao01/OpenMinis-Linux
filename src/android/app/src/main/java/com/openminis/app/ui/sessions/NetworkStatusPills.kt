@@ -114,7 +114,7 @@ private fun StatusPill(color: Color, text: String, description: String) {
         Text(
             text,
             fontSize = MinisTypography.chip,
-            lineHeight = 12.sp,
+            lineHeight = MinisTypography.lineChip,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
         )

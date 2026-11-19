@@ -328,7 +328,7 @@ private fun LogcatRow(line: LogcatLine) {
         style = MaterialTheme.typography.bodySmall.copy(
             fontFamily = FontFamily.Monospace,
             fontSize = MinisTypography.codeSm,
-            lineHeight = 15.sp,
+            lineHeight = MinisTypography.lineCodeSm,
         ),
         maxLines = 4,
         overflow = TextOverflow.Ellipsis,

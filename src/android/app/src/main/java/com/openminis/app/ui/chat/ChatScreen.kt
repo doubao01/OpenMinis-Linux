@@ -5157,7 +5157,7 @@ fun ChatScreen(
                                     // evenly above and below.
                                     style = LocalTextStyle.current.copy(
                                         fontSize = MinisTypography.body,
-                                        lineHeight = 16.25.sp,
+                                        lineHeight = MinisTypography.lineComposer,
                                         platformStyle = PlatformTextStyle(includeFontPadding = false),
                                         lineHeightStyle = LineHeightStyle(
                                             alignment = LineHeightStyle.Alignment.Center,

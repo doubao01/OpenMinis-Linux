@@ -253,7 +253,7 @@ private fun SubAgentDetailSheet(
                             color = ChatColors.primaryText,
                             style = TextStyle(
                                 fontSize = MinisTypography.title,
-                                lineHeight = 22.sp,
+                                lineHeight = MinisTypography.lineTitle,
                                 color = ChatColors.primaryText,
                             ),
                         )
@@ -411,7 +411,7 @@ private fun ToolStepBody(step: SubAgentActivityTracker.Step) {
             Text(
                 text = step.body,
                 fontSize = MinisTypography.foot,
-                lineHeight = 16.sp,
+                lineHeight = MinisTypography.lineNote,
                 color = ChatColors.primaryText,
                 modifier = Modifier
                     .heightIn(max = 180.dp)
@@ -428,7 +428,7 @@ private fun UserTaskBubble(title: String) {
             text = title.ifBlank { stringResource(R.string.subagent_task_fallback) },
             color = ChatColors.primaryText,
             fontSize = MinisTypography.bodyLg,
-            lineHeight = 20.sp,
+            lineHeight = MinisTypography.lineBodyLg,
             modifier = Modifier
                 .widthIn(max = 280.dp)
                 .background(ChatColors.userBubble, RoundedCornerShape(16.dp))

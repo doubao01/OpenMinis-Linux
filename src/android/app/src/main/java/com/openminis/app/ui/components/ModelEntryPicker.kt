@@ -578,7 +578,7 @@ fun ModalityBadge(badge: String) {
     Text(
         badge,
         fontSize = MinisTypography.cap2,
-        lineHeight = 11.sp,
+        lineHeight = MinisTypography.lineBadge,
         fontWeight = FontWeight.Medium,
         maxLines = 1,
         softWrap = false,

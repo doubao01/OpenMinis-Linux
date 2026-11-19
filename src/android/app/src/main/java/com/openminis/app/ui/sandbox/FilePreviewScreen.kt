@@ -433,7 +433,7 @@ private fun TextPreview(item: FileItem) {
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 12.sp,
-                                lineHeight = 18.sp,
+                                lineHeight = com.openminis.app.ui.tokens.MinisTypography.lineCode,
                             ),
                             softWrap = false,
                             modifier = Modifier.padding(12.dp),
@@ -772,7 +772,7 @@ private fun JsonPreview(item: FileItem) {
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontFamily = FontFamily.Monospace,
                             fontSize = 12.sp,
-                            lineHeight = 18.sp,
+                            lineHeight = com.openminis.app.ui.tokens.MinisTypography.lineCode,
                         ),
                         softWrap = false,
                         modifier = Modifier.padding(12.dp),

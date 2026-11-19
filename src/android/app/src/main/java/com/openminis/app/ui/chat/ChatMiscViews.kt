@@ -511,7 +511,7 @@ private fun CompactSummarySheet(
                     text = summary,
                     fontSize = 14.sp,
                     color = ChatColors.primaryText,
-                    lineHeight = 20.sp,
+                    lineHeight = com.openminis.app.ui.tokens.MinisTypography.lineBodyLg,
                 )
             }
             if (onRevert != null) {

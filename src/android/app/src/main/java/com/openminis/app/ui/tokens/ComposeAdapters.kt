@@ -142,4 +142,49 @@ object MinisTypography {
      *  视觉上比周围的说明文字更"在前"，又不至于跨进 18sp `head` 的标题感。 */
     val bodyInput: TextUnit
         @Composable @ReadOnlyComposable get() = LocalMinisType.current.bodyInput.sp
+
+    // ─── 行距角色 ───────────────────────────────────────────────────────────
+    // 以上是「字有多大」，以下是「行有多松」。两者必须分开：13sp 正文配 19、
+    // 等宽 13sp 配 18、输入框 16.5sp 配 16.25 —— 同一个字号三个行高，
+    // `MinisType.lineHeight(size)` 的连续曲线只能给一个答案。
+    // 这些值不是曲线输出，是钉死的实测值，所以装箱成常量而非函数。
+
+    /** 单行徽章行高（9-11sp + maxLines=1）。贴着字号，否则胶囊垂直居中会偏。 */
+    val lineBadge: TextUnit get() = MinisLineHeight.badge.sp
+
+    /** 多行说明 / 错误提示行高。12sp 正文与 M3 bodySmall 共用。 */
+    val lineNote: TextUnit get() = MinisLineHeight.note.sp
+
+    /** 11sp caption 两行排版的行高。 */
+    val lineCaption: TextUnit get() = MinisLineHeight.caption.sp
+
+    /** 13sp 正文默认行高。 */
+    val lineBody: TextUnit get() = MinisLineHeight.body.sp
+
+    /** 14sp 大正文行高。 */
+    val lineBodyLg: TextUnit get() = MinisLineHeight.bodyLg.sp
+
+    /** 等宽正文行高（12-13sp）。 */
+    val lineCode: TextUnit get() = MinisLineHeight.code.sp
+
+    /** 等宽小字行高（11sp）。 */
+    val lineCodeSm: TextUnit get() = MinisLineHeight.codeSm.sp
+
+    /** 紧凑等宽行高（13sp diff 行）。 */
+    val lineCodeDiff: TextUnit get() = MinisLineHeight.codeDiff.sp
+
+    /** 15sp 标题行高。 */
+    val lineTitle: TextUnit get() = MinisLineHeight.title.sp
+
+    /** 输入框基准行高（缩放前）。 */
+    val lineComposer: TextUnit get() = MinisLineHeight.composer.sp
+
+    /** 11sp cap 紧凑单行行高（顶栏按钮）。 */
+    val lineCapCompact: TextUnit get() = MinisLineHeight.capCompact.sp
+
+    /** 11sp cap 常规单行行高。 */
+    val lineCap: TextUnit get() = MinisLineHeight.cap.sp
+
+    /** 10sp chip 状态胶囊行高。 */
+    val lineChip: TextUnit get() = MinisLineHeight.chip.sp
 }

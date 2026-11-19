@@ -471,7 +471,7 @@ private fun FileAttachmentTile(
         Text(
             text = fileName,
             fontSize = MinisTypography.cap2,
-            lineHeight = 11.sp,
+            lineHeight = MinisTypography.lineBadge,
             color = ChatColors.primaryText,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,

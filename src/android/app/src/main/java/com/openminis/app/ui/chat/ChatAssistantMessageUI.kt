@@ -197,7 +197,7 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
             text = error,
             color = RawC.systemRed.tc,
             fontSize = 12.sp,
-            lineHeight = 16.sp,
+            lineHeight = com.openminis.app.ui.tokens.MinisTypography.lineNote,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
@@ -772,7 +772,7 @@ internal fun ThinkingBlock(block: AssistantBlock, isStreaming: Boolean, isLast: 
                     text = displayContent,
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
-                    lineHeight = 19.sp,
+                    lineHeight = com.openminis.app.ui.tokens.MinisTypography.lineBody,
                 )
             }
         }
@@ -1061,7 +1061,7 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
                     Text(
                         text = displayContent,
                         fontSize = 12.sp,
-                        lineHeight = 17.sp,
+                        lineHeight = com.openminis.app.ui.tokens.MinisTypography.lineCaption,
                         color = muted,
                     )
                 }

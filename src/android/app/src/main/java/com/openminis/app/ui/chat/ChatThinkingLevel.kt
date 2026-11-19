@@ -94,7 +94,7 @@ internal fun ThinkingLevelBadge(
         Text(
             text = level.localizedName(context),
             fontSize = MinisTypography.cap2,
-            lineHeight = 11.sp,
+            lineHeight = MinisTypography.lineBadge,
             fontWeight = FontWeight.Medium,
             color = badgeColor,
             maxLines = 1,

@@ -460,7 +460,7 @@ private fun DiffOverlay(diff: GitDiffView, onClose: () -> Unit) {
                             colored,
                             fontFamily = FontFamily.Monospace,
                             fontSize = MinisTypography.codeSm,
-                            lineHeight = 15.sp,
+                            lineHeight = MinisTypography.lineCodeSm,
                         )
                     }
                 }

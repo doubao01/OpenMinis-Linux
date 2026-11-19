@@ -67,6 +67,7 @@ import com.openminis.app.ui.theme.monetIconTileContentColor
 import com.openminis.app.ui.theme.m3Icon
 import com.openminis.app.i18n.uppercaseForDisplay
 import com.openminis.app.ui.tokens.MinisType
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * Shared primitives for settings pages. Grouped-card layout (iOS/ChatGPT style).
@@ -264,7 +265,7 @@ fun SettingsSection(
                 // already provides separation, so keep the footer's own bottom
                 // tight at 4dp).
                 modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp, bottom = 4.dp),
-                lineHeight = 16.sp,
+                lineHeight = MinisTypography.lineNote,
             )
         }
     }

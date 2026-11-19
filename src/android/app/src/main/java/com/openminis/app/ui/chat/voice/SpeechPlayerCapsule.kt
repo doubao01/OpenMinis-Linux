@@ -420,7 +420,7 @@ private fun CompactSpeaker(
             Text(
                 VoiceOutputState.speedLabel(speed),
                 fontSize = MinisTypography.cap2,
-                lineHeight = 11.sp,
+                lineHeight = MinisTypography.lineBadge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 maxLines = 1,
@@ -528,7 +528,7 @@ private fun ExpandedCapsule(
                 style = androidx.compose.ui.text.TextStyle(
                     fontSize = MinisTypography.cap,
                     fontWeight = FontWeight.Bold,
-                    lineHeight = 11.sp,
+                    lineHeight = MinisTypography.lineBadge,
                     platformStyle = androidx.compose.ui.text.PlatformTextStyle(
                         includeFontPadding = false,
                     ),
@@ -558,7 +558,7 @@ private fun ExpandedCapsule(
                 style = androidx.compose.ui.text.TextStyle(
                     fontSize = MinisTypography.cap,
                     fontWeight = FontWeight.Bold,
-                    lineHeight = 11.sp,
+                    lineHeight = MinisTypography.lineBadge,
                     platformStyle = androidx.compose.ui.text.PlatformTextStyle(
                         includeFontPadding = false,
                     ),

@@ -410,7 +410,7 @@ internal fun PickerActiveBadge() {
     Text(
         stringResource(R.string.model_picker_active_badge),
         fontSize = MinisTypography.cap2,
-        lineHeight = 11.sp,
+        lineHeight = MinisTypography.lineBadge,
         fontWeight = FontWeight.Medium,
         color = badgeTint,
         modifier = Modifier

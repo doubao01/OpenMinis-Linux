@@ -4,7 +4,7 @@ package com.openminis.app.ui.tokens
  * 自动生成 —— 不要手改。生成器: scripts/ui/gen_tokens.py
  *
  * 扫描事实：420 个 ui 下的 .kt 文件 -> Color(0x...): 284 处 / 131 个不同色值；
- * dp 字面量 3489 处 / 83 个不同值；sp 82 处。
+ * dp 字面量 3489 处 / 83 个不同值；sp 45 处。
  * （已排除注释、字符串，以及标了 token-literal-ok 的行。）
  * 本文件命名 25 个色值，当前覆盖 123/284 = 43% 的颜色使用点。
  * 剩下的未命名字面量由 scripts/ci/check_token_coverage.py 的按文件预算
@@ -468,6 +468,63 @@ data class MinisType(
             11f, 12f, 14.5f, 17f, 18f, 20f, 22f, 24f, 24f, 28f, 32f, 36f, 40f, 44f, 52f, 64f,
         )
     }
+}
+
+/** 具名行距角色。值是对齐到整个 sp 的实测量，不是曲线输出。
+ *
+ *  [MinisType.lineHeight] 是「字号 -> 行高」的连续插值，只能给一个答案。
+ *  但同一字号在不同用途下需要的行距并不相同：13sp 正文配 19，等宽日志配
+ *  18，输入框配 16.25（后者是 composerFontScale 缩放前的基准，必须钉死，
+ *  否则缩放时长行距会被曲线二次放大）。这类地方只能按角色取值。
+ *
+ *  命名按**用途**不按数值：`badge` 不是「11sp 的行高」，是「单行徽章的行高」。
+ *  同一数值服务多个角色时归入最大的一族，其余在注释里点名，避免出现
+ *  `lh11`/`lh16` 这种把字面量换个写法的假令牌。 */
+object MinisLineHeight {
+    /** 单行徽章：fontSize 9-11sp 且 maxLines=1。行高必须贴着字号，
+     *  否则 18dp 高的胶囊里文字会被行距顶出垂直居中。 */
+    const val badge = 11f
+
+    /** 多行说明与错误提示：12sp 正文、Material bodySmall。 */
+    const val note = 16f
+
+    /** 多行小字排版：11sp caption 两行、12sp 工具结果摘要。 */
+    const val caption = 17f
+
+    /** 13sp 正文默认行距。中文正文的舒适行距下限。 */
+    const val body = 19f
+
+    /** 14sp 大正文：sub-agent 栏、列表副标题。 */
+    const val bodyLg = 20f
+
+    /** 等宽正文 12-13sp：工具输出、日志、代码预览、memory 内容。
+     *  codeFoot(12) 与 code(13) 共用：等宽字形 x-height 一致，行距取
+     *  同一绝对值才让相邻区块的基线对齐。 */
+    const val code = 18f
+
+    /** 等宽小字 11sp：git 面板、logcat。比 [code] 紧一档。 */
+    const val codeSm = 15f
+
+    /** 紧凑等宽行 13sp：diff 的 +/- 行。每行只有 2dp 垂直 padding，
+     *  行距必须比常规 [code] 紧 1sp，否则相邻增删行会互相粘连，
+     *  一眼看不出是一行改成了另一行。 */
+    const val codeDiff = 17f
+
+    /** 15sp 标题：sub-agent 结果头。 */
+    const val title = 22f
+
+    /** 输入框基准行距。乘 composerFontScale 之前的值，16.5sp 字号配它
+     *  得 0.98 的紧行距，与 4 行可见高度的设计一致。 */
+    const val composer = 16.25f
+
+    /** 11sp cap 的紧凑单行：顶栏按钮文字。 */
+    const val capCompact = 13f
+
+    /** 11sp cap 的常规单行。 */
+    const val cap = 14f
+
+    /** 10sp chip：状态胶囊。 */
+    const val chip = 12f
 }
 
 /** 动效令牌。fast=120ms 用于 press，base=200ms 用于展开，slow=320ms 用于页面切换。 */

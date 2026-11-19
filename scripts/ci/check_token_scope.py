@@ -110,6 +110,25 @@ def mask_source(src: str) -> str:
                 if src[k] != "\n":
                     out[k] = " "
             i = j
+        elif src[i] == "'":
+            # Kotlin 字符字面量：'{' 或 '}' 里的括号不是语法括号。
+            # 漏掉这一支会让 LaunchedEffect 的闭合点被推到下一个 when 分支，
+            # 于是分支里合法的组合期读取被误判成在 effect 内（FilePreviewScreen:745）。
+            j = i + 1
+            while j < n:
+                if src[j] == "\\":
+                    j += 2
+                    continue
+                if src[j] == "'":
+                    j += 1
+                    break
+                if src[j] == "\n":   # 未闭合，别把整份文件吃掉
+                    break
+                j += 1
+            for k in range(i, min(j, n)):
+                if src[k] != "\n":
+                    out[k] = " "
+            i = j
         else:
             i += 1
     return "".join(out)
@@ -230,6 +249,22 @@ fun A() {
 }
 """,
             True,
+        ),
+        "char-literal-brace": (
+            # 字符字面量里的括号不能参与作用域配平。漏了这条，effect 的闭合点
+            # 会被推到下一个 when 分支，分支里的合法读取全被误报。
+            """@Composable
+fun B(x: String) {
+    LaunchedEffect(x) { load() }
+    val s = when (x.first()) {
+        '{' -> MinisTypography.lineCode
+        '}' -> MinisTypography.lineCode
+        else -> MinisTypography.lineCode
+    }
+    Text("", lineHeight = s)
+}
+""",
+            False,
         ),
     }
     failed = 0

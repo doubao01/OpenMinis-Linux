@@ -263,7 +263,7 @@ internal fun ChatTopBarTitle(
                                     Text(
                                         text = providerName,
                                         fontSize = MinisTypography.cap,
-                                        lineHeight = 13.sp,
+                                        lineHeight = MinisTypography.lineCapCompact,
                                         color = ChatColors.tertiaryText,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,

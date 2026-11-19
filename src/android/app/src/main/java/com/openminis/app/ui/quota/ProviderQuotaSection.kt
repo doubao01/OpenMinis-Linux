@@ -63,6 +63,7 @@ import com.openminis.app.ui.components.UrlPreviewSheet
 import com.openminis.app.ui.theme.LocalChatPalette
 import kotlinx.coroutines.launch
 import com.openminis.app.ui.tokens.MinisType
+import com.openminis.app.ui.tokens.MinisTypography
 
 // [T-provider-quota] "Quota" section of the provider detail page: the upstream
 // balance / quota of this instance's account, from the vendor itself - never
@@ -263,7 +264,7 @@ private fun SectionFooter(st: QuotaState, display: QuotaInstanceDisplay, instanc
                 text,
                 style = MaterialTheme.typography.bodySmall,
                 color = if (warning) quotaOrange() else MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 16.sp,
+                lineHeight = MinisTypography.lineNote,
             )
         }
     }
