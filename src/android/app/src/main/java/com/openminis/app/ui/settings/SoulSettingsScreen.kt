@@ -88,6 +88,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.withContext
+import com.openminis.app.ui.tokens.MinisTypography
 /**
  * [T-soul-md] Settings page for editing SOUL.md. Mirrors iOS
  * `SoulSettingsView` (commit 6370d5a):
@@ -410,7 +411,7 @@ fun SoulSettingsScreen(
                     if (style.isNotBlank()) {
                         Text(
                             text = style,
-                            fontSize = 13.sp,
+                            fontSize = MinisTypography.body,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
@@ -729,7 +730,6 @@ internal fun SoulIconGlyph(
         else -> Text(text = SoulMetadata.DISPLAY_EMOJI, fontSize = emojiSp)
     }
 }
-
 
 // SoulIconMenu 已移到 SoulIconMenu.kt（架构门禁行数）
 

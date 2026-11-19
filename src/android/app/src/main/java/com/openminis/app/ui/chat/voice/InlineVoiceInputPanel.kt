@@ -67,6 +67,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * [T-android-voice-panel] Inline voice input panel — Android port of iOS
@@ -688,7 +689,7 @@ private fun ExpandedContent(
                     .background(Color(0xFFFF9500).copy(alpha = 0.12f))
                     .padding(horizontal = 12.dp, vertical = 5.dp),
             ) {
-                Text("⚠︎", fontSize = 10.sp, color = Color(0xFFFF9500))
+                Text("⚠︎", fontSize = MinisTypography.chip, color = Color(0xFFFF9500))
                 Spacer(Modifier.width(5.dp))
                 Text(
                     transcribeError,
@@ -853,7 +854,7 @@ private fun TranscriptArea(
             },
             textStyle = TextStyle(
                 color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 16.sp,
+                fontSize = MinisTypography.titleLg,
                 textAlign = TextAlign.Center,
             ),
             cursorBrush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.primary),
@@ -907,4 +908,3 @@ private fun TranscriptArea(
         }
     }
 }
-

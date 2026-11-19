@@ -185,7 +185,7 @@ import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
-
+import com.openminis.app.ui.tokens.MinisTypography
 
 internal data class CategoryStyle(val icon: ImageVector, val color: Color)
 
@@ -1117,7 +1117,7 @@ fun SessionListScreen(
                                 // Folder names are user data — verbatim.
                                 Text(
                                     bar.folder.name,
-                                    fontSize = 14.sp,
+                                    fontSize = MinisTypography.bodyLg,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.onSurface,
                                     maxLines = 1,
@@ -1652,7 +1652,7 @@ private fun SectionHeader(title: String) {
         }
         Text(
             text = title,
-            fontSize = 14.sp,
+            fontSize = MinisTypography.bodyLg,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -1908,7 +1908,6 @@ private fun SessionItemContent(
             }
         }
     }
-
 
 }
 
@@ -2215,7 +2214,7 @@ private fun FolderCard(
                 // User data — rendered verbatim, never a string lookup.
                 Text(
                     block.folder.name,
-                    fontSize = 16.sp,
+                    fontSize = MinisTypography.titleLg,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
@@ -2233,7 +2232,7 @@ private fun FolderCard(
                             stringResource(R.string.group_n_chats, block.totalCount)
                         else -> stringResource(R.string.group_empty)
                     },
-                    fontSize = 14.sp,
+                    fontSize = MinisTypography.bodyLg,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -2246,7 +2245,7 @@ private fun FolderCard(
             ) {
                 Text(
                     dateText,
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     color = MaterialTheme.colorScheme.outline,
                 )
                 Row(
@@ -2632,7 +2631,7 @@ private fun SessionRow(
             if (searchQuery.isNotBlank()) {
                 Text(
                     text = highlightedAnnotatedString(titleText, searchQuery),
-                    fontSize = 16.sp,
+                    fontSize = MinisTypography.titleLg,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
@@ -2641,7 +2640,7 @@ private fun SessionRow(
             } else {
                 Text(
                     text = titleText,
-                    fontSize = 16.sp,
+                    fontSize = MinisTypography.titleLg,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
@@ -2653,7 +2652,7 @@ private fun SessionRow(
             if (searchQuery.isNotBlank() && searchSnippet != null) {
                 Text(
                     text = highlightedAnnotatedString(searchSnippet, searchQuery),
-                    fontSize = 14.sp,
+                    fontSize = MinisTypography.bodyLg,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -2662,7 +2661,7 @@ private fun SessionRow(
                 Text(
                     text = lastMessageForDisplay(session.lastMessage)
                         ?: stringResource(R.string.sessionlist_no_messages),
-                    fontSize = 14.sp,
+                    fontSize = MinisTypography.bodyLg,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -2672,7 +2671,7 @@ private fun SessionRow(
 
         Text(
             text = timeText,
-            fontSize = 13.sp,
+            fontSize = MinisTypography.body,
             color = MaterialTheme.colorScheme.outline,
             modifier = Modifier.padding(top = 12.dp),
         )
@@ -2934,7 +2933,7 @@ private fun SetupStepCard(
                 Text(
                     text = "$number",
                     color = Color.White,
-                    fontSize = 15.sp,
+                    fontSize = MinisTypography.title,
                     fontWeight = FontWeight.SemiBold,
                 )
             }
@@ -3089,7 +3088,7 @@ internal fun SessionEditSheet(
                             Spacer(Modifier.height(4.dp))
                             Text(
                                 cat,
-                                fontSize = 11.sp,
+                                fontSize = MinisTypography.cap,
                                 color = if (isSelected) monetIconTint(style.color)
                                 else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,

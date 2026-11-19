@@ -46,6 +46,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.coroutineContext
 import java.io.File
+import com.openminis.app.ui.tokens.MinisTypography
 
 // ─── MinisTextKit hook ────────────────────────────────────────────────────────
 // Each markdown fragment renders inside a [MarkdownBlock] / [RenderBlock]
@@ -807,7 +808,6 @@ internal fun findDisplayMathClose(lines: List<String>, from: Int): Int? {
     return null
 }
 
-
 internal fun MutableList<MdBlock>.addParagraphChunks(text: String) {
     if (text.isEmpty()) return
     for (chunk in BoundedText.splitForCompose(text)) {
@@ -937,7 +937,7 @@ internal fun BrokenImagePlaceholder(alt: String?) {
             )
             Text(
                 text = alt?.takeIf { it.isNotBlank() } ?: "Image not available",
-                fontSize = 12.sp,
+                fontSize = MinisTypography.foot,
                 color = palette.secondaryText,
                 textAlign = TextAlign.Center,
                 maxLines = 2,

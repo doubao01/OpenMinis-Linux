@@ -108,7 +108,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatScreen.kt": {
       "color": 2,
-      "sp": 6,
+      "sp": 2,
       "dp": 101
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatStopOptions.kt": {
@@ -128,7 +128,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatToolDetailUI.kt": {
       "color": 0,
-      "sp": 37,
+      "sp": 7,
       "dp": 112
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatTopBarSection.kt": {
@@ -293,7 +293,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownText.kt": {
       "color": 0,
-      "sp": 3,
+      "sp": 2,
       "dp": 5
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/SupervisorStatusBar.kt": {
@@ -323,7 +323,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/voice/InlineVoiceInputPanel.kt": {
       "color": 2,
-      "sp": 2,
+      "sp": 0,
       "dp": 26
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/voice/InlineVoicePanelParts.kt": {
@@ -558,7 +558,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/sessions/SessionListScreen.kt": {
       "color": 8,
-      "sp": 12,
+      "sp": 0,
       "dp": 142
     },
     "src/android/app/src/main/java/com/openminis/app/ui/sessions/SessionRunNowMenuItem.kt": {
@@ -853,7 +853,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulSettingsScreen.kt": {
       "color": 0,
-      "sp": 3,
+      "sp": 2,
       "dp": 34
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/StorageManagementScreen.kt": {

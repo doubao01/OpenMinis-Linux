@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import java.io.File
+import com.openminis.app.ui.tokens.MinisTypography
 import androidx.core.content.ContextCompat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -4052,7 +4053,7 @@ fun ChatScreen(
                                     Spacer(Modifier.width(6.dp))
                                     Text(
                                         stringResource(R.string.chat_move_to_capsule),
-                                        fontSize = 11.sp,
+                                        fontSize = MinisTypography.cap,
                                         fontWeight = FontWeight.Medium,
                                         color = ChatColors.secondaryText,
                                     )
@@ -4294,7 +4295,7 @@ fun ChatScreen(
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     text = partial,
-                                    fontSize = 14.sp,
+                                    fontSize = MinisTypography.bodyLg,
                                     color = ChatColors.secondaryText,
                                     maxLines = 2,
                                 )
@@ -4973,7 +4974,7 @@ fun ChatScreen(
                             ) {
                                 Text(
                                     text = sttLocale.language.uppercase().take(2),
-                                    fontSize = 12.sp,
+                                    fontSize = MinisTypography.foot,
                                     fontWeight = FontWeight.Bold,
                                     color = ChatColors.primaryText,
                                 )
@@ -5155,7 +5156,7 @@ fun ChatScreen(
                                     // predictable box and the 6dp padding reads
                                     // evenly above and below.
                                     style = LocalTextStyle.current.copy(
-                                        fontSize = 13.sp,
+                                        fontSize = MinisTypography.body,
                                         lineHeight = 16.25.sp,
                                         platformStyle = PlatformTextStyle(includeFontPadding = false),
                                         lineHeightStyle = LineHeightStyle(
@@ -5579,7 +5580,6 @@ private data class HistoryEdgeVisible(
     val newestEdge: Boolean,
     val oldestEdge: Boolean,
 )
-
 
 // [T-android-split-chat] Message rows, assistant blocks, tool detail, composer
 // widgets, model picker and misc views live in their own Chat*UI / ChatMiscViews

@@ -198,7 +198,7 @@ internal fun ToolDetailSheet(
                 // user is already scanning timing info.
                 Text(
                     text = "Minis Computer",
-                    fontSize = 15.sp,
+                    fontSize = MinisTypography.title,
                     fontWeight = FontWeight.SemiBold,
                     color = ChatColors.primaryText,
                 )
@@ -421,7 +421,7 @@ internal fun ToolDetailSheet(
                                 ) {
                                     Text(
                                         text = "$ $command",
-                                        fontSize = 13.sp,
+                                        fontSize = MinisTypography.code,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = FontFamily.Monospace,
                                         color = Color.White,
@@ -443,7 +443,7 @@ internal fun ToolDetailSheet(
                                         }
                                         Text(
                                             text = linkified,
-                                            fontSize = 13.sp,
+                                            fontSize = MinisTypography.code,
                                             fontFamily = FontFamily.Monospace,
                                             color = RawC.systemGreen.tc,  // iOS .green
                                             lineHeight = 18.sp,
@@ -466,14 +466,14 @@ internal fun ToolDetailSheet(
                                     ) {
                                         Text(
                                             text = sheetMonitor.formattedCpu(),
-                                            fontSize = 11.sp,
+                                            fontSize = MinisTypography.codeSm,
                                             fontWeight = FontWeight.Medium,
                                             fontFamily = FontFamily.Monospace,
                                             color = RawC.systemGreen.tc,  // iOS .green
                                         )
                                         Text(
                                             text = sheetMonitor.formattedMem(),
-                                            fontSize = 11.sp,
+                                            fontSize = MinisTypography.codeSm,
                                             fontWeight = FontWeight.Medium,
                                             fontFamily = FontFamily.Monospace,
                                             color = RawC.systemGreen.tc,
@@ -563,7 +563,7 @@ internal fun ToolDetailSheet(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = if (fileName.isNotEmpty()) fileName else "(file)",
-                                        fontSize = 13.sp,
+                                        fontSize = MinisTypography.code,
                                         fontWeight = FontWeight.Medium,
                                         fontFamily = FontFamily.Monospace,
                                         color = ChatColors.primaryText,
@@ -574,7 +574,7 @@ internal fun ToolDetailSheet(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = "($sizeLabel)",
-                                        fontSize = 11.sp,
+                                        fontSize = MinisTypography.cap,
                                         color = if (isLive) MinisTokens.colors.statusWarn.tc.copy(alpha = 0.80f)
                                                 else ChatColors.tertiaryText,
                                     )
@@ -597,7 +597,7 @@ internal fun ToolDetailSheet(
                                         oldStr.lines().forEach { line ->
                                             Text(
                                                 text = "- $line",
-                                                fontSize = 13.sp,
+                                                fontSize = MinisTypography.code,
                                                 fontFamily = FontFamily.Monospace,
                                                 color = redText,
                                                 lineHeight = 17.sp,
@@ -612,7 +612,7 @@ internal fun ToolDetailSheet(
                                         newStr.lines().forEach { line ->
                                             Text(
                                                 text = "+ $line",
-                                                fontSize = 13.sp,
+                                                fontSize = MinisTypography.code,
                                                 fontFamily = FontFamily.Monospace,
                                                 color = greenText,
                                                 lineHeight = 17.sp,
@@ -639,7 +639,7 @@ internal fun ToolDetailSheet(
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = stringResource(R.string.chat_tool_edited),
-                                                fontSize = 13.sp,
+                                                fontSize = MinisTypography.body,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = ChatColors.primaryText,
                                             )
@@ -647,7 +647,7 @@ internal fun ToolDetailSheet(
                                                 Spacer(modifier = Modifier.width(6.dp))
                                                 Text(
                                                     text = path,
-                                                    fontSize = 12.sp,
+                                                    fontSize = MinisTypography.codeFoot,
                                                     fontFamily = FontFamily.Monospace,
                                                     color = ChatColors.secondaryText,
                                                     maxLines = 1,
@@ -659,7 +659,7 @@ internal fun ToolDetailSheet(
                                         if (resultDetail != null) {
                                             Text(
                                                 text = resultDetail,
-                                                fontSize = 12.sp,
+                                                fontSize = MinisTypography.foot,
                                                 color = ChatColors.tertiaryText,
                                                 modifier = Modifier.padding(top = 2.dp),
                                             )
@@ -759,7 +759,7 @@ internal fun ToolDetailSheet(
                                     if (action.isNotEmpty()) {
                                         Text(
                                             text = action,
-                                            fontSize = 12.sp,
+                                            fontSize = MinisTypography.foot,
                                             fontWeight = FontWeight.SemiBold,
                                             color = Color.White,
                                             modifier = Modifier
@@ -773,7 +773,7 @@ internal fun ToolDetailSheet(
                                         // Color(white: 0.35) text — distinct pill against sheet bg.
                                         Text(
                                             text = resolvedUrl,
-                                            fontSize = 12.sp,
+                                            fontSize = MinisTypography.foot,
                                             color = MinisTokens.colors.urlCapsuleText.tc,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis,
@@ -828,7 +828,7 @@ internal fun ToolDetailSheet(
                                             strokeWidth = 2.dp,
                                             color = ChatColors.link,
                                         )
-                                        Text(stringResource(R.string.loading), fontSize = 12.sp, color = ChatColors.tertiaryText)
+                                        Text(stringResource(R.string.loading), fontSize = MinisTypography.foot, color = ChatColors.tertiaryText)
                                     }
                                 }
                             }
@@ -859,7 +859,7 @@ internal fun ToolDetailSheet(
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
                                             text = stringResource(R.string.chat_tool_result_label),
-                                            fontSize = 13.sp,
+                                            fontSize = MinisTypography.body,
                                             fontWeight = FontWeight.Medium,
                                             color = ChatColors.secondaryText,
                                         )
@@ -867,7 +867,7 @@ internal fun ToolDetailSheet(
                                     HorizontalDivider(thickness = 0.5.dp, color = ChatColors.separator)
                                     Text(
                                         text = block.content,
-                                        fontSize = 13.sp,
+                                        fontSize = MinisTypography.code,
                                         fontFamily = FontFamily.Monospace,
                                         color = ChatColors.primaryText,
                                         lineHeight = MinisTypography.type.lineHeightMono(13f).sp,
@@ -950,7 +950,7 @@ internal fun ToolDetailSheet(
                             if (block.content.isNotEmpty()) {
                                 Text(
                                     text = block.content,
-                                    fontSize = 13.sp,
+                                    fontSize = MinisTypography.code,
                                     fontFamily = FontFamily.Monospace,
                                     color = ChatColors.primaryText,
                                     lineHeight = 18.sp,
@@ -1001,7 +1001,7 @@ internal fun ToolDetailSheet(
                                     Text(
                                         text = if (isLive) "Running..." else "No output",
                                         color = ChatColors.tertiaryText,
-                                        fontSize = 14.sp,
+                                        fontSize = MinisTypography.bodyLg,
                                     )
                                 }
                             }
@@ -1051,7 +1051,7 @@ internal fun ToolDetailSheet(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = toolTitleLabel(block.toolName),
-                            fontSize = 14.sp,
+                            fontSize = MinisTypography.bodyLg,
                             lineHeight = MinisTypography.type.lineHeightTight(14f).sp,
                             fontWeight = FontWeight.SemiBold,
                             color = ChatColors.primaryText,
@@ -1060,7 +1060,7 @@ internal fun ToolDetailSheet(
                         )
                         Text(
                             text = block.toolTitle.ifEmpty { block.toolName },
-                            fontSize = 12.sp,
+                            fontSize = MinisTypography.foot,
                             lineHeight = MinisTypography.type.lineHeightTight(12f).sp,
                             color = ChatColors.secondaryText,
                             maxLines = 1,
@@ -1082,7 +1082,7 @@ internal fun ToolDetailSheet(
                             if (block.durationMs > 0 && !isLive) {
                                 Text(
                                     text = formatToolDuration(block.durationMs),
-                                    fontSize = 11.sp,
+                                    fontSize = MinisTypography.codeSm,
                                     fontFamily = FontFamily.Monospace,
                                     color = ChatColors.tertiaryText,
                                 )
@@ -1136,7 +1136,7 @@ internal fun ToolDetailSheet(
                             )
                             Text(
                                 "Live",
-                                fontSize = 13.sp,
+                                fontSize = MinisTypography.body,
                                 fontWeight = FontWeight.Medium,
                                 color = ChatColors.primaryText,
                             )
@@ -1144,7 +1144,7 @@ internal fun ToolDetailSheet(
                     } else {
                         Text(
                             "${currentIdx + 1} / ${toolBlocks.size}",
-                            fontSize = 13.sp,
+                            fontSize = MinisTypography.code,
                             fontWeight = FontWeight.Medium,
                             fontFamily = FontFamily.Monospace,
                             color = ChatColors.secondaryText,
@@ -1300,7 +1300,7 @@ private fun LazyRevealToolText(
     Column(modifier = modifier) {
         Text(
             text = displayed,
-            fontSize = 13.sp,
+            fontSize = MinisTypography.code,
             fontFamily = FontFamily.Monospace,
             color = color,
             lineHeight = 18.sp,
@@ -1318,7 +1318,7 @@ private fun LazyRevealToolText(
             ) {
                 Text(
                     text = stringResource(R.string.chat_tool_load_more, nextLines),
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     fontWeight = FontWeight.Medium,
                     color = color.copy(alpha = 0.9f),
                     modifier = Modifier.clickable {
@@ -1327,7 +1327,7 @@ private fun LazyRevealToolText(
                 )
                 Text(
                     text = stringResource(R.string.chat_tool_load_all, remainingLines),
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     fontWeight = FontWeight.Medium,
                     color = color.copy(alpha = 0.9f),
                     modifier = Modifier.clickable { revealed = total },
@@ -1390,7 +1390,7 @@ private fun EditorCard(
                 Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(14.dp))
                 Text(
                     text = title,
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     fontWeight = FontWeight.Medium,
                     color = titleColor,
                     maxLines = 1,
@@ -1400,7 +1400,7 @@ private fun EditorCard(
                 if (sizeLabel != null) {
                     Text(
                         text = if (isStreaming) "($sizeLabel received)" else "($sizeLabel)",
-                        fontSize = 11.sp,
+                        fontSize = MinisTypography.cap,
                         color = if (isStreaming) RawC.systemOrange.tc.copy(alpha = 0.8f) else sizeColor,
                     )
                 }
@@ -1444,7 +1444,7 @@ private fun EditorCard(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = trailingText,
-                fontSize = 12.sp,
+                fontSize = MinisTypography.foot,
                 color = ChatColors.tertiaryText,
                 modifier = Modifier.padding(horizontal = 4.dp),
             )

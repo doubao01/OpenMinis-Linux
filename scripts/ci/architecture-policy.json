@@ -158,7 +158,7 @@
     "src/android/app/src/main/java/com/openminis/app/ui/navigation/ChatSplitScaffold.kt": 952,
     "src/android/app/src/main/java/com/openminis/app/ui/sandbox/FilePreviewScreen.kt": 1250,
     "src/android/app/src/main/java/com/openminis/app/ui/sandbox/MirrorSettingsScreen.kt": 861,
-    "src/android/app/src/main/java/com/openminis/app/ui/sessions/SessionListScreen.kt": 3243,
+    "src/android/app/src/main/java/com/openminis/app/ui/sessions/SessionListScreen.kt": 3242,
     "src/android/app/src/main/java/com/openminis/app/ui/sessions/SessionListViewModel.kt": 1199,
     "src/android/app/src/main/java/com/openminis/app/ui/settings/AddProviderScreen.kt": 900,
     "src/android/app/src/main/java/com/openminis/app/ui/settings/AppearanceScreen.kt": 833,
