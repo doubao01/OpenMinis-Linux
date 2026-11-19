@@ -348,7 +348,7 @@ private fun TerminalTopBar(
             color = TerminalFg,
             style = TextStyle(
                 fontFamily = JetBrainsMonoFontFamily,
-                fontSize = 16.sp,
+                fontSize = MinisTypography.titleLg,
             ),
         )
         Spacer(modifier = Modifier.weight(1f))

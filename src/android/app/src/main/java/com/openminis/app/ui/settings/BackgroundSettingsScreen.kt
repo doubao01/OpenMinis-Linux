@@ -424,7 +424,7 @@ private fun BgToggleRow(
         Spacer(Modifier.width(12.dp))
         Text(
             text = title,
-            fontSize = 15.sp,
+            fontSize = MinisTypography.title,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = rowAlpha),
             modifier = Modifier.weight(1f),
@@ -473,7 +473,7 @@ private fun BgRow(
         Column(modifier = Modifier.padding(end = 6.dp)) {
             Text(
                 text = title,
-                fontSize = 15.sp,
+                fontSize = MinisTypography.title,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
             )

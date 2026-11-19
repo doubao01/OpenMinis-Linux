@@ -54,6 +54,7 @@ import com.openminis.app.ui.theme.IosBlue
 import com.openminis.app.ui.theme.IosGreen
 import com.openminis.app.ui.theme.monetIconTint
 import com.openminis.app.ui.theme.m3Icon
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * [R4+R10] Shared skeleton for the model-picker family of sheets — the MAIN
@@ -408,7 +409,7 @@ internal fun PickerActiveBadge() {
     val badgeTint = monetIconTint(IosGreen)
     Text(
         stringResource(R.string.model_picker_active_badge),
-        fontSize = 9.sp,
+        fontSize = MinisTypography.cap2,
         lineHeight = 11.sp,
         fontWeight = FontWeight.Medium,
         color = badgeTint,

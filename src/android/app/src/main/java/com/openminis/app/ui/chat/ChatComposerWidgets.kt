@@ -138,7 +138,7 @@ internal fun AttachmentChip(
                     // extension visible, which is what identifies the file.
                     Text(
                         text = attachment.fileName,
-                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = MinisTypography.cap2),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,

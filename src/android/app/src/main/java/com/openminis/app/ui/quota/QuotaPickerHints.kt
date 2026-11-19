@@ -163,7 +163,7 @@ fun ModelQuotaMemberPill(instanceId: String, modelId: String, onTap: () -> Unit)
     ) {
         Text(
             pill.text,
-            fontSize = 9.sp,
+            fontSize = MinisTypography.cap2,
             lineHeight = 11.sp,
             fontWeight = FontWeight.Medium,
             color = fg,
@@ -215,7 +215,7 @@ fun ModelQuotaHintView(instanceId: String, modelId: String) {
         )
         Text(
             word,
-            fontSize = 9.sp,
+            fontSize = MinisTypography.cap2,
             lineHeight = 11.sp,
             fontWeight = FontWeight.Medium,
             color = color,

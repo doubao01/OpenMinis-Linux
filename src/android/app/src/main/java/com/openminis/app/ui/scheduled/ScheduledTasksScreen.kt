@@ -237,7 +237,7 @@ private fun ScheduledTaskRow(
                 Text(
                     text = task.label.ifBlank { task.prompt.take(40) },
                     fontWeight = FontWeight.Medium,
-                    fontSize = 15.sp,
+                    fontSize = MinisTypography.title,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

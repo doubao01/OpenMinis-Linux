@@ -419,7 +419,7 @@ private fun CompactSpeaker(
         if (speed > 1.0f) {
             Text(
                 VoiceOutputState.speedLabel(speed),
-                fontSize = 9.sp,
+                fontSize = MinisTypography.cap2,
                 lineHeight = 11.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,

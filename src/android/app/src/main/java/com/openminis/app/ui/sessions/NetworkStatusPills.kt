@@ -39,6 +39,7 @@ import com.openminis.app.network.NetworkAlertCenter
 import com.openminis.app.network.NetworkAlertEvent
 import com.openminis.app.network.NetworkHub
 import com.openminis.app.network.NetworkStatusMonitor
+import com.openminis.app.ui.tokens.MinisTypography
 
 private val PillGreen = Color(0xFF34C759)
 private val PillAmber = Color(0xFFFF9500)
@@ -112,7 +113,7 @@ private fun StatusPill(color: Color, text: String, description: String) {
         Spacer(Modifier.width(4.dp))
         Text(
             text,
-            fontSize = 10.sp,
+            fontSize = MinisTypography.chip,
             lineHeight = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,

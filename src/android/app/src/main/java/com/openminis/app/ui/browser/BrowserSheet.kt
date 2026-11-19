@@ -231,7 +231,7 @@ fun BrowserSheet(
                     item {
                         Text(
                             "${tabs.size}/3",
-                            fontSize = 10.sp,
+                            fontSize = MinisTypography.chip,
                             fontWeight = FontWeight.Medium,
                             fontFamily = FontFamily.Monospace,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),

@@ -179,7 +179,7 @@ private fun SubAgentDetailSheet(
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
                     text = memberLabel(member),
-                    fontSize = 16.sp,
+                    fontSize = MinisTypography.titleLg,
                     fontWeight = FontWeight.SemiBold,
                     color = ChatColors.primaryText,
                     maxLines = 1,
@@ -252,7 +252,7 @@ private fun SubAgentDetailSheet(
                             markdown = step.body,
                             color = ChatColors.primaryText,
                             style = TextStyle(
-                                fontSize = 15.sp,
+                                fontSize = MinisTypography.title,
                                 lineHeight = 22.sp,
                                 color = ChatColors.primaryText,
                             ),

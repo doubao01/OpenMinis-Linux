@@ -207,7 +207,7 @@ private fun NewChatRow(onClick: () -> Unit) {
         }
         Text(
             text = stringResource(R.string.new_chat),
-            fontSize = 15.sp,
+            fontSize = MinisTypography.title,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
@@ -260,7 +260,7 @@ private fun MoveToPickerRow(
         ) {
             Text(
                 text = session.title ?: untitled,
-                fontSize = 15.sp,
+                fontSize = MinisTypography.title,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,

@@ -169,7 +169,7 @@ internal fun TypingIndicator() {
     ) {
         Text(
             text = stringResource(R.string.chat_typing_indicator, soulName),
-            fontSize = 15.sp,
+            fontSize = MinisTypography.title,
             color = ChatColors.tertiaryText,
         )
         // Animated bouncing dots
@@ -183,7 +183,7 @@ internal fun TypingIndicator() {
             )
             Text(
                 text = dot,
-                fontSize = 15.sp,
+                fontSize = MinisTypography.title,
                 fontWeight = FontWeight.Bold,
                 color = ChatColors.tertiaryText,
                 modifier = Modifier.graphicsLayer { translationY = offsetY },

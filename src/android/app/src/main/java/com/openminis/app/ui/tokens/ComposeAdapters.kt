@@ -51,6 +51,26 @@ object MinisTypography {
     val type: MinisType
         @Composable @ReadOnlyComposable get() = LocalMinisType.current
 
+    /** 微档：角标数字、未读点、极小的计数。9sp。
+     *
+     *  9sp 是这套排版的下限。它不是「比 cap 更小的字」，用途也完全不同 ——
+     *  cap 是能被读的小节标题，cap2 是**不打算被逐字读**的纯符号（角标、红点
+     *  里的数字、hover 提示的箭头）。这类东西嵌在 4-8dp 的圆点里，字号再大
+     *  就会溢出色块。混进 cap 会让有人调小节标题时把角标撑破。 */
+    val cap2: TextUnit
+        @Composable @ReadOnlyComposable get() = LocalMinisType.current.cap2.sp
+
+    /** 徽章 / 胶囊标签字号。10sp。
+     *
+     *  这一档的判据不是"有多小"，是**外面套着一个有边框或底色的容器**：
+     *  浏览器 tab 计数、模型名字标签、头像首字母、在线状态胶囊。它们都在
+     *  18-22dp 高的圆角块里，字号必须留出上下 padding 才不贴边。
+     *
+     *  归进 cap2(9sp) 会小得在胶囊里浮起来，归进 cap(11sp) 会在 18dp 高的
+     *  块里顶到边框。10 是这两个约束挤出来的唯一值，不是随便取的中间档。 */
+    val chip: TextUnit
+        @Composable @ReadOnlyComposable get() = LocalMinisType.current.chip.sp
+
     /** 正文档字号。13sp 不在 M3 规范档位里（bodyMedium 14 / bodySmall 12），
      *  所以每个用它的地方都得手写 `13.sp` —— 全仓 54 处。这是令牌该接管的
      *  典型场景：值本身没错，错的是散落 54 份副本，改一次正文尺寸要改 54 处。 */
@@ -96,6 +116,26 @@ object MinisTypography {
     /** 等宽大档（公式渲染、统计数值）。14sp。见 [codeSm] 的档位说明。 */
     val codeLg: TextUnit
         @Composable @ReadOnlyComposable get() = LocalMinisType.current.bodyLg.sp
+
+    /** 小标题 / 列表项主行。15sp。
+     *
+     *  15 是个别扭但要保住的值：它比 bodyLg(14) 大一档、比 titleLg(16) 小一档，
+     *  专门用在「一屏里有多个并列小节」的列表，让每个小节的标题略微跳出来。
+     *  归进 bodyLg 会把 8 处列表标题压平，归进 titleLg 会让它们抢正文的注意力。 */
+    val title: TextUnit
+        @Composable @ReadOnlyComposable get() = LocalMinisType.current.title.sp
+
+    /** 大标题档：对话框标题、分节大标题。16sp。
+     *
+     *  和 bodyLg(14) 只差 2sp，但这一档的意义在**行高**：titleLg 走
+     *  lineHeight 曲线的 24sp 锚点，bodyLg 走 20sp。同样的 16sp 正文，
+     *  行距一松就是标题感。所以这一档不能靠「复制 bodyLg 再加粗」替代。 */
+    val titleLg: TextUnit
+        @Composable @ReadOnlyComposable get() = LocalMinisType.current.titleLg.sp
+
+    /** 页内主标题。18sp。列表页 / 空状态 / 设置分组的大标题。 */
+    val head: TextUnit
+        @Composable @ReadOnlyComposable get() = LocalMinisType.current.head.sp
 
     /** 输入框正文。16.5sp —— 比正文松半档，因为打字时光标需要呼吸空间。
      *  16.5 这个数不是随手取的：它刚好高于 16sp 的 `titleLg`，让输入区在

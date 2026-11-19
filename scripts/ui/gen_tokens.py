@@ -474,8 +474,9 @@ data class MinisDimens(
 
 /** 字号 + 行高。字号是离散档位，行高是连续插值 —— 两者性质不同，别混用。 */
 data class MinisType(
-    val cap2: Float = 9f, val cap: Float = 11f, val foot: Float = 12f,
-    val body: Float = 13f, val bodyLg: Float = 14f, val title: Float = 15f,
+    val cap2: Float = 9f, val chip: Float = 10f, val cap: Float = 11f,
+    val foot: Float = 12f, val body: Float = 13f, val bodyLg: Float = 14f,
+    val title: Float = 15f,
     val titleLg: Float = 16f, val head: Float = 18f,
     /** 输入框 / 用户气泡 / 代码编辑器。这三处都是多行可编辑区，16.5 是字宽与
      *  可读性的折中：再小输入时看不住，再大又把气泡撑宽、一行塞不下几个字。 */

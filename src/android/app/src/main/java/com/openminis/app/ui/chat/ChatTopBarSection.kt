@@ -143,7 +143,7 @@ internal fun ChatTopBarTitle(
                             }
                             Text(
                                 text = displayTitle,
-                                fontSize = 16.sp,
+                                fontSize = MinisTypography.titleLg,
                                 lineHeight = MinisTypography.type.lineHeightTight(16f).sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = ChatColors.primaryText,

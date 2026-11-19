@@ -425,8 +425,8 @@ internal fun ChatComposerSlashAndMentionPopups(
                                             .fillMaxWidth()
                                             .height(
                                                 slashPickerHeight(
-                                                    titleSp = 13.sp,
-                                                    subtitleSp = 11.sp,
+                                                    titleSp = MinisTypography.body,
+                                                    subtitleSp = MinisTypography.cap,
                                                     verticalPadding = 8.dp,
                                                     iconSize = 16.dp,
                                                 ),
@@ -500,7 +500,7 @@ internal fun ChatComposerSlashAndMentionPopups(
                                                         if (entry.host) R.string.group_chat_host_suffix
                                                         else R.string.mention_model_badge
                                                     ),
-                                                    fontSize = 10.sp,
+                                                    fontSize = MinisTypography.chip,
                                                     fontWeight = FontWeight.Medium,
                                                     color = ChatColors.secondaryText,
                                                     modifier = Modifier
@@ -566,8 +566,8 @@ internal fun ChatComposerSlashAndMentionPopups(
                                         // inheriting the slash row's.
                                         .height(
                                             slashPickerHeight(
-                                                titleSp = 13.sp,
-                                                subtitleSp = 11.sp,
+                                                titleSp = MinisTypography.body,
+                                                subtitleSp = MinisTypography.cap,
                                                 verticalPadding = 8.dp,
                                                 iconSize = 16.dp,
                                             ),
@@ -635,7 +635,7 @@ internal fun ChatComposerSlashAndMentionPopups(
                                             // Scope / mount badge — matches iOS capsule.
                                             Text(
                                                 text = entry.mountName ?: entry.scope.displayLabel,
-                                                fontSize = 10.sp,
+                                                fontSize = MinisTypography.chip,
                                                 fontWeight = FontWeight.Medium,
                                                 color = ChatColors.secondaryText,
                                                 modifier = Modifier

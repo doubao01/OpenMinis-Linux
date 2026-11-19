@@ -66,7 +66,7 @@ internal fun ThinkingFullContentDialog(content: String, onDismiss: () -> Unit) {
                 ) {
                     Text(
                         text = stringResource(R.string.chat_thinking_header),
-                        fontSize = 15.sp,
+                        fontSize = MinisTypography.title,
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF007AFF),
                     )

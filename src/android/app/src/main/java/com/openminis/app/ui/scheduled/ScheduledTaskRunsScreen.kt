@@ -72,7 +72,7 @@ fun ScheduledTaskRunsScreen(
                         Text(
                             stringResource(R.string.scheduled_task_runs_title),
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
+                            fontSize = MinisTypography.head,
                         )
                         if (task != null && task.label.isNotBlank()) {
                             Text(
