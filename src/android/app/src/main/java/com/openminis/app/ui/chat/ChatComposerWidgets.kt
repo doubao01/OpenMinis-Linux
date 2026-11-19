@@ -237,7 +237,7 @@ internal fun MicButton(
         if (!localeBadge.isNullOrEmpty()) {
             Text(
                 text = localeBadge,
-                fontSize = 8.sp,
+                fontSize = 8.sp,  // token-literal-ok: locale 徽章 Bold 8sp 是实现旁注，非排版档位
                 fontWeight = FontWeight.Bold,
                 color = Color.Red,
                 modifier = Modifier

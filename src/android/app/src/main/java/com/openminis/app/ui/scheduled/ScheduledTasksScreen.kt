@@ -95,7 +95,7 @@ fun ScheduledTasksScreen(
                     Text(
                         stringResource(R.string.automation_title),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
+                        fontSize = MinisTypography.display,
                     )
                 },
                 navigationIcon = {

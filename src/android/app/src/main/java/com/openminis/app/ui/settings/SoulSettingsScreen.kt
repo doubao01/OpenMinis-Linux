@@ -364,7 +364,7 @@ fun SoulSettingsScreen(
                             .clickable { showIconMenu = true },
                         contentAlignment = Alignment.Center,
                     ) {
-                        SoulIconGlyph(icon = icon, sizeDp = 30.dp, emojiSp = 24.sp)
+                        SoulIconGlyph(icon = icon, sizeDp = 30.dp, emojiSp = 24.sp)  // token-literal-ok: emoji 字形字号即图形尺寸，Token 表不覆盖此尺度
                         // Badge kept INSIDE the circle's bounds: on iOS an
                         // overhanging badge was clipped to a sliver by the
                         // enclosing button label.
@@ -404,7 +404,7 @@ fun SoulSettingsScreen(
                 Column(modifier = Modifier.padding(start = 4.dp)) {
                     Text(
                         text = name.ifBlank { "Minis Ultra" },
-                        fontSize = 17.sp,
+                        fontSize = 17.sp,  // token-literal-ok: Sheet 标题：17sp 夹在 16/18 之间，是为对齐 RoundedCorner 视觉边界
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
                     )

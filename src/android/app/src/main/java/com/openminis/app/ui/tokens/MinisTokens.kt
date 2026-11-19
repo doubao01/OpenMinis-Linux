@@ -4,7 +4,7 @@ package com.openminis.app.ui.tokens
  * 自动生成 —— 不要手改。生成器: scripts/ui/gen_tokens.py
  *
  * 扫描事实：420 个 ui 下的 .kt 文件 -> Color(0x...): 284 处 / 131 个不同色值；
- * dp 字面量 3490 处 / 83 个不同值；sp 98 处。
+ * dp 字面量 3489 处 / 83 个不同值；sp 82 处。
  * （已排除注释、字符串，以及标了 token-literal-ok 的行。）
  * 本文件命名 25 个色值，当前覆盖 123/284 = 43% 的颜色使用点。
  * 剩下的未命名字面量由 scripts/ci/check_token_coverage.py 的按文件预算
@@ -363,6 +363,18 @@ data class MinisType(
     val foot: Float = 12f, val body: Float = 13f, val bodyLg: Float = 14f,
     val title: Float = 15f,
     val titleLg: Float = 16f, val head: Float = 18f,
+    /** 展示档：Markdown h2、统计大数字。20sp。
+     *
+     *  令牌表此前止步于 18(head)，因为 18 是「最大的正文可用字号」——
+     *  界面里的功能文字到此为止。20 之上是**展示**：Markdown 标题、用量
+     *  统计里的主数字。它们的共同点是出现频率低、占位大、不需要和 13sp
+     *  正文在同一行共存。混进 head 会让「调大标题」误伤所有小节标题。 */
+    val display: Float = 20f,
+    /** 展示大档：Markdown h1、emoji 头像字形。24sp。
+     *
+     *  24 是正文的 1.85 倍。到这个尺度，字形细节（尤其是 emoji 的色块边缘）
+     *  开始主导观感，再大就变成插画而非文字，需要换 Image 而非 fontSize。 */
+    val displayLg: Float = 24f,
     /** 输入框 / 用户气泡 / 代码编辑器。这三处都是多行可编辑区，16.5 是字宽与
      *  可读性的折中：再小输入时看不住，再大又把气泡撑宽、一行塞不下几个字。 */
     val bodyInput: Float = 16.5f,

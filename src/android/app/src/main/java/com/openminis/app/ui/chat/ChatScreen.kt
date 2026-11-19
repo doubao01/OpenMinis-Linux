@@ -4912,7 +4912,7 @@ fun ChatScreen(
                         }) {
                             Text(
                                 "/",
-                                fontSize = 20.sp,
+                                fontSize = MinisTypography.display,
                                 fontWeight = FontWeight.Bold,
                                 fontStyle = FontStyle.Italic,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,

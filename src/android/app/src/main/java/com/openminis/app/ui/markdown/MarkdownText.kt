@@ -216,12 +216,12 @@ private fun HeadingBlock(
     mathSpans: List<MarkdownParser.MathSpan>,
 ) {
     val (fontSize, fontWeight) = when (heading.level) {
-        1 -> 24.sp to FontWeight.Bold
-        2 -> 20.sp to FontWeight.Bold
-        3 -> 18.sp to FontWeight.SemiBold
-        4 -> 16.sp to FontWeight.SemiBold
-        5 -> 15.sp to FontWeight.Medium
-        else -> 14.sp to FontWeight.Medium
+        1 -> com.openminis.app.ui.tokens.MinisTypography.type.displayLg.sp to FontWeight.Bold
+        2 -> com.openminis.app.ui.tokens.MinisTypography.type.display.sp to FontWeight.Bold
+        3 -> com.openminis.app.ui.tokens.MinisTypography.type.head.sp to FontWeight.SemiBold
+        4 -> com.openminis.app.ui.tokens.MinisTypography.type.titleLg.sp to FontWeight.SemiBold
+        5 -> com.openminis.app.ui.tokens.MinisTypography.type.title.sp to FontWeight.Medium
+        else -> com.openminis.app.ui.tokens.MinisTypography.type.bodyLg.sp to FontWeight.Medium
     }
     // (#4) Headings carry inline math through [MathFlowText] now — previously
     // the placeholder sentinel was stripped here and `$x^2$` inside a heading

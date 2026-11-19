@@ -63,7 +63,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatComposerWidgets.kt": {
       "color": 2,
-      "sp": 1,
+      "sp": 0,
       "dp": 40
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatFlatItems.kt": {
@@ -108,7 +108,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatScreen.kt": {
       "color": 2,
-      "sp": 2,
+      "sp": 1,
       "dp": 101
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatStopOptions.kt": {
@@ -128,7 +128,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatToolDetailUI.kt": {
       "color": 0,
-      "sp": 7,
+      "sp": 6,
       "dp": 112
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatTopBarSection.kt": {
@@ -448,7 +448,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/markdown/MarkdownText.kt": {
       "color": 1,
-      "sp": 7,
+      "sp": 1,
       "dp": 41
     },
     "src/android/app/src/main/java/com/openminis/app/ui/markdown/SyntaxHighlighter.kt": {
@@ -538,7 +538,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/scheduled/ScheduledTasksScreen.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 10
     },
     "src/android/app/src/main/java/com/openminis/app/ui/sessions/GroupPickerSheet.kt": {
@@ -548,7 +548,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/sessions/NetworkStatusPills.kt": {
       "color": 2,
-      "sp": 2,
+      "sp": 1,
       "dp": 3
     },
     "src/android/app/src/main/java/com/openminis/app/ui/sessions/SessionGroupVisuals.kt": {
@@ -833,7 +833,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulEmojiPickerSheet.kt": {
       "color": 0,
-      "sp": 3,
+      "sp": 0,
       "dp": 10
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulGlyphs.kt": {
@@ -853,8 +853,8 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulSettingsScreen.kt": {
       "color": 0,
-      "sp": 2,
-      "dp": 34
+      "sp": 0,
+      "dp": 33
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/StorageManagementScreen.kt": {
       "color": 0,

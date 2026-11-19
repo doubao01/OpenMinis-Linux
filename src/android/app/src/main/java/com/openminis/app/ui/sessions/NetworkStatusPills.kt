@@ -53,7 +53,7 @@ private val PillAmber = Color(0xFFFF9500)
 @Composable
 internal fun HomeTitleWithNetworkPills(title: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        Text(title, fontWeight = FontWeight.Bold, fontSize = MinisTypography.display)
         NetworkStatusPills()
     }
 }

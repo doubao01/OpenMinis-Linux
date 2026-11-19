@@ -1090,7 +1090,7 @@ internal fun ToolDetailSheet(
                             if (block.startTimeMs > 0L) {
                                 Text(
                                     text = formatStepTimestamp(block.startTimeMs),
-                                    fontSize = 9.sp,
+                                    fontSize = MinisTypography.cap2,
                                     fontFamily = FontFamily.Monospace,
                                     color = ChatColors.tertiaryText.copy(alpha = 0.75f),
                                 )
