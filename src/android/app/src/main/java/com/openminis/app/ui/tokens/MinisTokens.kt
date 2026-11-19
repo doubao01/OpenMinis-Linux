@@ -4,7 +4,7 @@ package com.openminis.app.ui.tokens
  * 自动生成 —— 不要手改。生成器: refactor/tools/gen_tokens.py
  *
  * 扫描事实：420 个 ui 下的 .kt 文件 -> Color(0x...): 284 处 / 131 个不同色值；
- * dp 字面量 3515 处 / 83 个不同值；sp 363 处。
+ * dp 字面量 3515 处 / 83 个不同值；sp 362 处。
  * 本文件命名 25 个色值，当前覆盖 123/284 = 43% 的颜色使用点；
  * 未命名的色值留在原地，由 refactor/tools/check_ui_tokens.py 的棘轮逐步压制。
  *
@@ -137,7 +137,7 @@ object RawType {
     const val bodyLg: Float = 14f  // x 36
     const val title: Float = 15f  // x 18
     const val titleLg: Float = 16f  // x 25
-    const val head: Float = 18f  // x 13
+    const val head: Float = 18f  // x 12
 }
 
 /**
@@ -372,7 +372,43 @@ data class MinisType(
     val body: Float = 13f, val bodyLg: Float = 14f, val title: Float = 15f,
     val titleLg: Float = 16f, val head: Float = 18f,
 ) {
-    fun lineHeight(size: Float, ratio: Float = 1.35f): Float = size * ratio
+    /**
+     * 行高。**不是** 字号 × 单一比例 —— 真实设计不这样。
+     *
+     * 全仓实测 57 组多行 fontSize/lineHeight 配对（已排除 2 组单行标签，
+     * 那些把 lineHeight 压到等于 fontSize 是为消除行间空隙，属于刻意做法）：
+     *
+     *   字号 9-11  → 比值 1.20-1.32（小字紧凑，否则一屏放不下几条）
+     *   字号 12-16 → 比值 1.38-1.50（正文需要松，这是可读性的主体）
+     *   字号 22+   → 比值 1.12-1.33（显示字号反而收紧，否则行间裂开）
+     *
+     * 呈倒 U 形，不是单调的。旧版写死 `size * 1.35f`，把这条曲线压成一个点：
+     * 9sp 会被拉松到 12.2（实际 11），16sp 会被压紧到 21.6（实际 24）。
+     *
+     * 未知字号退回 1.35（旧行为），保证调用方不会拿到 0。
+     */
+    fun lineHeight(size: Float): Float {
+        val ratio = when {
+            size <= 9f -> 1.22f
+            size <= 10f -> 1.20f
+            size <= 11f -> 1.32f
+            size <= 12f -> 1.42f
+            size <= 13f -> 1.38f
+            size <= 14f -> 1.43f
+            size <= 15f -> 1.47f
+            size <= 16f -> 1.50f
+            size <= 22f -> 1.27f
+            size <= 24f -> 1.33f
+            size <= 28f -> 1.29f
+            size <= 32f -> 1.25f
+            size <= 36f -> 1.22f
+            size <= 45f -> 1.16f
+            size <= 57f -> 1.12f
+            else -> 1.35f
+        }
+        return size * ratio
+    }
+
     companion object {
         val Default = MinisType()
     }

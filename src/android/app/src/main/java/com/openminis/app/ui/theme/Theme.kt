@@ -23,8 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.openminis.app.ui.tokens.LocalMinisColors
 import com.openminis.app.ui.tokens.LocalMinisDimens
+import com.openminis.app.ui.tokens.LocalMinisType
 import com.openminis.app.ui.tokens.MinisColors
 import com.openminis.app.ui.tokens.MinisDimens
+import com.openminis.app.ui.tokens.MinisType
 
 // Accent: iOS blue, desaturated. [T-android-accent-blue-parity]
 //
@@ -223,6 +225,10 @@ fun MinisTheme(
     // 整体缩一档间距」，拿 dynamicActive 当开关会让开启动态取色的手机无故变密。
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
     val minisDimens = if (screenWidthDp >= 600) MinisDimens.Compact else MinisDimens()
+    // 行高阶梯单一来源：MinisType.lineHeight(size) 由全仓 57 组多行
+    // fontSize/lineHeight 配对反推。M3Typography 里 11sp 与 12sp 同用 16sp 行高
+    // 是 M3 规范下限所致，令牌表里 12sp = 17sp。
+    val minisType = MinisType()
 
     MaterialTheme(
         colorScheme = colorScheme,
@@ -235,6 +241,7 @@ fun MinisTheme(
             LocalUseRoundedIcons provides dynamicActive,
             LocalMinisColors provides minisColors,
             LocalMinisDimens provides minisDimens,
+            LocalMinisType provides minisType,
         ) {
             // [T-decor-shared-clock] 所有装饰动画共用一个 30fps 相位来源。
             // 消费者必须显式读 LocalDecorPhase / decor* 派生器才真正共享时钟

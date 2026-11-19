@@ -266,6 +266,43 @@ def check_dimens_monotonic(src: str) -> list:
     return fails
 
 
+def check_lineheight_ladder(src: str) -> list:
+    """MinisType.lineHeight 的比值表必须让**实际行高**随字号严格递增。
+
+    这条曲线是倒 U 形：9sp 紧（1.22）、16sp 最松（1.50）、57sp 又收紧（1.12）。
+    比值本身不是单调的，所以不能直接校验比值 —— 要代入字号算出实际行高再比。
+    真实会犯的错是把某一档的比值手滑写错（例如 16sp 的 1.50 写成 1.05），
+    这时 16sp 的行高 16.8 会低于 15sp 的 22.05，两档倒挂而编译、渲染都不报错。
+    """
+    m = re.search(r'fun lineHeight\(size: Float\): Float \{(.*?)\n    \}', src, re.S)
+    if not m:
+        return ['MinisType.lineHeight 未找到 —— 正则失效或函数被重写']
+
+    body = m.group(1)
+    steps = [(float(a), float(b)) for a, b in
+             re.findall(r'size <= ([0-9.]+)f -> ([0-9.]+)f', body)]
+    if len(steps) < 5:
+        return [f'MinisType.lineHeight 只解析到 {len(steps)} 档，少于 5 档 —— 正则失效']
+
+    fails = []
+    probes = [(s, s * r) for s, r in steps]
+    for (s1, h1), (s2, h2) in zip(probes, probes[1:]):
+        if h2 < h1:
+            fails.append(f'MinisType.lineHeight: {s2:g}sp 行高 {h2:.1f} < '
+                         f'{s1:g}sp 的 {h1:.1f}（越大字行距越紧，读起来会挤成一坨）')
+        elif abs(h2 - h1) < 0.05:
+            fails.append(f'MinisType.lineHeight: {s1:g}sp 与 {s2:g}sp 行高塌成同值'
+                         f' {h1:.1f}（阶梯断档）')
+
+    # 正文必须比标题松、比小字松 —— 这是这条曲线存在的理由。
+    r16 = next((r for s, r in steps if s == 16.0), None)
+    r9 = next((r for s, r in steps if s == 9.0), None)
+    if r16 and r9 and r16 <= r9:
+        fails.append(f'MinisType.lineHeight: 16sp 比值 {r16} 未高于 9sp 的 {r9}，'
+                     f'正文该比注脚松')
+    return fails
+
+
 def main() -> int:
     path = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT
     if not path.exists():
@@ -367,6 +404,7 @@ def main() -> int:
 
     # 7. 尺寸阶梯单调性（默认 + 每个 alternate 档）
     fails.extend(check_dimens_monotonic(src))
+    fails.extend(check_lineheight_ladder(src))
 
     # 8. 令牌死代码 —— 定义了却没人读
     fails.extend(check_token_dead_code(src))

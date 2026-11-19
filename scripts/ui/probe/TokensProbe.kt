@@ -1,5 +1,6 @@
 import com.openminis.app.ui.tokens.MinisColors
 import com.openminis.app.ui.tokens.MinisDimens
+import com.openminis.app.ui.tokens.MinisType
 
 /**
  * 运行时断言：在真 JVM 上实例化 MinisColors.Light / Dark，验证语义值。
@@ -193,6 +194,22 @@ fun main() {
     check("radiusSm 仍是 8dp（存量语义）", base.radiusSm == 8f, "%.1f".format(base.radiusSm))
     check("radiusMd 仍是 12dp（存量语义）", base.radiusMd == 12f, "%.1f".format(base.radiusMd))
     check("radiusLg 仍是 16dp（存量语义）", base.radiusLg == 16f, "%.1f".format(base.radiusLg))
+
+    // 12. 行高曲线：小字紧、正文松、显示字号回收到紧。
+    // 旧版 lineHeight(size) = size * 1.35f 是一条平直线，实测数据是倒 U 形。
+    val ty = MinisType()
+    fun lh(sz: Float): Float = ty.lineHeight(sz)
+    check("9sp 行高应偏紧 (约 11)", lh(9f) in 10.5f..11.5f, "%.2f".format(lh(9f)))
+    check("12sp 行高应放宽 (约 17)", lh(12f) in 16.5f..17.5f, "%.2f".format(lh(12f)))
+    check("16sp 行高应最松 (约 24)", lh(16f) in 23.5f..24.5f, "%.2f".format(lh(16f)))
+    check("57sp 行高应收紧 (约 64)", lh(57f) in 63f..65f, "%.2f".format(lh(57f)))
+    check("行高永远大于字号", (listOf(9f, 11f, 13f, 16f, 24f, 57f)).all { lh(it) > it })
+    // 倒 U 形的关键性质：正文比小字松、正文比大字松
+    check("正文 16sp 比小字 9sp 松", lh(16f) / 16f > lh(9f) / 9f,
+        "16=%.3f 9=%.3f".format(lh(16f) / 16f, lh(9f) / 9f))
+    check("正文 16sp 比大字 57sp 松", lh(16f) / 16f > lh(57f) / 57f,
+        "16=%.3f 57=%.3f".format(lh(16f) / 16f, lh(57f) / 57f))
+    check("未知字号有兜底（不为 0）", lh(200f) > 0f, "%.1f".format(lh(200f)))
 
     println()
     println("通过 $pass 项，失败 $fail 项")

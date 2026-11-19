@@ -42,3 +42,12 @@ object Minis {
     val dimens: MinisDimens
         @Composable @ReadOnlyComposable get() = LocalMinisDimens.current
 }
+
+// ─── 行高 / 字号阶梯 ────────────────────────────────────────────────────────
+
+val LocalMinisType = staticCompositionLocalOf { MinisType() }
+
+object MinisTypography {
+    val type: MinisType
+        @Composable @ReadOnlyComposable get() = LocalMinisType.current
+}

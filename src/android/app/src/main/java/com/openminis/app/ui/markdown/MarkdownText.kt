@@ -368,7 +368,7 @@ private fun CodeBlockView(
                     fontFamily = FontFamily.Monospace,
                     fontSize = 13.sp,
                     color = codeColor,
-                    lineHeight = 18.sp,
+                    lineHeight = com.openminis.app.ui.tokens.MinisTypography.type.lineHeight(13f).sp,
                 ),
             )
         }
