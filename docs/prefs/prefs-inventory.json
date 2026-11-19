@@ -448,7 +448,9 @@
       "usage_files": [
         "provider/FreeLaneHealth.kt"
       ],
-      "keys": {},
+      "keys": {
+        "KEY_DEAD": "dead_ids"
+      },
       "dyn_keys": [],
       "open_key_space": false,
       "ephemeral": false
@@ -1450,7 +1452,9 @@
       "usage_files": [
         "provider/StreamTraceRecorder.kt"
       ],
-      "keys": {},
+      "keys": {
+        "PREFS_ENABLED": "enabled"
+      },
       "dyn_keys": [],
       "open_key_space": false,
       "ephemeral": false
@@ -1711,7 +1715,9 @@
       "usage_files": [
         "provider/FreeLaneHealth.kt"
       ],
-      "keys": {},
+      "keys": {
+        "KEY_DEAD": "dead_ids"
+      },
       "dyn_keys": [],
       "open_key_space": false,
       "ephemeral": false
@@ -5887,7 +5893,7 @@
   "totals": {
     "prefs_files": 90,
     "prefs_encrypted": 8,
-    "key_constants_attributed": 154,
+    "key_constants_attributed": 157,
     "orphan_keys": 32,
     "usage_sites": 165,
     "usage_files": 96,

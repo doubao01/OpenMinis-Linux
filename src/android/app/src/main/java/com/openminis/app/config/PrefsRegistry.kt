@@ -4,7 +4,7 @@ package com.openminis.app.config
  * 自动生成 —— 不要手改。
  * 生成器: refactor/tools/gen_prefs_registry.py
  * 源目录: /tmp/oml/src/android/app/src/main/java/com/openminis/app
- * 规模:   90 个 prefs 文件（加密 8）/ 已归属键常量 154 / 165 处使用
+ * 规模:   90 个 prefs 文件（加密 8）/ 已归属键常量 157 / 165 处使用
  *
  * 目的: 把「SharedPreferences 文件名 + 键名」从 93 个文件里的裸字符串收敛为一处
  * 可枚举、可校验、可审计的数据表。设计见 refactor/docs/01-config-unification.md。
@@ -79,7 +79,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "env_var_values", module = "data", scope = PrefsScope.ENCRYPTED, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "envvar_privacy", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "privacy_mode_enabled"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "file_browser_prefs", module = "ui", scope = PrefsScope.PLAIN, keys = mapOf("PREF_KEY_SHOW_HIDDEN" to "file_browser_show_hidden"), note = "2 usages across 1 file(s)"),
-        PrefsFileSpec(name = "free_lane_health", module = "provider", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "free_lane_health", module = "provider", scope = PrefsScope.PLAIN, keys = mapOf("KEY_DEAD" to "dead_ids"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "hang_detector_prefs", module = "diagnostics", scope = PrefsScope.PLAIN, keys = mapOf("KEY_HANG_COUNT" to "hang_count", "KEY_LAST_HANG_AT" to "last_hang_at_ms"), note = "4 usages across 1 file(s)"),
         PrefsFileSpec(name = "host_event_hooks", module = "sandbox", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "hooks_json"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "local_tool_plugins", module = "plugins", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "tools_json"), note = "3 usages across 1 file(s)"),
@@ -133,7 +133,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "soul_store", module = "agent", scope = PrefsScope.PLAIN, keys = mapOf("FORCE_OVERWRITE_KEY" to "force_overwrite_1_36_13"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "speech_recognition", module = "speech", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENGINE_ID" to "engineId", "KEY_LOCALE" to "locale"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "ssh_host_secrets", module = "ssh", scope = PrefsScope.ENCRYPTED, note = "1 usages across 1 file(s)"),
-        PrefsFileSpec(name = "stream_trace", module = "provider", scope = PrefsScope.PLAIN, note = "2 usages across 1 file(s)"),
+        PrefsFileSpec(name = "stream_trace", module = "provider", scope = PrefsScope.PLAIN, keys = mapOf("PREFS_ENABLED" to "enabled"), note = "2 usages across 1 file(s)"),
         PrefsFileSpec(name = "sub_agent_types", module = "tools", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "types_json"), note = "2 usages across 1 file(s)"),
         PrefsFileSpec(name = "text_segmenter", module = "shared", scope = PrefsScope.PLAIN, keys = mapOf("KEY_DICT_VERSION" to "jieba_dict_version"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "translate_settings", module = "i18n", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "enabled", "KEY_ENTRY" to "entry_id", "KEY_LANG" to "lang"), note = "1 usages across 1 file(s)"),
@@ -146,7 +146,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "vscreen", module = "vscreen", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "web_search_prefs", module = "tools", scope = PrefsScope.PLAIN, keys = mapOf("KEY_BING_KEY" to "bing_key", "KEY_BOCHA" to "bocha_key", "KEY_BRAVE" to "brave_key", "KEY_CUSTOM_KEY" to "custom_key", "KEY_CUSTOM_KEY_HEADER" to "custom_key_header", "KEY_CUSTOM_URL" to "custom_url", "KEY_ENGINE" to "engine", "KEY_ENGINE_EXPLICIT" to "engine_explicit", "KEY_EXA" to "exa_key", "KEY_FALLBACK" to "fallback_ddg", "KEY_JINA" to "jina_key", "KEY_KEYLESS_CN" to "keyless_cn", "KEY_SEARXNG_URL" to "searxng_url", "KEY_TAVILY" to "tavily_key", "KEY_ZHIPU" to "zhipu_key"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "workspace_layout", module = "sandbox", scope = PrefsScope.PLAIN, keys = mapOf("KEY_DONE" to "legacy_v1_done", "KEY_DONE_V2" to "legacy_v2_filed"), note = "1 usages across 1 file(s)"),
-        PrefsFileSpec(name = "zen_free_lane_health", module = "provider", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "zen_free_lane_health", module = "provider", scope = PrefsScope.PLAIN, keys = mapOf("KEY_DEAD" to "dead_ids"), note = "1 usages across 1 file(s)"),
     )
 
     private val byName: Map<String, PrefsFileSpec> = files.associateBy { it.name }

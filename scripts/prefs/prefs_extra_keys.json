@@ -133,6 +133,24 @@
         "scene."
       ],
       "reason": "dynamic-prefix: keyOf(scene) = KEY_PREFIX + scene.key。KEY_PREFIX 是拼接片段，生成器已排除 _PREFIX 后缀常量，所以这里显式声明前缀"
+    },
+    "stream_trace": {
+      "keys": {
+        "PREFS_ENABLED": "enabled"
+      },
+      "reason": "literal-key: 常量名是 PREFS_ENABLED（不匹配 KEY_* 规则），扫描器没抓到"
+    },
+    "free_lane_health": {
+      "reason": "literal-key: 单个键 dead_ids 存 JSON（lane:id → 死亡时间戳），键空间不是开放的",
+      "keys": {
+        "KEY_DEAD": "dead_ids"
+      }
+    },
+    "zen_free_lane_health": {
+      "reason": "literal-key: 旧版同一个键名，只读一次做迁移",
+      "keys": {
+        "KEY_DEAD": "dead_ids"
+      }
     }
   }
 }
