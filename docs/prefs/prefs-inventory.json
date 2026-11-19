@@ -1024,7 +1024,9 @@
       "keys": {
         "KEY": "privacy_global_level"
       },
-      "dyn_keys": [],
+      "dyn_keys": [
+        "level_"
+      ],
       "open_key_space": false,
       "ephemeral": false
     },
@@ -1041,7 +1043,7 @@
       ],
       "keys": {},
       "dyn_keys": [],
-      "open_key_space": false,
+      "open_key_space": true,
       "ephemeral": true
     },
     {

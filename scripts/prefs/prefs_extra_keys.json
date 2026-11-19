@@ -45,7 +45,8 @@
     },
     "offload_permissions_asked": {
       "ephemeral": true,
-      "reason": "ephemeral: 「已经问过用户权限」的一次性标记"
+      "reason": "open-key-space: 键是 Android 权限字符串（android.permission.CAMERA 等），由系统定义，无法静态枚举",
+      "openKeySpace": true
     },
     "provider_refresh_marks": {
       "ephemeral": true,
@@ -114,6 +115,12 @@
     "skills_prefs": {
       "openKeySpace": true,
       "reason": "open-key-space: 排序状态键由 UI 层动态生成，SkillsManagementScreen 用 lazy 句柄持有"
+    },
+    "offload_permissions": {
+      "dynPrefixes": [
+        "level_"
+      ],
+      "reason": "dynamic-prefix: \"level_$toolName\" 按工具名存权限等级"
     }
   }
 }
