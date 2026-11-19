@@ -399,10 +399,10 @@ internal fun ToolDetailSheet(
                                     .fillMaxHeight()
                                     .heightIn(min = cardMinHeight)
                                     .clip(RoundedCornerShape(10.dp))
-                                    .background(Color.Black)
+                                    .background(MinisTokens.colors.terminalBg.tc)
                                     .border(
                                         width = 0.5.dp,
-                                        color = Color(0xFF404040),
+                                        color = MinisTokens.colors.terminalBorder.tc,
                                         shape = RoundedCornerShape(10.dp),
                                     ),
                             ) {
@@ -436,7 +436,7 @@ internal fun ToolDetailSheet(
                                                 com.openminis.app.ui.util.linkifyUrls(
                                                     text = block.content,
                                                     onClick = urlClick,
-                                                    linkColor = Color(0xFF7CC4FF), // light blue on dark terminal bg
+                                                    linkColor = MinisTokens.colors.terminalLink.tc,
                                                 )
                                             } else androidx.compose.ui.text.AnnotatedString(block.content)
                                         }
@@ -458,7 +458,7 @@ internal fun ToolDetailSheet(
                                         modifier = Modifier
                                             .align(Alignment.BottomCenter)
                                             .fillMaxWidth()
-                                            .background(Color(0xFF141414))
+                                            .background(MinisTokens.colors.terminalHudBg.tc)
                                             .padding(vertical = 2.5.dp),
                                         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
                                         verticalAlignment = Alignment.CenterVertically,
@@ -495,15 +495,15 @@ internal fun ToolDetailSheet(
                         val oldStr = toolArgsResolved.oldString
                         val newStr = toolArgsResolved.newString
 
-                        // T126-fix: ChatPalette.isDark follows the in-app theme
-                        // override, isSystemInDarkTheme() doesn't.
-                        val isDark = ChatColors.isDark
-                        val cardBg = if (isDark) Color(0xFF1A1A1A) else Color(0xFFF0F0F0)
-                        val cardBorder = if (isDark) Color(0xFF404040) else Color(0xFFD1D1D1)
-                        val redBg = if (isDark) Color(0xFF4D1414) else Color(0xFFFFE5E5)
-                        val redText = if (isDark) Color(0xFFFF6666) else Color(0xFFCC1A1A)
-                        val greenBg = if (isDark) Color(0xFF144D14) else Color(0xFFE5FFE5)
-                        val greenText = if (isDark) Color(0xFF66FF66) else Color(0xFF1A991A)
+                        // T126-fix: the in-app theme override wins over the system
+                        // setting; the light/dark pairs live in MinisColors now.
+                        val tk = MinisTokens.colors
+                        val cardBg = tk.editorCardBg.tc
+                        val cardBorder = tk.editorCardBorder.tc
+                        val redBg = tk.diffRemovedBg.tc
+                        val redText = tk.diffRemovedText.tc
+                        val greenBg = tk.diffAddedBg.tc
+                        val greenText = tk.diffAddedText.tc
 
                         val bytes = (oldStr.toByteArray(Charsets.UTF_8).size +
                             newStr.toByteArray(Charsets.UTF_8).size)
@@ -574,7 +574,8 @@ internal fun ToolDetailSheet(
                                     Text(
                                         text = "($sizeLabel)",
                                         fontSize = 11.sp,
-                                        color = if (isLive) Color(0xCCFF9500) else ChatColors.tertiaryText,
+                                        color = if (isLive) MinisTokens.colors.statusWarn.tc.copy(alpha = 0.80f)
+                                                else ChatColors.tertiaryText,
                                     )
                                 }
                                 HorizontalDivider(thickness = 0.5.dp, color = cardBorder)
@@ -772,12 +773,12 @@ internal fun ToolDetailSheet(
                                         Text(
                                             text = resolvedUrl,
                                             fontSize = 12.sp,
-                                            color = Color(0xFF595959),
+                                            color = MinisTokens.colors.urlCapsuleText.tc,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis,
                                             modifier = Modifier
                                                 .weight(1f)
-                                                .background(Color(0xFFD9D9D9), CircleShape)
+                                                .background(MinisTokens.colors.urlCapsuleBg.tc, CircleShape)
                                                 .clip(CircleShape)
                                                 .clickable { clipboardManager.setText(AnnotatedString(resolvedUrl)) }
                                                 .padding(horizontal = 10.dp, vertical = 2.dp),
@@ -1355,21 +1356,15 @@ private fun EditorCard(
         bytes >= 1024 -> String.format("%.1f KB", bytes / 1024.0)
         else -> "$bytes B"
     }
-    // Match iOS fileEditorContent (ToolLiveSheet.swift:1350) instead of the
-    // generic chat palette: the editor card needs its own dark/light grayscale
-    // ramp so the body stands out from the sheet container and the header
-    // strip reads as one notch lighter than the body.
-    //   iOS dark  : body white:0.10 (#1A1A1A), header white:0.13 (#212121),
-    //               border white:0.25 (#404040)
-    //   iOS light : body white:0.94 (#F0F0F0), header white:0.92 (#EBEBEB),
-    //               border white:0.82 (#D1D1D1)
-    // T126-fix: use ChatPalette.isDark so the in-app theme override (Settings →
-    // Appearance) wins over the system setting. Otherwise users on Light system
-    // + Dark in-app would see white card on black chat.
-    val isDark = ChatColors.isDark
-    val cardBg = if (isDark) Color(0xFF1A1A1A) else Color(0xFFF0F0F0)
-    val headerBg = if (isDark) Color(0xFF212121) else Color(0xFFEBEBEB)
-    val cardBorder = if (isDark) Color(0xFF404040) else Color(0xFFD1D1D1)
+    // T126-fix: the in-app theme override (Settings → Appearance) wins over the
+    // system setting. Reading MinisTokens.colors instead of a local `isDark` flag
+    // also removes the duplicated if/else ladder — the light/dark pair is the
+    // token layer's job, and check_token_semantics verifies the two sets differ
+    // where they must (a copy-paste bug here used to be invisible).
+    val tokens = MinisTokens.colors
+    val cardBg = tokens.editorCardBg.tc
+    val headerBg = tokens.editorCardHeaderBg.tc
+    val cardBorder = tokens.editorCardBorder.tc
 
     Column(
         modifier = Modifier

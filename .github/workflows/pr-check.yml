@@ -159,6 +159,30 @@ jobs:
       - name: UI design tokens are regenerable
         run: python3 scripts/ci/check_ui_tokens.py
 
+      # [T-token-semantics] The generator proves MinisTokens.kt matches source;
+      # it says nothing about whether the Light/Dark pair is *correct*. A slot
+      # copied from Light into Dark, a swapped background, or a text color that
+      # silently drops under 4.5:1 all compile and all render wrong — the first
+      # one only in dark mode, which CI screenshots never show.
+      - name: Design token semantics (dark parity, contrast)
+        run: python3 scripts/ci/check_token_semantics.py
+
+      # [T-composition-local-wire] A declared CompositionLocal with no
+      # `provides` anywhere keeps its default forever. PR #126 shipped exactly
+      # that (provider mounted, no consumer) and called it a fix; the token
+      # layer hit the mirror-image version (consumer, no provider). Both are
+      # invisible at compile time and mostly invisible at runtime.
+      - name: CompositionLocals are all provided
+        run: python3 scripts/ci/check_composition_locals.py
+
+      # [T-token-runtime-probe] The two checks above are static. This one
+      # actually compiles MinisTokens.kt on a plain JVM and asserts the values:
+      # dark surfaces really are darker, diff colors point the right way, text
+      # clears 4.5:1. It caught Light.diffAddedText sitting at 3.52:1 on day one.
+      # Needs kotlinc; the script self-skips when it is absent.
+      - name: Design token runtime probe
+        run: bash scripts/ui/probe/run_probe.sh
+
       # [T-announced-tools-core] The plan board fragment told the model to
       # "advance items with agent_plan" while agent_plan was long-tail, so the
       # board the user watched could never move (and could never be created:

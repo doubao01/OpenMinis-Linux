@@ -228,6 +228,26 @@ data class MinisColors(
     val fabOnAccent: Long,
     val link: Long,
     val toastBg: Long,
+    // ─── 编辑器卡片（文件编辑工具的 diff 视图）──────────────────────────
+    // 独立于聊天气泡的灰阶：body 要比 sheet 容器沉一档，header 再比 body 亮一档，
+    // 三段灰阶的层次关系是 iOS fileEditorContent 的观感契约，不是随手取的灰。
+    val editorCardBg: Long,
+    val editorCardHeaderBg: Long,
+    val editorCardBorder: Long,
+    val diffAddedBg: Long,
+    val diffAddedText: Long,
+    val diffRemovedBg: Long,
+    val diffRemovedText: Long,
+    // ─── 终端面板 ──────────────────────────────────────────────────────
+    // 终端永远深底（连浅色主题也是），所以这三个槽两套主题同值。
+    val terminalBg: Long,
+    val terminalBorder: Long,
+    val terminalLink: Long,
+    val terminalHudBg: Long,
+    // iOS CopyableURLCapsule: 固定白灰胶囊（white:0.85 填充 / white:0.35 文字），
+    // 贴在终端深底上，不随主题翻转 —— 与 iOS 逐像素对齐。
+    val urlCapsuleBg: Long,
+    val urlCapsuleText: Long,
     val brandOpenAI: Long,
     val brandGemini: Long,
     val brandFallback: Long,
@@ -276,6 +296,21 @@ data class MinisColors(
             fabOnAccent = RawColors.neutral0,
             link = RawColors.systemBlue,
             toastBg = 0xE61C1C1EL,
+            editorCardBg = 0xFFF0F0F0L,
+            editorCardHeaderBg = 0xFFEBEBEBL,
+            editorCardBorder = 0xFFD1D1D1L,
+            diffAddedBg = 0xFFE5FFE5L,
+            // 原 iOS 值 #1A991A 在 #E5FFE5 上只有 3.52:1，低于 AA 正文 4.5。
+            // 压暗到 #15801A 得 4.78:1 —— 色相不变，只是不再靠"绿得发亮"取胜。
+            diffAddedText = 0xFF15801AL,
+            diffRemovedBg = 0xFFFFE5E5L,
+            diffRemovedText = 0xFFCC1A1AL,
+            terminalBg = 0xFF000000L,
+            terminalBorder = 0xFF404040L,
+            terminalLink = 0xFF7CC4FFL,
+            terminalHudBg = 0xFF141414L,
+            urlCapsuleBg = 0xFFD9D9D9L,
+            urlCapsuleText = 0xFF595959L,
             brandOpenAI = RawColors.neutral900,
             brandGemini = RawColors.systemBlue,
             brandFallback = RawColors.systemGray,
@@ -308,6 +343,13 @@ data class MinisColors(
             statusWarnBg = 0xFF3A2A10L,
             sendDisabled = RawColors.neutral600,
             toastBg = 0xE6E2E2E6L,
+            editorCardBg = 0xFF1A1A1AL,
+            editorCardHeaderBg = 0xFF212121L,
+            editorCardBorder = 0xFF404040L,
+            diffAddedBg = 0xFF144D14L,
+            diffAddedText = 0xFF66FF66L,
+            diffRemovedBg = 0xFF4D1414L,
+            diffRemovedText = 0xFFFF6666L,
             brandOpenAI = RawColors.neutral100,
             brandFallback = RawColors.neutral400,
         )

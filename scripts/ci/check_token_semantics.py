@@ -1,0 +1,257 @@
+#!/usr/bin/env python3
+"""纯 JVM 断言：设计令牌语义层的自洽性。
+
+不依赖 Android、不依赖 Compose —— 直接解析 MinisTokens.kt 源码文本做静态断言。
+任何机器上 0.1 秒跑完，不需要 gradle / 模拟器。
+
+## 检查项（每条都对应一类真实会发生的错误）
+
+1. **深色继承白名单** —— `Dark = Light.copy(...)` 意味着没显式赋值的槽位直接
+   沿用浅色值。对 accent 色（systemBlue 之类）这是对的，两套都能用；但**任何
+   surface / 文字 / 边框槽位一旦被继承，就是白卡片贴在黑背景上**。所以只允许
+   白名单里的纯 accent 槽位继承，其余必须显式赋值。
+
+2. **明暗方向** —— 深色方案的背景类槽位必须比浅色暗、文字类必须比浅色亮。
+   写反了编译通过、运行不报错，只是看不见字。
+
+3. **WCAG 对比度** —— 文字槽位相对其所在背景达到 4.5:1（正文 AA）。
+   这条能抓出「设计稿改了一个色值，深色模式下悄悄掉到 2.8:1」这类腐化。
+
+4. **槽位漂移** —— Dark 多出 Light 没有的槽位（多半是改名改了一半）。
+
+5. **引用可解析** —— `RawColors.X` 拼错。
+
+6. **品牌哈希配对** —— brandHashLight / brandHashDark 按索引配对，长度必须一致。
+
+用法：
+    python3 scripts/ci/check_token_semantics.py [MinisTokens.kt 路径]
+"""
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+DEFAULT = (ROOT / "src/android/app/src/main/java/com/openminis/app/ui/tokens/MinisTokens.kt")
+
+# 允许被 Dark 继承（不显式赋值）的槽位：纯 accent 色，两套主题共用一个值。
+# 新增项必须确认「它在黑底上也可读」，否则就是白卡片/黑字的来源。
+INHERIT_OK = {
+    'primary', 'statusInfo', 'statusWarn', 'statusDanger', 'statusWarnBg',
+    'toolPending', 'toolRunning', 'toolSuccess', 'toolFailed', 'toolCancelled',
+    'categoryCode', 'categoryCreative', 'categoryResearch', 'categoryAffair',
+    'sendEnabled', 'fabAccent', 'fabOnAccent', 'link',
+    'brandOpenAI', 'brandGemini', 'brandFallback',
+    # 终端面板永远深底（浅色主题也是），两套同值是设计意图而非漏填。
+    'terminalBg', 'terminalBorder', 'terminalLink', 'terminalHudBg',
+    'urlCapsuleBg', 'urlCapsuleText',
+}
+
+# 深色方案里必须更暗的槽位（背景/表面/边框/填充）
+DARKER_IN_DARK = {
+    'background', 'surface', 'surfaceVariant', 'cardBg', 'cardBorder',
+    'inputBg', 'inputBorder', 'codeBlockBg', 'inlineCodeBg', 'separator',
+    'sendDisabled',
+}
+# toastBg 故意不入 DARKER_IN_DARK：它是**反色**设计（浅色主题给深色气泡、
+# 深色主题给浅色气泡），两套都靠反色拉开对比，方向恰好相反。
+
+# 深色方案里必须更亮的槽位（文字/前景）
+BRIGHTER_IN_DARK = {
+    'onBackground', 'onSurface', 'onSurfaceVariant', 'textPrimary',
+    'textSecondary', 'textTertiary', 'outline', 'codeBlockText',
+    'inlineCodeText',
+}
+
+# 正文级文字槽位 → 应达到的对比度（WCAG AA：正文 4.5，大字/辅助 3.0）
+TEXT_MIN_CONTRAST = {
+    'textPrimary': 4.5,
+    'textSecondary': 4.5,
+    'textTertiary': 3.0,   # 三级文字按 AA 大字/辅助信息放宽
+    'onBackground': 4.5,
+    'onSurface': 4.5,
+    'link': 3.0,           # 链接按 AA 非文字/大字号放宽
+}
+
+# 已知且已接受的对比度缺口（键为 "主题.槽位"，值为实测比值）。
+# 只允许「不低于基线」，防止改色时悄悄变差；想调高就把基线改高。
+# textTertiary 浅色 = iOS 系统色 #8E8E93 on #F2F2F7，实测 2.92 —— 照抄 iOS
+# 既有观感，改它会让三级文字比 iOS 更黑、层级消失。
+CONTRAST_BASELINE = {
+    'Light.textTertiary': 2.92,
+    'Dark.textTertiary': 6.43,
+}
+
+
+def luminance(argb: int) -> float:
+    """sRGB 相对亮度（WCAG 定义）。"""
+    def ch(c: int) -> float:
+        c = c / 255.0
+        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+    return (0.2126 * ch((argb >> 16) & 0xFF)
+            + 0.7152 * ch((argb >> 8) & 0xFF)
+            + 0.0722 * ch(argb & 0xFF))
+
+
+def contrast(a: int, b: int) -> float:
+    la, lb = luminance(a), luminance(b)
+    hi, lo = max(la, lb), min(la, lb)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def parse_consts(src: str):
+    """收集 RawColors / Brand / BrandDark 里的 `const val name: Long = 0x...L`。"""
+    consts, scope = {}, 'top'
+    for line in src.split('\n'):
+        st = line.strip()
+        if st.startswith('object BrandDark'):
+            scope = 'BrandDark'
+        elif st.startswith('object Brand'):
+            scope = 'Brand'
+        elif st.startswith('object RawColors'):
+            scope = 'top'
+        elif st.startswith('}') and scope in ('Brand', 'BrandDark'):
+            scope = 'top'
+        m = re.search(r'const val ([A-Za-z0-9_]+):\s*Long\s*=\s*(0x[0-9A-Fa-f]+)L', st)
+        if m:
+            key = f'{scope}.{m.group(1)}' if scope != 'top' else m.group(1)
+            consts[key] = int(m.group(2), 16)
+    return consts
+
+
+def parse_slots(src: str, marker: str, stop: str):
+    """解析 `val Light = MinisColors(...)` / `val Dark = Light.copy(...)` 的槽位赋值。"""
+    i = src.find(marker)
+    if i < 0:
+        return None
+    j = src.find(stop, i)
+    body = src[i:j if j > 0 else len(src)]
+    return dict(re.findall(
+        r'^\s*([a-z][A-Za-z0-9_]*)\s*=\s*([^,\n]+?),?\s*$', body, re.M))
+
+
+def resolve(expr: str, consts: dict):
+    """`RawColors.systemBlue` / `0xFF123456L` / `RawColors.Brand.zhipu` → int。"""
+    expr = expr.strip()
+    m = re.fullmatch(r'0x([0-9A-Fa-f]+)L', expr)
+    if m:
+        return int(m.group(1), 16)
+    m = re.fullmatch(r'RawColors\.((?:Brand|BrandDark)\.)?([A-Za-z0-9_]+)', expr)
+    if m:
+        key = f'{m.group(1)}{m.group(2)}' if m.group(1) else m.group(2)
+        return consts.get(key)
+    return None
+
+
+def main() -> int:
+    path = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT
+    if not path.exists():
+        print(f"token semantics: SKIP ({path} not found)")
+        return 0
+
+    src = path.read_text(encoding='utf-8')
+    consts = parse_consts(src)
+    light = parse_slots(src, 'val Light = MinisColors(', 'val Dark =')
+    dark = parse_slots(src, 'val Dark = Light.copy(', '\n    }\n}')
+
+    if light is None or dark is None:
+        print("token semantics: FAILED (找不到 Light / Dark 定义，生成器模板变了？)")
+        return 1
+
+    fails = []
+
+    # 1. 深色继承白名单
+    inherited = sorted(set(light) - set(dark))
+    bad_inherit = [k for k in inherited if k not in INHERIT_OK]
+    if bad_inherit:
+        fails.append(
+            f"深色方案继承了非 accent 槽位 {len(bad_inherit)} 个"
+            f"（浅色值会漏到深色模式）：{', '.join(bad_inherit)}")
+
+    # 4. 槽位漂移
+    extra = sorted(set(dark) - set(light))
+    if extra:
+        fails.append(f"深色方案多出 {len(extra)} 个槽位：{', '.join(extra)}")
+
+    # 解析全部槽位的有效值（Dark 未赋值的继承 Light）
+    eff_light, eff_dark = {}, {}
+    for k in sorted(light):
+        a = resolve(light[k], consts)
+        if a is None:
+            fails.append(f"Light.{k} 无法解析：{light[k].strip()}")
+        else:
+            eff_light[k] = a
+        expr = dark.get(k, light[k])
+        b = resolve(expr, consts)
+        if b is None:
+            fails.append(f"Dark.{k} 无法解析：{expr.strip()}")
+        else:
+            eff_dark[k] = b
+
+    # 2. 明暗方向（只在两侧都解析成功时比较）
+    for k in sorted(DARKER_IN_DARK & eff_light.keys() & eff_dark.keys()):
+        if luminance(eff_dark[k]) > luminance(eff_light[k]) + 0.02:
+            fails.append(
+                f"{k}: 深色应更暗，实际 Light=#{eff_light[k]:08X} Dark=#{eff_dark[k]:08X}")
+    for k in sorted(BRIGHTER_IN_DARK & eff_light.keys() & eff_dark.keys()):
+        if luminance(eff_dark[k]) < luminance(eff_light[k]) - 0.02:
+            fails.append(
+                f"{k}: 深色应更亮，实际 Light=#{eff_light[k]:08X} Dark=#{eff_dark[k]:08X}")
+
+    # 3. WCAG 对比度（两套主题各查一遍，文字 vs 背景）
+    for theme, slots in (('Light', eff_light), ('Dark', eff_dark)):
+        bg = slots.get('background')
+        if bg is None:
+            continue
+        for k, need in TEXT_MIN_CONTRAST.items():
+            fg = slots.get(k)
+            if fg is None:
+                continue
+            got = contrast(fg, bg)
+            key = f'{theme}.{k}'
+            if key in CONTRAST_BASELINE:
+                # 已接受的缺口：只防退步
+                floor = CONTRAST_BASELINE[key]
+                if got < floor - 0.05:
+                    fails.append(
+                        f"{key} 对比度退化到 {got:.2f}:1，低于基线 {floor:.2f}:1"
+                        f"（#{fg:08X} on #{bg:08X}）")
+                continue
+            if got < need:
+                fails.append(
+                    f"{key} 对比度 {got:.2f}:1 < {need}:1"
+                    f"（#{fg:08X} on #{bg:08X}）")
+
+    # 5. 引用可解析
+    unresolved = {f'{a or ""}{b}'
+                  for a, b in re.findall(
+                      r'RawColors\.((?:Brand|BrandDark)\.)?([A-Za-z0-9_]+)', src)
+                  if f'{a or ""}{b}' not in consts}
+    if unresolved:
+        fails.append(f"未定义的 RawColors 引用 {len(unresolved)} 个："
+                     f"{', '.join(sorted(unresolved)[:10])}")
+
+    # 6. 品牌哈希配对
+    hl = re.search(r'brandHashLight:\s*List<Long>\s*=\s*listOf\((.*?)\)', src, re.S)
+    hd = re.search(r'brandHashDark:\s*List<Long>\s*=\s*listOf\((.*?)\)', src, re.S)
+    if hl and hd:
+        a = len(re.findall(r'0x[0-9A-Fa-f]+L', hl.group(1)))
+        b = len(re.findall(r'0x[0-9A-Fa-f]+L', hd.group(1)))
+        if a != b:
+            fails.append(f"品牌哈希兜底长度不配对：Light {a} 条 / Dark {b} 条（按索引配对会越界）")
+        else:
+            print(f"  品牌哈希兜底：Light/Dark 各 {a} 条，配对正确")
+
+    print(f"语义槽位：Light {len(light)} 个 / Dark {len(dark)} 个"
+          f"（显式 {len(dark)}，继承 {len(inherited)}）；RawColors 常量 {len(consts)} 个")
+    if fails:
+        print(f"\n断言失败 {len(fails)} 项：")
+        for f in fails:
+            print(f"  ✗ {f}")
+        return 1
+
+    print("PASS: 深色继承限于 accent、明暗方向正确、文字对比度达标、引用全可解析")
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

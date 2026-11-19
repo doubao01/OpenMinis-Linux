@@ -15,11 +15,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.openminis.app.ui.tokens.LocalMinisColors
+import com.openminis.app.ui.tokens.LocalMinisDimens
+import com.openminis.app.ui.tokens.MinisColors
+import com.openminis.app.ui.tokens.MinisDimens
 
 // Accent: iOS blue, desaturated. [T-android-accent-blue-parity]
 //
@@ -210,6 +215,14 @@ fun MinisTheme(
         } else {
             fallbackChatPalette
         }
+    // [T-tokens-wire] 令牌层必须在这里真正提供，否则 LocalMinisColors 一直取
+    // staticCompositionLocalOf 的默认值（MinisColors.Light），深色模式读令牌
+    // 永远拿到浅色值 —— 与 PR #126「只挂 Provider 没接消费者」同型的假修复。
+    val minisColors = if (darkTheme) MinisColors.Dark else MinisColors.Light
+    // 紧凑档跟屏幕宽度走，不跟取色走 —— Compact 的语义是「平板分栏 / 小屏横屏
+    // 整体缩一档间距」，拿 dynamicActive 当开关会让开启动态取色的手机无故变密。
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp
+    val minisDimens = if (screenWidthDp >= 600) MinisDimens.Compact else MinisDimens()
 
     MaterialTheme(
         colorScheme = colorScheme,
@@ -220,6 +233,8 @@ fun MinisTheme(
             LocalChatPalette provides chatPalette,
             LocalMonetDynamic provides dynamicActive,
             LocalUseRoundedIcons provides dynamicActive,
+            LocalMinisColors provides minisColors,
+            LocalMinisDimens provides minisDimens,
         ) {
             // [T-decor-shared-clock] 所有装饰动画共用一个 30fps 相位来源。
             // 消费者必须显式读 LocalDecorPhase / decor* 派生器才真正共享时钟
