@@ -39,6 +39,8 @@ PROVIDES = re.compile(
 )
 # import androidx.compose.material3.LocalContentColor 之类的框架自带 Local
 IMPORT_LOCAL = re.compile(r'^\s*import\s+[\w.]*\.(Local[A-Za-z0-9_]*)\s*$', re.M)
+# 读值：LocalFoo.current（不匹配 `provides` 那一行本身）
+CONSUME = re.compile(r'\b(Local[A-Za-z0-9_]*)\.current\b')
 
 # 允许豁免的 Local：只在测试/预览里提供，或由宿主 App 注入。
 # 新增豁免必须写明理由 —— 空集合是健康状态。
@@ -53,13 +55,21 @@ def main() -> int:
     decls = {}   # name -> 声明所在文件
     provides = {}  # name -> 提供点数量
     imported = set()  # 通过 import 引入的框架自带 Local
+    consumers = {}  # name -> 读它的文件集合
 
     for p in SRC.rglob("*.kt"):
         try:
             s = p.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        if "ompositionLocalOf" not in s and " provides " not in s:
+        # 不能只看「声明 / provides」就跳过 —— 消费者文件往往两样都没有，
+        # 只有 LocalXxx.current。早期版本就是在这里 continue，
+        # 导致 consumers 恒为 0（每个 Local 都被误报成死代码）。
+        if (
+            "ompositionLocalOf" not in s
+            and " provides " not in s
+            and ".current" not in s
+        ):
             continue
         rel = p.relative_to(ROOT).as_posix()
         for m in DECL.finditer(s):
@@ -73,6 +83,9 @@ def main() -> int:
             provides[name] = provides.get(name, 0) + 1
         for m in IMPORT_LOCAL.finditer(s):
             imported.add(m.group(1))
+        # 消费者：Local.foo / Local.foo.current（读值）
+        for m in CONSUME.finditer(s):
+            consumers.setdefault(m.group(1), set()).add(rel)
 
     orphans = sorted(n for n in decls if provides.get(n, 0) == 0 and n not in EXEMPT)
     # 反向：提供了但本仓没声明 —— 若来自 import 则是框架自带，合法；否则是拼错
@@ -82,6 +95,14 @@ def main() -> int:
     print(f"CompositionLocal 声明 {len(decls)} 个，提供点合计 {sum(provides.values())} 处")
     if not orphans and not ghosts:
         print("PASS: 每个 Local 都有提供点，每个 provides 都能解析到声明")
+        # 只有死代码警告（不影响退出码）—— PR #126 的教训反方向：
+        # 提供点齐全但没人读，同样是白做。这条不 fail，因为可能是为将来
+        # 的消费者预留；但要让人看见它没人用。
+        dead = sorted(n for n in decls if not consumers.get(n))
+        if dead:
+            print(f"\n提示：{len(dead)} 个 Local 有提供点但当前无人读取（死代码）：")
+            for n in dead:
+                print(f"  {n}  —— provides {provides.get(n, 0)} 处，consumers 0")
         return 0
 
     if orphans:

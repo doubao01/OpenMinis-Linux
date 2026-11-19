@@ -140,6 +140,60 @@ fun main() {
     check("touchTargetMin >= 48dp", base.touchTargetMin >= 48f,
         "%.1f".format(base.touchTargetMin))
 
+    // 10. 间距阶梯在运行期仍然单调 —— 静态检查按声明序推导，这里核对真实取值。
+    // 旧版 Compact 只覆盖 5 个槽，于是 spaceMd2(10) > spaceLg(8) 倒挂：排版会
+    // 忽紧忽松，但编译通过、渲染也不报错，肉眼极难归因到令牌。
+    fun ladderOf(d: MinisDimens) = listOf(
+        "spaceXxs" to d.spaceXxs, "spaceXs" to d.spaceXs,
+        "spaceSm" to d.spaceSm, "spaceMd" to d.spaceMd,
+        "spaceMd2" to d.spaceMd2, "spaceLg" to d.spaceLg,
+        "spaceLg2" to d.spaceLg2, "spaceXl" to d.spaceXl,
+        "spaceXl2" to d.spaceXl2, "spaceXxl" to d.spaceXxl,
+        "spaceXxl2" to d.spaceXxl2, "spaceXxl3" to d.spaceXxl3,
+        "spaceXxl4" to d.spaceXxl4, "spaceHuge" to d.spaceHuge,
+        "spaceHuge2" to d.spaceHuge2, "spaceGiant" to d.spaceGiant,
+        "spaceGiant2" to d.spaceGiant2,
+    )
+    val baseMap = ladderOf(base).toMap()
+    for ((seq, name) in listOf(ladderOf(base) to "默认", ladderOf(compact) to "Compact")) {
+        for (i in 0 until seq.size - 1) {
+            val (an, av) = seq[i]
+            val (bn, bv) = seq[i + 1]
+            check("$name 阶梯 $an < $bn", av < bv, "$an=%.1f $bn=%.1f".format(av, bv))
+        }
+    }
+    // Compact 只能缩、不能涨，否则「紧凑」名不副实
+    for ((n, v) in ladderOf(compact)) {
+        check("Compact.$n <= 默认", v <= baseMap.getValue(n),
+            "compact=%.1f base=%.1f".format(v, baseMap.getValue(n)))
+    }
+
+    // 11. 圆角阶梯同样必须递增 —— 补档时容易插错位置。原版只有 Sm/Md/Lg 三档，
+    // 全仓 211 处 RoundedCornerShape 里 55% 落在三档之外（10dp 用了 44 次却没有
+    // 令牌），令牌若不能表达真实设计就只是装饰。
+    fun radiusOf(d: MinisDimens) = listOf(
+        "radiusXs" to d.radiusXs, "radiusXs2" to d.radiusXs2,
+        "radiusSm3" to d.radiusSm3, "radiusSm" to d.radiusSm,
+        "radiusMd3" to d.radiusMd3, "radiusMd" to d.radiusMd,
+        "radiusLg3" to d.radiusLg3, "radiusLg" to d.radiusLg,
+        "radiusXl" to d.radiusXl, "radiusXl2" to d.radiusXl2,
+        "radiusXxl" to d.radiusXxl, "radiusHuge" to d.radiusHuge,
+        "radiusHuge2" to d.radiusHuge2,
+    )
+    for ((seq, name) in listOf(radiusOf(base) to "默认", radiusOf(compact) to "Compact")) {
+        for (i in 0 until seq.size - 1) {
+            val (an, av) = seq[i]
+            val (bn, bv) = seq[i + 1]
+            check("$name 圆角 $an < $bn", av < bv, "$an=%.1f $bn=%.1f".format(av, bv))
+        }
+    }
+    check("radiusPill 远大于 radiusHuge2", base.radiusPill > 10 * base.radiusHuge2,
+        "pill=%.0f huge2=%.0f".format(base.radiusPill, base.radiusHuge2))
+    // 旧三档的值不能被改名顺手改掉
+    check("radiusSm 仍是 8dp（存量语义）", base.radiusSm == 8f, "%.1f".format(base.radiusSm))
+    check("radiusMd 仍是 12dp（存量语义）", base.radiusMd == 12f, "%.1f".format(base.radiusMd))
+    check("radiusLg 仍是 16dp（存量语义）", base.radiusLg == 16f, "%.1f".format(base.radiusLg))
+
     println()
     println("通过 $pass 项，失败 $fail 项")
     if (fail > 0) {

@@ -71,6 +71,17 @@ STROKE = {'0.5': 'hairline', '1': 'thin', '2': 'thick'}
 SP_NAMES = {'9': 'cap2', '11': 'cap', '12': 'foot', '13': 'body',
             '14': 'bodyLg', '15': 'title', '16': 'titleLg', '18': 'head'}
 
+# 圆角令牌。原版只有 Sm/Md/Lg 三档（8/12/16），但全仓 RoundedCornerShape
+# 实测 211 处里有 114 处（55%）落在三档之外 —— 10dp 用了 44 次却没有令牌。
+# 令牌若不能表达真实设计，它就不是令牌而是装饰；这里按实际频次补齐。
+RADIUS_ORDER = ['2', '4', '6', '8', '10', '12', '14', '16', '18', '20', '24', '28', '32']
+RADIUS_NAMES = {
+    '2': 'radiusXs', '4': 'radiusXs2', '6': 'radiusSm', '8': 'radiusSm2',
+    '10': 'radiusMd', '12': 'radiusMd2', '14': 'radiusLg', '16': 'radiusLg2',
+    '18': 'radiusXl', '20': 'radiusXl2', '24': 'radiusXxl', '28': 'radiusHuge',
+    '32': 'radiusHuge2',
+}
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -369,13 +380,41 @@ data class MinisDimens(
     val spaceGiant: Float = 48f, val spaceGiant2: Float = 56f,
     val strokeHairline: Float = 0.5f, val strokeThin: Float = 1f, val strokeThick: Float = 2f,
     val touchTargetMin: Float = 48f,
-    val radiusSm: Float = 8f, val radiusMd: Float = 12f, val radiusLg: Float = 16f,
+    // 命名保持原三档语义不变：radiusSm=8 / radiusMd=12 / radiusLg=16。
+    // 新增档位插在它们前后，不改旧值 —— 旧值若被改成 6，任何存量调用都会
+    // 悄悄变窄，而"更小更精致"这种视觉变化没人会当成 bug 报上来。
+    val radiusXs: Float = 2f, val radiusXs2: Float = 4f,
+    val radiusSm3: Float = 6f, val radiusSm: Float = 8f,
+    val radiusMd3: Float = 10f, val radiusMd: Float = 12f,
+    val radiusLg3: Float = 14f, val radiusLg: Float = 16f,
+    val radiusXl: Float = 18f, val radiusXl2: Float = 20f,
+    val radiusXxl: Float = 24f, val radiusHuge: Float = 28f,
+    val radiusHuge2: Float = 32f,
     val radiusPill: Float = 999f,
 ) {
     companion object {
-        /** 紧凑档：平板分栏 / 小屏横屏时整体缩一档间距，视觉比例不变。 */
+        /**
+         * 紧凑档：平板分栏 / 小屏横屏时整体缩一档间距。
+         *
+         * 必须覆盖整条 space 阶梯。只改其中几个槽会破坏单调性 —— 旧版只写了
+         * spaceSm/Md/Lg/Xl/Xxl，于是 spaceMd2(10) > spaceLg(8)、
+         * spaceLg2(14) > spaceXl(12)、spaceXl2(18) > spaceXxl(16) 三处倒挂，
+         * 且 spaceXs 与 spaceSm 塌成同值 4。视觉上表现为「大间距比小间距还小」，
+         * 排版忽紧忽松。check_token_semantics 现在会拦住这种半套改写。
+         */
         val Compact = MinisDimens(
-            spaceSm = 4f, spaceMd = 6f, spaceLg = 8f, spaceXl = 12f, spaceXxl = 16f,
+            spaceXxs = 2f, spaceXs = 3f, spaceSm = 4f,
+            spaceMd = 6f, spaceMd2 = 8f, spaceLg = 10f,
+            spaceLg2 = 12f, spaceXl = 14f, spaceXl2 = 16f,
+            spaceXxl = 18f, spaceXxl2 = 20f, spaceXxl3 = 22f,
+            spaceXxl4 = 24f, spaceHuge = 28f, spaceHuge2 = 34f,
+            spaceGiant = 40f, spaceGiant2 = 48f,
+            strokeHairline = 0.5f, strokeThin = 1f, strokeThick = 2f,
+            touchTargetMin = 48f,
+            radiusXs = 2f, radiusXs2 = 3f, radiusSm3 = 4f, radiusSm = 6f,
+            radiusMd3 = 8f, radiusMd = 10f, radiusLg3 = 12f, radiusLg = 14f,
+            radiusXl = 16f, radiusXl2 = 18f, radiusXxl = 20f,
+            radiusHuge = 24f, radiusHuge2 = 28f, radiusPill = 999f,
         )
     }
 }

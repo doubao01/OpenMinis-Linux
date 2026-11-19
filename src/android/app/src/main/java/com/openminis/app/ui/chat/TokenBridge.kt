@@ -14,5 +14,8 @@ internal typealias RawC = com.openminis.app.ui.tokens.RawColors
 /** 语义色入口，同 `tokens.MinisTheme.colors`。 */
 internal typealias MinisTokens = com.openminis.app.ui.tokens.MinisTheme
 
+/** 尺寸入口，同 `tokens.Minis.dimens`。 */
+internal typealias Dims = com.openminis.app.ui.tokens.Minis
+
 /** 0xAARRGGBB → Compose Color，同 [com.openminis.app.ui.tokens.asColor]。 */
 internal val Long.tc: Color get() = Color(this.toInt())

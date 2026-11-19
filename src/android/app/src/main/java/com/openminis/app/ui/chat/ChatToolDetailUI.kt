@@ -1356,12 +1356,11 @@ private fun EditorCard(
         bytes >= 1024 -> String.format("%.1f KB", bytes / 1024.0)
         else -> "$bytes B"
     }
-    // T126-fix: the in-app theme override (Settings → Appearance) wins over the
-    // system setting. Reading MinisTokens.colors instead of a local `isDark` flag
-    // also removes the duplicated if/else ladder — the light/dark pair is the
-    // token layer's job, and check_token_semantics verifies the two sets differ
-    // where they must (a copy-paste bug here used to be invisible).
+    // T126-fix: in-app Appearance wins over the OS setting; the light/dark
+    // pairs live in MinisColors and check_token_semantics keeps them honest.
+    // 尺寸同理走 dimens 令牌（Compact 档在平板分栏时整条阶梯缩一档）。
     val tokens = MinisTokens.colors
+    val dim = Dims.dimens
     val cardBg = tokens.editorCardBg.tc
     val headerBg = tokens.editorCardHeaderBg.tc
     val cardBorder = tokens.editorCardBorder.tc
@@ -1370,23 +1369,23 @@ private fun EditorCard(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(horizontal = 12.dp, vertical = 12.dp),
+            .padding(horizontal = dim.spaceLg.dp, vertical = dim.spaceLg.dp),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(dim.radiusMd3.dp))
                 .background(cardBg)
-                .border(0.5.dp, cardBorder, RoundedCornerShape(10.dp)),
+                .border(0.5.dp, cardBorder, RoundedCornerShape(dim.radiusMd3.dp)),
         ) {
             // Header row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(headerBg)
-                    .padding(vertical = 10.dp, horizontal = 14.dp),
+                    .padding(vertical = dim.spaceMd2.dp, horizontal = dim.spaceLg2.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(dim.spaceSm.dp),
             ) {
                 Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(14.dp))
                 Text(

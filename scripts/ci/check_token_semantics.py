@@ -142,6 +142,130 @@ def resolve(expr: str, consts: dict):
     return None
 
 
+# 令牌层里「只需要被看见」的符号：它们由 MinisTheme 提供，或只在自身文件内用。
+DEAD_CODE_EXEMPT_OBJECTS = {'RawColors', 'RawSpace', 'RawType', 'MinisColors',
+                            'MinisDimens', 'MinisType'}
+DEAD_CODE_MIN_MEMBERS = 3   # 少于此数的对象不判（可能是纯常量表）
+
+
+def check_token_dead_code(src: str) -> list:
+    """令牌定义了但全仓没人读 —— 与「有消费者没提供点」互为镜像的那种空转。
+
+    PR #126 是挂了 Provider 没接消费者；令牌层这一轮是消费者齐了没提供点，
+    外加 Minis.dimens / MinisMotion / MinisType 三件套长期无人读取。这类东西
+    编译通过、CI 通过、代码看着很整齐，唯一的问题是对产品零影响。
+
+    这里只报**候选**（不算 fail）：令牌往往先定义、后接入，硬 fail 会误伤
+    正在铺路的提交。真正的收口靠 reviewer 看这份清单。
+    """
+    root = ROOT / 'src/android/app/src/main/java/com/openminis/app'
+    if not root.exists():
+        return []
+    # 收集 ui/ 下所有非 tokens 目录的源码
+    others = []
+    for p in root.rglob('*.kt'):
+        if '/ui/tokens/' in p.as_posix() or p.name == 'TokenBridge.kt':
+            continue
+        try:
+            others.append(p.read_text(encoding='utf-8', errors='replace'))
+        except OSError:
+            pass
+    used = '\n'.join(others)
+
+    warns = []
+    # MinisMotion / MinisType 这类 object：逐个成员看有没有被引用
+    for om in re.finditer(r'object (\w+) \{([^}]*)\}', src):
+        name, body = om.group(1), om.group(2)
+        if name in DEAD_CODE_EXEMPT_OBJECTS:
+            continue
+        members = re.findall(r'const val (\w+)', body)
+        if len(members) < DEAD_CODE_MIN_MEMBERS:
+            continue
+        dead = [m for m in members if f'{name}.{m}' not in used]
+        if len(dead) == len(members):
+            warns.append(f'object {name} 无人使用（{len(members)} 个成员全部零引用）')
+        elif dead:
+            warns.append(f'object {name} 有 {len(dead)}/{len(members)} 个成员零引用：'
+                         f'{", ".join(dead)}')
+
+    # 令牌入口：整体零引用就是悬空。别名（Dims / MinisTokens / MinisTheme）
+    # 也算调用方 —— 已到棘轮上限的文件故意用包内 typealias 省 import 行数，
+    # 只认全限定写法会把它们误报成死代码。
+    entries = {
+        'Minis.dimens': ('Minis.dimens', 'Dims.dimens', 'MinisDimensEntry.dimens'),
+        'MinisTheme.colors': ('MinisTheme.colors', 'MinisTokens.colors'),
+    }
+    for label, aliases in entries.items():
+        if not any(a in used for a in aliases):
+            warns.append(f'{label} 无任何调用方（令牌入口悬空）')
+
+    if warns:
+        print(f'\n提示：令牌死代码 {len(warns)} 项（不算失败，但要有人跟进）：')
+        for w in warns:
+            print(f'  · {w}')
+    return []
+
+
+def check_dimens_monotonic(src: str) -> list:
+    """MinisDimens 的 space* 阶梯必须严格递增，默认档和每个 alternate 档都要。
+
+    只改其中几个槽位是真实会发生的错误：旧版 Compact 只写了 spaceSm/Md/Lg/Xl/Xxl，
+    于是 spaceMd2(10) > spaceLg(8)、spaceLg2(14) > spaceXl(12)、spaceXl2(18) >
+    spaceXxl(16) 三处倒挂，spaceXs 与 spaceSm 还塌成同值 4。编译通过、渲染出来
+    只是「大间距比小间距小」，肉眼很难归因到令牌。
+    """
+    fails = []
+    m = re.search(r'data class MinisDimens\((.*?)\n\)', src, re.S)
+    if not m:
+        return ['MinisDimens 声明未找到，无法校验尺寸阶梯']
+
+    def grab(text):
+        return {mm.group(1): float(mm.group(2))
+                for mm in re.finditer(r'(space\w+)\s*:\s*Float\s*=\s*([0-9.]+)f', text)}
+
+    def grab_assigned(text):
+        return {mm.group(1): float(mm.group(2))
+                for mm in re.finditer(r'\b(space\w+)\s*=\s*([0-9.]+)f', text)}
+
+    defaults = grab(m.group(1))
+    if not defaults:
+        return ['MinisDimens 未解析到 space* 默认值']
+
+    # 阶梯顺序取**声明顺序**，不按数值排序。按值排序有个隐蔽问题：一旦默认值
+    # 本身写错（例如 spaceMd 被写成 30），排序会被带偏，检查就查不出它错。
+    # 声明顺序是人的意图，与值无关，所以永远可用来当参照。
+    ladder = list(defaults)
+
+    def check(name, values):
+        out = []
+        seq = [(k, values[k]) for k in ladder if k in values]
+        for i in range(len(seq) - 1):
+            a, av = seq[i]
+            b, bv = seq[i + 1]
+            if av > bv:
+                out.append(f'MinisDimens.{name}: {a}={av:g} > {b}={bv:g}'
+                           f'（阶梯倒挂，大间距比小间距还小）')
+            elif av == bv:
+                out.append(f'MinisDimens.{name}: {a} == {b} == {av:g}'
+                           f'（两档塌成同值，层级消失）')
+        return out
+
+    fails.extend(check('默认', defaults))
+
+    # alternate 档在 companion object 里，不在主构造参数表中 —— 必须在全文找，
+    # 否则这条检查会静默空转（我第一次就写成只搜参数表，反向用例没报错才发现）。
+    seen = 0
+    for am in re.finditer(r'val (\w+) = MinisDimens\(\s*(.*?)\n\s*\)', src, re.S):
+        seen += 1
+        alt = dict(defaults)
+        alt.update(grab_assigned(am.group(2)))
+        fails.extend(check(am.group(1), alt))
+    if seen == 0:
+        fails.append('MinisDimens 未找到任何 alternate 档（Compact 之类）—— 正则失效')
+
+    return fails
+
+
 def main() -> int:
     path = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT
     if not path.exists():
@@ -240,6 +364,12 @@ def main() -> int:
             fails.append(f"品牌哈希兜底长度不配对：Light {a} 条 / Dark {b} 条（按索引配对会越界）")
         else:
             print(f"  品牌哈希兜底：Light/Dark 各 {a} 条，配对正确")
+
+    # 7. 尺寸阶梯单调性（默认 + 每个 alternate 档）
+    fails.extend(check_dimens_monotonic(src))
+
+    # 8. 令牌死代码 —— 定义了却没人读
+    fails.extend(check_token_dead_code(src))
 
     print(f"语义槽位：Light {len(light)} 个 / Dark {len(dark)} 个"
           f"（显式 {len(dark)}，继承 {len(inherited)}）；RawColors 常量 {len(consts)} 个")

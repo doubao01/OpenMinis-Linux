@@ -4,7 +4,7 @@ package com.openminis.app.ui.tokens
  * 自动生成 —— 不要手改。生成器: refactor/tools/gen_tokens.py
  *
  * 扫描事实：420 个 ui 下的 .kt 文件 -> Color(0x...): 284 处 / 131 个不同色值；
- * dp 字面量 3522 处 / 83 个不同值；sp 363 处。
+ * dp 字面量 3515 处 / 83 个不同值；sp 363 处。
  * 本文件命名 25 个色值，当前覆盖 123/284 = 43% 的颜色使用点；
  * 未命名的色值留在原地，由 refactor/tools/check_ui_tokens.py 的棘轮逐步压制。
  *
@@ -107,11 +107,11 @@ object RawColors {
 object RawSpace {
     const val xxs: Float = 2f  // x 159
     const val xs: Float = 4f  // x 268
-    const val sm: Float = 6f  // x 202
+    const val sm: Float = 6f  // x 201
     const val md: Float = 8f  // x 497
-    const val md2: Float = 10f  // x 222
-    const val lg: Float = 12f  // x 364
-    const val lg2: Float = 14f  // x 208
+    const val md2: Float = 10f  // x 219
+    const val lg: Float = 12f  // x 362
+    const val lg2: Float = 14f  // x 207
     const val xl: Float = 16f  // x 426
     const val xl2: Float = 18f  // x 103
     const val xxl: Float = 20f  // x 173
@@ -327,13 +327,41 @@ data class MinisDimens(
     val spaceGiant: Float = 48f, val spaceGiant2: Float = 56f,
     val strokeHairline: Float = 0.5f, val strokeThin: Float = 1f, val strokeThick: Float = 2f,
     val touchTargetMin: Float = 48f,
-    val radiusSm: Float = 8f, val radiusMd: Float = 12f, val radiusLg: Float = 16f,
+    // 命名保持原三档语义不变：radiusSm=8 / radiusMd=12 / radiusLg=16。
+    // 新增档位插在它们前后，不改旧值 —— 旧值若被改成 6，任何存量调用都会
+    // 悄悄变窄，而"更小更精致"这种视觉变化没人会当成 bug 报上来。
+    val radiusXs: Float = 2f, val radiusXs2: Float = 4f,
+    val radiusSm3: Float = 6f, val radiusSm: Float = 8f,
+    val radiusMd3: Float = 10f, val radiusMd: Float = 12f,
+    val radiusLg3: Float = 14f, val radiusLg: Float = 16f,
+    val radiusXl: Float = 18f, val radiusXl2: Float = 20f,
+    val radiusXxl: Float = 24f, val radiusHuge: Float = 28f,
+    val radiusHuge2: Float = 32f,
     val radiusPill: Float = 999f,
 ) {
     companion object {
-        /** 紧凑档：平板分栏 / 小屏横屏时整体缩一档间距，视觉比例不变。 */
+        /**
+         * 紧凑档：平板分栏 / 小屏横屏时整体缩一档间距。
+         *
+         * 必须覆盖整条 space 阶梯。只改其中几个槽会破坏单调性 —— 旧版只写了
+         * spaceSm/Md/Lg/Xl/Xxl，于是 spaceMd2(10) > spaceLg(8)、
+         * spaceLg2(14) > spaceXl(12)、spaceXl2(18) > spaceXxl(16) 三处倒挂，
+         * 且 spaceXs 与 spaceSm 塌成同值 4。视觉上表现为「大间距比小间距还小」，
+         * 排版忽紧忽松。check_token_semantics 现在会拦住这种半套改写。
+         */
         val Compact = MinisDimens(
-            spaceSm = 4f, spaceMd = 6f, spaceLg = 8f, spaceXl = 12f, spaceXxl = 16f,
+            spaceXxs = 2f, spaceXs = 3f, spaceSm = 4f,
+            spaceMd = 6f, spaceMd2 = 8f, spaceLg = 10f,
+            spaceLg2 = 12f, spaceXl = 14f, spaceXl2 = 16f,
+            spaceXxl = 18f, spaceXxl2 = 20f, spaceXxl3 = 22f,
+            spaceXxl4 = 24f, spaceHuge = 28f, spaceHuge2 = 34f,
+            spaceGiant = 40f, spaceGiant2 = 48f,
+            strokeHairline = 0.5f, strokeThin = 1f, strokeThick = 2f,
+            touchTargetMin = 48f,
+            radiusXs = 2f, radiusXs2 = 3f, radiusSm3 = 4f, radiusSm = 6f,
+            radiusMd3 = 8f, radiusMd = 10f, radiusLg3 = 12f, radiusLg = 14f,
+            radiusXl = 16f, radiusXl2 = 18f, radiusXxl = 20f,
+            radiusHuge = 24f, radiusHuge2 = 28f, radiusPill = 999f,
         )
     }
 }
