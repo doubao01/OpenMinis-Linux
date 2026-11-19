@@ -466,7 +466,6 @@ fun ChatScreen(
         viewModel.onForegroundChanged(true)
         // Stamp read on enter AND dispose so streamed rows aren't "unseen" on leave.
         com.openminis.app.data.UnreadRegistry.markRead(
-            tHangDiagAppContext,
             viewModel.realSessionId.ifBlank { sessionId },
         )
         // Mount/dispose markers (PerfLongCtx, hangCount extra preserved).
@@ -481,7 +480,6 @@ fun ChatScreen(
             viewModel.onForegroundChanged(false)
             // Final read stamp.
             com.openminis.app.data.UnreadRegistry.markRead(
-                tHangDiagAppContext,
                 viewModel.realSessionId.ifBlank { sessionId },
             )
             // T-android-new-chat-empty-residue: drop sessions materialised by

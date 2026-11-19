@@ -419,7 +419,7 @@ class SessionListViewModel(
             chatRepository.deleteSession(id)
             ChatViewModelStore.release(id)
             com.openminis.app.service.SessionBadgeStore.clear(id)
-            com.openminis.app.data.UnreadRegistry.forget(context, id)
+            com.openminis.app.data.UnreadRegistry.forget(id)
         }
     }
 

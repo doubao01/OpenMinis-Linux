@@ -619,7 +619,7 @@ fun SessionListScreen(
             .filter {
                 com.openminis.app.data.UnreadRegistry.isUnread(
                     it.updatedAt,
-                    com.openminis.app.data.UnreadRegistry.lastReadAtMs(context, it.id),
+                    com.openminis.app.data.UnreadRegistry.lastReadAtMs(it.id),
                 )
             }
             .map { it.id }.toSet()
