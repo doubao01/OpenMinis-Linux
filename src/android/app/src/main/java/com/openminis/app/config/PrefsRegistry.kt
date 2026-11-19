@@ -4,7 +4,7 @@ package com.openminis.app.config
  * 自动生成 —— 不要手改。
  * 生成器: refactor/tools/gen_prefs_registry.py
  * 源目录: /tmp/oml/src/android/app/src/main/java/com/openminis/app
- * 规模:   90 个 prefs 文件（加密 8）/ 已归属键常量 153 / 165 处使用
+ * 规模:   90 个 prefs 文件（加密 8）/ 已归属键常量 154 / 165 处使用
  *
  * 目的: 把「SharedPreferences 文件名 + 键名」从 93 个文件里的裸字符串收敛为一处
  * 可枚举、可校验、可审计的数据表。设计见 refactor/docs/01-config-unification.md。
@@ -67,7 +67,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "backup_rclone_secrets", module = "backup", scope = PrefsScope.ENCRYPTED, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "backup_ui", module = "ui", scope = PrefsScope.PLAIN, keys = mapOf("KEY_CATEGORIES" to "selectedCategories", "KEY_ENCRYPT" to "encrypt", "KEY_MAX_FILE_MB" to "maxFileSizeMB"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "bash_install", module = "agent", scope = PrefsScope.PLAIN, keys = mapOf("KEY_FAIL_COUNT" to "failCount", "KEY_LAST_FAIL" to "lastFailAt"), note = "3 usages across 1 file(s)"),
-        PrefsFileSpec(name = "browser_prefs", module = "browser", scope = PrefsScope.PLAIN, keys = mapOf("LITERAL_custom_user_agent" to "custom_user_agent", "LITERAL_user_agent_profile" to "user_agent_profile"), note = "6 usages across 3 file(s)"),
+        PrefsFileSpec(name = "browser_prefs", module = "browser", scope = PrefsScope.PLAIN, keys = mapOf("LITERAL_custom_user_agent" to "custom_user_agent", "LITERAL_user_agent_profile" to "user_agent_profile", "PREF_GLOBAL_VIEWPORT_HEIGHT" to "browser_custom_viewport_height", "PREF_GLOBAL_VIEWPORT_WIDTH" to "browser_custom_viewport_width", "PREF_IDLE_TIMEOUT_MINUTES" to "idle_timeout_minutes"), dynamicPrefixes = listOf("engine_stale_seen_"), note = "6 usages across 3 file(s)"),
         PrefsFileSpec(name = "collab_roles", module = "tools", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "roles_json"), note = "2 usages across 1 file(s)"),
         PrefsFileSpec(name = "composer_input_prefs", module = "ui", scope = PrefsScope.PLAIN, keys = mapOf("KEY_MODE" to "composer_input_mode_pref"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "crash_freq_prefs", module = "crash", scope = PrefsScope.PLAIN, keys = mapOf("KEY_DISMISSED_AT" to "dismissed_at", "KEY_FORCE_HOME_UNTIL" to "force_home_until", "KEY_SUPPRESS_UNTIL" to "suppress_until"), note = "6 usages across 1 file(s)"),
@@ -105,7 +105,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "minis_scheduled_tasks_prefs", module = "scheduled", scope = PrefsScope.PLAIN, keys = mapOf("KEY_TASKS" to "tasks_json"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_storage_scan", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ROOTFS_BYTES" to "ubuntu_rootfs_bytes"), note = "2 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_tool_limits", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_CHARS" to "fileReadMaxChars", "KEY_LINES" to "fileReadMaxLines", "KEY_MAIN_TURNS" to "mainSessionMaxTurns", "KEY_SHELL" to "shellTimeoutSec", "KEY_TURNS" to "subagentMaxTurns", "LITERAL_autoConcurrency" to "autoConcurrency", "LITERAL_toolCallConcurrency" to "toolCallConcurrency"), note = "1 usages across 1 file(s)"),
-        PrefsFileSpec(name = "minis_unread_registry", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_PREFIX" to "lastReadAt:"), dynamicPrefixes = listOf("lastReadAt:"), note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "minis_unread_registry", module = "data", scope = PrefsScope.PLAIN, dynamicPrefixes = listOf("lastReadAt:"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "mirror_settings", module = "sandbox", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "chat.confirmBeforeStop", "KEY_FRESH_INSTALL" to "rootfs.freshInstall"), dynamicPrefixes = listOf("mirror.selected.", "mirror.useCustom."), note = "4 usages across 3 file(s)"),
         PrefsFileSpec(name = "multi_agent_settings", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "enabled", "KEY_MAX_CONCURRENT" to "max_concurrent", "KEY_MODEL_IDS" to "model_entry_ids", "KEY_SUBAGENT_MAX_ATTEMPTS" to "subagent_max_attempts", "KEY_SUBAGENT_MAX_TURNS" to "subagent_max_turns", "KEY_SUPERVISOR_MAX_WORKER_TURNS" to "supervisor_max_worker_turns", "KEY_WORKER_MODEL_ID" to "worker_model_entry_id"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "oauth_prefs", module = "auth", scope = PrefsScope.ENCRYPTED, keys = mapOf("KEY_MANUAL_BEARER" to "manual_bearer_token"), dynamicPrefixes = listOf("oauth_", "oauth_manual_bearer_token_", "oauth_tokens_"), note = "5 usages across 3 file(s)"),
@@ -140,7 +140,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "ui_prefs", module = "ui", scope = PrefsScope.PLAIN, keys = mapOf("KEY_LIST_COLLAPSED" to "tablet_list_pane_collapsed", "KEY_LIST_PANE_WIDTH" to "tablet_list_pane_width_dp"), note = "2 usages across 2 file(s)"),
         PrefsFileSpec(name = "update_download_prefs", module = "data", scope = PrefsScope.EPHEMERAL, keys = mapOf("KEY_WIFI_ONLY" to "wifi_only"), note = "2 usages across 1 file(s)"),
         PrefsFileSpec(name = "update_sources", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_INCLUDE_ROLLING" to "include_rolling", "KEY_PREFERRED" to "preferred_source_id"), note = "1 usages across 1 file(s)"),
-        PrefsFileSpec(name = "voice_announcement_prefs", module = "speech", scope = PrefsScope.PLAIN, keys = mapOf("KEY_PREFIX" to "scene."), note = "3 usages across 1 file(s)"),
+        PrefsFileSpec(name = "voice_announcement_prefs", module = "speech", scope = PrefsScope.PLAIN, dynamicPrefixes = listOf("scene."), note = "3 usages across 1 file(s)"),
         PrefsFileSpec(name = "voice_correction_prefs", module = "speech", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "voiceCorrectionCollectionEnabled", "KEY_PROMPTED" to "voiceCorrectionCollectionPrompted"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "voice_prefs", module = "speech", scope = PrefsScope.PLAIN, keys = mapOf("KEY_DRAG_X_DP" to "readReplies.capsuleDragXDp", "KEY_DRAG_Y_DP" to "readReplies.capsuleDragYDp", "KEY_ENABLED" to "readReplies", "KEY_EXPANDED" to "voice.panel.expanded", "KEY_MUTED" to "readReplies.muted", "KEY_SPEED" to "readReplies.speed", "KEY_SYSTEM_VOICE" to "readReplies.systemVoice", "KEY_SYSTEM_VOICE_LABEL" to "readReplies.systemVoiceLabel", "KEY_VOLUME" to "readReplies.volume"), note = "3 usages across 2 file(s)"),
         PrefsFileSpec(name = "vscreen", module = "vscreen", scope = PrefsScope.PLAIN, note = "1 usages across 1 file(s)"),

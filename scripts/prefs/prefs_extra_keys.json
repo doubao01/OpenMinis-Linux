@@ -95,9 +95,15 @@
     "browser_prefs": {
       "keys": {
         "LITERAL_user_agent_profile": "user_agent_profile",
-        "LITERAL_custom_user_agent": "custom_user_agent"
+        "LITERAL_custom_user_agent": "custom_user_agent",
+        "PREF_IDLE_TIMEOUT_MINUTES": "idle_timeout_minutes",
+        "PREF_GLOBAL_VIEWPORT_WIDTH": "browser_custom_viewport_width",
+        "PREF_GLOBAL_VIEWPORT_HEIGHT": "browser_custom_viewport_height"
       },
-      "reason": "literal-key: BrowserSettingsSheet 里直接写字面量（Compose 内联），没有常量"
+      "reason": "literal-key + dynamic-prefix: user_agent_profile/custom_user_agent 由 UI 内联写；engine_stale_seen_<TARGET_MAJOR> 按 WebView 主版本号记录横幅已读",
+      "dynPrefixes": [
+        "engine_stale_seen_"
+      ]
     },
     "minis_group_chat": {
       "dynPrefixes": [
@@ -121,6 +127,12 @@
         "level_"
       ],
       "reason": "dynamic-prefix: \"level_$toolName\" 按工具名存权限等级"
+    },
+    "voice_announcement_prefs": {
+      "dynPrefixes": [
+        "scene."
+      ],
+      "reason": "dynamic-prefix: keyOf(scene) = KEY_PREFIX + scene.key。KEY_PREFIX 是拼接片段，生成器已排除 _PREFIX 后缀常量，所以这里显式声明前缀"
     }
   }
 }

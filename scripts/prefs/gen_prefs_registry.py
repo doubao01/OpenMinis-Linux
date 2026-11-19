@@ -122,7 +122,11 @@ def scan(src_root):
     for p, s in files:
         rel = os.path.relpath(p, src_root)
         local = {n for n, e in prefs.items() if any(u['file'] == rel for u in e.get('usages', []))}
-        keys = RE_KEY_CONST.findall(s)
+        keys = [(n, l) for n, l in RE_KEY_CONST.findall(s)
+                # KEY_PREFIX / KEY_SUFFIX 是拼接用的片段，不是完整的键名。
+                # 把它们当键登记，注册表里会出现一条永远读不到的 `"scene."`，
+                # 而真正的键 `scene.tool_result` 反倒过不了守卫。
+                if not n.endswith(('_PREFIX', '_SUFFIX'))]
         # 注意：这里不能因为「没有 KEY_* 常量」就跳过 —— MirrorSettingsScreen 这类
         # 文件是纯动态键（"mirror.selected.${x}"），一个常量都没有，但它的前缀
         # 必须被登记，否则严格校验会锁死这个文件。

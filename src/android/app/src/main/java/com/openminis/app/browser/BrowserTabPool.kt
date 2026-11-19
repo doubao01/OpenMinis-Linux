@@ -274,8 +274,7 @@ class BrowserTabPool(private val context: Context) {
         // Restore persisted User-Agent profile from SharedPreferences so pool-owned
         // WebViews start in the correct mode (Mobile vs Desktop) and
         // captureWebViewBitmap() uses the matching viewport.
-        val prefs = context.getSharedPreferences("browser_prefs", Context.MODE_PRIVATE)
-        val profileName = prefs.getString("user_agent_profile", null)
+        val profileName = com.openminis.app.config.Prefs.file("browser_prefs").stringOrNull("user_agent_profile")
         if (profileName != null) {
             runCatching { UserAgentProfile.valueOf(profileName) }.getOrNull()?.let {
                 _userAgentProfile.value = it
@@ -316,8 +315,7 @@ class BrowserTabPool(private val context: Context) {
     fun setIdleTimeoutMinutes(minutes: Int) {
         val clamped = minutes.coerceIn(MIN_IDLE_TIMEOUT_MINUTES, MAX_IDLE_TIMEOUT_MINUTES)
         idleTimeoutMs = clamped * 60_000L
-        val prefs = context.getSharedPreferences("browser_prefs", Context.MODE_PRIVATE)
-        prefs.edit().putInt(PREF_IDLE_TIMEOUT_MINUTES, clamped).apply()
+        com.openminis.app.config.Prefs.file("browser_prefs").set(PREF_IDLE_TIMEOUT_MINUTES, clamped)
         Log.i(TAG, "Idle timeout set to $clamped min")
     }
 
@@ -1238,11 +1236,11 @@ class BrowserTabPool(private val context: Context) {
     suspend fun setGlobalViewport(width: Int, height: Int) {
         _customViewportWidth.value = width.coerceAtLeast(0)
         _customViewportHeight.value = height.coerceAtLeast(0)
-        val prefs = context.getSharedPreferences("browser_prefs", Context.MODE_PRIVATE)
-        prefs.edit()
-            .putInt(PREF_GLOBAL_VIEWPORT_WIDTH, _customViewportWidth.value)
-            .putInt(PREF_GLOBAL_VIEWPORT_HEIGHT, _customViewportHeight.value)
-            .apply()
+        // 宽高一起写：只写一个会让下次恢复时出现「宽度是新的、高度还是旧的」
+        com.openminis.app.config.Prefs.file("browser_prefs").write {
+            putInt(PREF_GLOBAL_VIEWPORT_WIDTH, _customViewportWidth.value)
+            putInt(PREF_GLOBAL_VIEWPORT_HEIGHT, _customViewportHeight.value)
+        }
         applyViewportToAllTabs()
     }
 

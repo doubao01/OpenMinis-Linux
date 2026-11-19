@@ -232,9 +232,14 @@
       ],
       "keys": {
         "LITERAL_custom_user_agent": "custom_user_agent",
-        "LITERAL_user_agent_profile": "user_agent_profile"
+        "LITERAL_user_agent_profile": "user_agent_profile",
+        "PREF_GLOBAL_VIEWPORT_HEIGHT": "browser_custom_viewport_height",
+        "PREF_GLOBAL_VIEWPORT_WIDTH": "browser_custom_viewport_width",
+        "PREF_IDLE_TIMEOUT_MINUTES": "idle_timeout_minutes"
       },
-      "dyn_keys": [],
+      "dyn_keys": [
+        "engine_stale_seen_"
+      ],
       "open_key_space": false,
       "ephemeral": false
     },
@@ -926,9 +931,7 @@
       "usage_files": [
         "data/UnreadRegistry.kt"
       ],
-      "keys": {
-        "KEY_PREFIX": "lastReadAt:"
-      },
+      "keys": {},
       "dyn_keys": [
         "lastReadAt:"
       ],
@@ -1576,10 +1579,10 @@
       "usage_files": [
         "speech/VoiceAnnouncementPrefs.kt"
       ],
-      "keys": {
-        "KEY_PREFIX": "scene."
-      },
-      "dyn_keys": [],
+      "keys": {},
+      "dyn_keys": [
+        "scene."
+      ],
       "open_key_space": false,
       "ephemeral": false
     },
@@ -5870,7 +5873,6 @@
     "KEY_LEARNED",
     "KEY_PAID",
     "KEY_PORT",
-    "KEY_PREFIX",
     "KEY_PROBED_AT",
     "KEY_PROJECT_RULES",
     "KEY_REMOTES",
@@ -5885,8 +5887,8 @@
   "totals": {
     "prefs_files": 90,
     "prefs_encrypted": 8,
-    "key_constants_attributed": 153,
-    "orphan_keys": 33,
+    "key_constants_attributed": 154,
+    "orphan_keys": 32,
     "usage_sites": 165,
     "usage_files": 96,
     "constant_conflicts": 459
