@@ -66,6 +66,7 @@ import com.openminis.app.ui.theme.monetIconTileColor
 import com.openminis.app.ui.theme.monetIconTileContentColor
 import com.openminis.app.ui.theme.m3Icon
 import com.openminis.app.i18n.uppercaseForDisplay
+import com.openminis.app.ui.tokens.MinisType
 
 /**
  * Shared primitives for settings pages. Grouped-card layout (iOS/ChatGPT style).
@@ -227,7 +228,7 @@ fun SettingsSection(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Medium,
-                letterSpacing = 0.5.sp,
+                letterSpacing = MinisType().sectionLabelSpacing.sp,
                 // [T-android-settings-ui-md3] #5 header→card gap = 8dp (was 6dp,
                 // off-grid). Horizontal stays 32dp to align the header text with
                 // the inset card's content.

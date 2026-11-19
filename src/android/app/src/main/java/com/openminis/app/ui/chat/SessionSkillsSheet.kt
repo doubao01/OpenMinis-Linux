@@ -36,6 +36,7 @@ import com.openminis.app.ui.components.DialogTextField
 import com.openminis.app.ui.settings.SettingsSection
 import com.openminis.app.ui.settings.SkillRowItem
 import com.openminis.app.ui.components.MinisTextButton
+import com.openminis.app.ui.tokens.MinisType
 
 /**
  * Bottom sheet showing all skills with per-session enable/disable toggles.
@@ -124,7 +125,7 @@ fun SessionSkillsSheet(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium,
-                        letterSpacing = 0.5.sp,
+                        letterSpacing = MinisType().sectionLabelSpacing.sp,
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     // Enable/Disable All operate on the FILTERED subset so a

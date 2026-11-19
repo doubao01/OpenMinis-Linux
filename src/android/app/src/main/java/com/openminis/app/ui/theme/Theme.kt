@@ -327,21 +327,21 @@ private fun TextStyle.scale(factor: Float): TextStyle =
 // ─── M3 Typography (Material You 模式用) ───────────────────────────────────
 
 private val M3Typography = Typography(
-    displayLarge = TextStyle(fontSize = 57.sp, fontWeight = FontWeight.Normal, lineHeight = 64.sp),
-    displayMedium = TextStyle(fontSize = 45.sp, fontWeight = FontWeight.Normal, lineHeight = 52.sp),
-    displaySmall = TextStyle(fontSize = 36.sp, fontWeight = FontWeight.Normal, lineHeight = 44.sp),
-    headlineLarge = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Normal, lineHeight = 40.sp),
-    headlineMedium = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Normal, lineHeight = 36.sp),
-    headlineSmall = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Normal, lineHeight = 32.sp),
-    titleLarge = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Medium, lineHeight = 28.sp),
-    titleMedium = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium, lineHeight = 24.sp),
-    titleSmall = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, lineHeight = 20.sp),
-    bodyLarge = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Normal, lineHeight = 24.sp),
-    bodyMedium = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal, lineHeight = 20.sp),
-    bodySmall = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Normal, lineHeight = 16.sp),
-    labelLarge = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, lineHeight = 20.sp),
-    labelMedium = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Medium, lineHeight = 16.sp),
-    labelSmall = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Medium, lineHeight = MinisType().lineHeightTight(11f).sp),
+    displayLarge = TextStyle(fontSize = 57.sp, fontWeight = FontWeight.Normal, lineHeight = 64.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    displayMedium = TextStyle(fontSize = 45.sp, fontWeight = FontWeight.Normal, lineHeight = 52.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    displaySmall = TextStyle(fontSize = 36.sp, fontWeight = FontWeight.Normal, lineHeight = 44.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    headlineLarge = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Normal, lineHeight = 40.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    headlineMedium = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Normal, lineHeight = 36.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    headlineSmall = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Normal, lineHeight = 32.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    titleLarge = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Medium, lineHeight = 28.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    titleMedium = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium, lineHeight = 24.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    titleSmall = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, lineHeight = 20.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    bodyLarge = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Normal, lineHeight = 24.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    bodyMedium = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal, lineHeight = 20.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    bodySmall = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Normal, lineHeight = 16.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    labelLarge = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, lineHeight = 20.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    labelMedium = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Medium, lineHeight = 16.sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
+    labelSmall = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Medium, lineHeight = MinisType().lineHeightTight(11f).sp),  // token-literal-ok: Material3 规范拷贝，值由规范决定而非本项目排版意图
 )
 
 private fun scaledTypography(factor: Float): Typography {

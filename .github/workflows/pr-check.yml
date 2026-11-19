@@ -159,6 +159,17 @@ jobs:
       - name: UI design tokens are regenerable
         run: python3 scripts/ci/check_ui_tokens.py
 
+      # [T-token-coverage] The generator proves the token file matches source;
+      # it says nothing about whether code *uses* the tokens. Measured: 284
+      # unnamed color literals, 318 unnamed sp, 3490 unnamed dp remain. Without
+      # a ratchet those counts only grow — writing 16.sp is always cheaper than
+      # finding the semantic slot, so the table drifts into decoration. Budget is
+      # per-file (a total hides "A removed 20, B added 20") and may only go down.
+      - name: Design token coverage ratchet
+        run: |
+          python3 scripts/ci/check_token_coverage.py --selftest
+          python3 scripts/ci/check_token_coverage.py
+
       # [T-token-semantics] The generator proves MinisTokens.kt matches source;
       # it says nothing about whether the Light/Dark pair is *correct*. A slot
       # copied from Light into Dark, a swapped background, or a text color that

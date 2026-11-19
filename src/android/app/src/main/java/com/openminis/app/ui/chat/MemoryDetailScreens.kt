@@ -36,6 +36,7 @@ import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.theme.m3Icon
 import com.openminis.app.ui.components.MinisTextButton
 import com.openminis.app.i18n.uppercaseForDisplay
+import com.openminis.app.ui.tokens.MinisType
 
 /**
  * Stateless detail body composables used by [SessionMemorySheet] when a row
@@ -239,7 +240,7 @@ private fun SectionHeader(text: String) {
         text = text.uppercaseForDisplay(),
         fontSize = 11.sp,
         fontWeight = FontWeight.Medium,
-        letterSpacing = 0.5.sp,
+        letterSpacing = MinisType().sectionLabelSpacing.sp,
         color = ChatColors.secondaryText,
     )
 }

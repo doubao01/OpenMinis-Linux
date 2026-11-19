@@ -27,6 +27,9 @@ from collections import Counter
 RE_HEX = re.compile(r'Color\(0x([0-9A-Fa-f]{8})\)')
 RE_DP = re.compile(r'(?<![\w.])(\d+(?:\.\d+)?)\.dp\b')
 RE_SP = re.compile(r'(?<![\w.])(\d+(?:\.\d+)?)\.sp\b')
+# 注释里的字面量不算使用点：`// 原来是 16.sp` 不改渲染，计入会让棘轮的压力
+# 来自空气。统计口径必须和一线的痛感一致，否则预算会被注释慢慢吃掉。
+RE_COMMENT = re.compile(r'(?://|/\*).*$')
 
 # iOS HIG 系统色。这张表是**契约**，不是统计结果：名字一旦发布就不能删。
 IOS_NAMES = {
@@ -93,14 +96,68 @@ def load_brand():
     return json.load(open(p, encoding='utf-8'))
 
 
+def strip_comments(src):
+    """返回「只有代码」的文本：注释整段删除，字符串内容置空（保留引号占位）。
+
+    为什么字符串也要置空：`Text("16.sp")` 里的 16.sp 是给人看的文案，不是排版
+    参数。计入预算会让改一句文案触发排版告警，预算就失去可信度。
+    `//` 只在前面是空白或行首时才算注释 —— 真实代码里没有 `x//y` 这种写法，
+    所以 `"https://..."` 不会被误切（而且它在字符串里，本来就被置空了）。
+    """
+    out = []
+    i, n = 0, len(src)
+    in_str = False
+    while i < n:
+        c = src[i]
+        if in_str:
+            if c == '\\' and i + 1 < n:
+                i += 2; continue
+            if c == '"':
+                in_str = False
+                out.append('"')
+            i += 1
+            continue
+        if c == '"':
+            in_str = True; out.append(c); i += 1; continue
+        if src.startswith('/*', i):
+            j = src.find('*/', i + 2)
+            j = n if j < 0 else j + 2
+            # 关键：块注释里的换行必须补回来。否则去注释文本的行号与原文错位，
+            # 所有"按行"的定位（豁免标记、诊断输出）都会指到错误的位置。
+            out.append('\n' * src.count('\n', i, j))
+            i = j
+            continue
+        if src.startswith('//', i) and (i == 0 or src[i - 1].isspace()):
+            j = src.find('\n', i)
+            i = n if j < 0 else j
+            continue
+        out.append(c); i += 1
+    return ''.join(out)
+
+
+EXEMPT = re.compile(r'token-literal-ok\s*:\s*(\S.*)?$')
+
+
 def scan(ui_root):
+    """聚合字面量。带 token-literal-ok 的行按豁免处理，不计入。
+
+    豁免语义必须和 check_token_coverage.py 完全一致，否则生成器的统计头
+    与棘轮预算对不上，看的人会以为其中一个坏了。
+    """
     colors, dps, sps, files = Counter(), Counter(), Counter(), 0
     for dirpath, _, names in os.walk(ui_root):
         for n in names:
             if not n.endswith('.kt'):
                 continue
             files += 1
-            s = open(os.path.join(dirpath, n), encoding='utf-8', errors='replace').read()
+            raw = open(os.path.join(dirpath, n), encoding='utf-8', errors='replace').read()
+            s = strip_comments(raw)
+            if 'token-literal-ok' in raw:
+                # 按行扣减：豁免行在去注释文本里的字面量全部作废
+                keep = []
+                for o_line, c_line in zip(raw.split('\n'), s.split('\n')):
+                    keep.append(c_line if not EXEMPT.search(o_line) else '')
+                s = '\n'.join(keep)
             for m in RE_HEX.finditer(s):
                 colors[m.group(1).upper()] += 1
             for m in RE_DP.finditer(s):
@@ -142,12 +199,14 @@ def render(files, colors, dps, sps, brand):
     head = '''package com.openminis.app.ui.tokens
 
 /**
- * 自动生成 —— 不要手改。生成器: refactor/tools/gen_tokens.py
+ * 自动生成 —— 不要手改。生成器: scripts/ui/gen_tokens.py
  *
  * 扫描事实：%d 个 ui 下的 .kt 文件 -> Color(0x...): %d 处 / %d 个不同色值；
  * dp 字面量 %d 处 / %d 个不同值；sp %d 处。
- * 本文件命名 %d 个色值，当前覆盖 %d/%d = %d%% 的颜色使用点；
- * 未命名的色值留在原地，由 refactor/tools/check_ui_tokens.py 的棘轮逐步压制。
+ * （已排除注释、字符串，以及标了 token-literal-ok 的行。）
+ * 本文件命名 %d 个色值，当前覆盖 %d/%d = %d%% 的颜色使用点。
+ * 剩下的未命名字面量由 scripts/ci/check_token_coverage.py 的按文件预算
+ * 逐步压制 —— 那个脚本才是棘轮，本文件只负责统计。
  *
  * 注意：常量全量输出，不因"源码里暂时没有使用者"而删除 —— 迁移完一个色值后
  * 源码里就不再有它，如果按频率裁剪，令牌会把自己删空。

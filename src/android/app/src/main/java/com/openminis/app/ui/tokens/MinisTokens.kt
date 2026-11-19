@@ -1,12 +1,14 @@
 package com.openminis.app.ui.tokens
 
 /**
- * 自动生成 —— 不要手改。生成器: refactor/tools/gen_tokens.py
+ * 自动生成 —— 不要手改。生成器: scripts/ui/gen_tokens.py
  *
  * 扫描事实：420 个 ui 下的 .kt 文件 -> Color(0x...): 284 处 / 131 个不同色值；
- * dp 字面量 3515 处 / 83 个不同值；sp 347 处。
- * 本文件命名 25 个色值，当前覆盖 123/284 = 43% 的颜色使用点；
- * 未命名的色值留在原地，由 refactor/tools/check_ui_tokens.py 的棘轮逐步压制。
+ * dp 字面量 3490 处 / 83 个不同值；sp 311 处。
+ * （已排除注释、字符串，以及标了 token-literal-ok 的行。）
+ * 本文件命名 25 个色值，当前覆盖 123/284 = 43% 的颜色使用点。
+ * 剩下的未命名字面量由 scripts/ci/check_token_coverage.py 的按文件预算
+ * 逐步压制 —— 那个脚本才是棘轮，本文件只负责统计。
  *
  * 注意：常量全量输出，不因"源码里暂时没有使用者"而删除 —— 迁移完一个色值后
  * 源码里就不再有它，如果按频率裁剪，令牌会把自己删空。
@@ -105,26 +107,26 @@ object RawColors {
 
 /** 间距 / 圆角 / 线宽原语（2dp 栅格）。未命名的值（如 3/5/7）由棘轮压制。 */
 object RawSpace {
-    const val xxs: Float = 2f  // x 159
-    const val xs: Float = 4f  // x 268
-    const val sm: Float = 6f  // x 201
-    const val md: Float = 8f  // x 497
+    const val xxs: Float = 2f  // x 154
+    const val xs: Float = 4f  // x 267
+    const val sm: Float = 6f  // x 199
+    const val md: Float = 8f  // x 496
     const val md2: Float = 10f  // x 219
-    const val lg: Float = 12f  // x 362
+    const val lg: Float = 12f  // x 360
     const val lg2: Float = 14f  // x 207
-    const val xl: Float = 16f  // x 426
-    const val xl2: Float = 18f  // x 103
+    const val xl: Float = 16f  // x 425
+    const val xl2: Float = 18f  // x 102
     const val xxl: Float = 20f  // x 173
     const val xxl2: Float = 22f  // x 31
     const val xxl3: Float = 24f  // x 94
-    const val xxl4: Float = 28f  // x 34
-    const val huge: Float = 32f  // x 87
-    const val huge2: Float = 40f  // x 19
-    const val giant: Float = 48f  // x 25
-    const val giant2: Float = 56f  // x 31
+    const val xxl4: Float = 28f  // x 33
+    const val huge: Float = 32f  // x 86
+    const val huge2: Float = 40f  // x 17
+    const val giant: Float = 48f  // x 24
+    const val giant2: Float = 56f  // x 30
     const val hairline: Float = 0.5f  // x 100
-    const val thin: Float = 1f  // x 58
-    const val thick: Float = 2f  // x 159
+    const val thin: Float = 1f  // x 55
+    const val thick: Float = 2f  // x 154
     const val touchTargetMin: Float = 48f  // 无障碍硬要求，不是审美
 }
 

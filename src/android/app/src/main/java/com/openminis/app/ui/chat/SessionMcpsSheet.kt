@@ -37,6 +37,7 @@ import com.openminis.app.R
 import com.openminis.app.data.repository.MCPRepository
 import com.openminis.app.ui.settings.SettingsRow
 import com.openminis.app.ui.settings.SettingsSection
+import com.openminis.app.ui.tokens.MinisType
 
 private const val MCP_NOTE_TRUNC = 200
 
@@ -120,7 +121,7 @@ fun SessionMcpsSheet(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium,
-                        letterSpacing = 0.5.sp,
+                        letterSpacing = MinisType().sectionLabelSpacing.sp,
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     MinisTextButton(

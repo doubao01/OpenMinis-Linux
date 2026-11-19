@@ -62,6 +62,7 @@ import com.openminis.app.ui.components.MinisTextButton
 import com.openminis.app.ui.components.UrlPreviewSheet
 import com.openminis.app.ui.theme.LocalChatPalette
 import kotlinx.coroutines.launch
+import com.openminis.app.ui.tokens.MinisType
 
 // [T-provider-quota] "Quota" section of the provider detail page: the upstream
 // balance / quota of this instance's account, from the vendor itself - never
@@ -99,7 +100,7 @@ fun ProviderQuotaSection(instance: ProviderInstance) {
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Medium,
-                letterSpacing = 0.5.sp,
+                letterSpacing = MinisType().sectionLabelSpacing.sp,
             )
             Spacer(Modifier.weight(1f))
             if (canRefresh(display)) {
@@ -452,7 +453,7 @@ private fun SheetSection(header: String?, content: @Composable ColumnScope.() ->
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Medium,
-                letterSpacing = 0.5.sp,
+                letterSpacing = MinisType().sectionLabelSpacing.sp,
                 modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 8.dp),
             )
         }
