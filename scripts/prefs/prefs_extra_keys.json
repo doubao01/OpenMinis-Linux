@@ -84,6 +84,36 @@
       "dynPrefixes": [
         "keypool_"
       ]
+    },
+    "file_browser_prefs": {
+      "keys": {
+        "PREF_KEY_SHOW_HIDDEN": "file_browser_show_hidden"
+      },
+      "reason": "归属漏抓: 常量定义在 companion object 里（第 518 行），与使用点（288/309）跨了 200 多行，归属规则没连上"
+    },
+    "browser_prefs": {
+      "keys": {
+        "LITERAL_user_agent_profile": "user_agent_profile",
+        "LITERAL_custom_user_agent": "custom_user_agent"
+      },
+      "reason": "literal-key: BrowserSettingsSheet 里直接写字面量（Compose 内联），没有常量"
+    },
+    "minis_group_chat": {
+      "dynPrefixes": [
+        "closed:",
+        "enabled:",
+        "opening:",
+        "round:"
+      ],
+      "reason": "dynamic-template: 键是 \"closed:$fromId\" / \"enabled:$toId\" 这类字符串模板（群聊按会话对记录），无法静态枚举"
+    },
+    "session_list_ui": {
+      "openKeySpace": true,
+      "reason": "open-key-space: 键由列表状态动态生成，SessionListViewModel 作为 internal val 暴露给 UI 层"
+    },
+    "skills_prefs": {
+      "openKeySpace": true,
+      "reason": "open-key-space: 排序状态键由 UI 层动态生成，SkillsManagementScreen 用 lazy 句柄持有"
     }
   }
 }

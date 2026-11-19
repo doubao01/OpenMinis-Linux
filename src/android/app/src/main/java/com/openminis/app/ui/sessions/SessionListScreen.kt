@@ -381,16 +381,16 @@ private fun relativeDate(context: Context, timestamp: Long): String {
     val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
     val hours = TimeUnit.MILLISECONDS.toHours(diff)
 
-    if (seconds < 60) return context.getString(R.string.time_just_now)
+    if (seconds < 60) return context.string(R.string.time_just_now)
     if (minutes < 60) return context.getString(R.string.time_minutes_ago, minutes.toInt())
-    if (hours < 24) return context.getString(R.string.time_hours_ago, hours.toInt())
+    if (hours < 24) return context.string(R.string.time_hours_ago, hours.toInt())
 
     val dateCal = Calendar.getInstance().apply { time = Date(timestamp) }
     val yesterdayCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
     if (dateCal.get(Calendar.YEAR) == yesterdayCal.get(Calendar.YEAR) &&
         dateCal.get(Calendar.DAY_OF_YEAR) == yesterdayCal.get(Calendar.DAY_OF_YEAR)
     ) {
-        return context.getString(R.string.time_yesterday)
+        return context.string(R.string.time_yesterday)
     }
 
     val days = TimeUnit.MILLISECONDS.toDays(diff)
@@ -1376,7 +1376,7 @@ private fun DualFabRow(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences("ui_prefs", Context.MODE_PRIVATE) }
+    val prefs = remember { com.openminis.app.config.Prefs.file("ui_prefs") }
     // [T-android-sessionlist-prefs-io] The FIRST getBoolean on a cold
     // process synchronously loads the XML on the calling thread — and this
     // `remember` runs inside a composition frame. Same storage-stall
@@ -1385,7 +1385,7 @@ private fun DualFabRow(
     var isSwapped by remember { mutableStateOf(false) }
     LaunchedEffect(prefs) {
         isSwapped = withContext(Dispatchers.IO) {
-            prefs.getBoolean(PREF_FAB_SWAPPED, false)
+            prefs.bool(PREF_FAB_SWAPPED, false)
         }
     }
 
@@ -1430,7 +1430,7 @@ private fun DualFabRow(
                         onDragEnd = {
                             if (kotlin.math.abs(chatDragX) > swapThreshold) {
                                 isSwapped = !isSwapped
-                                prefs.edit().putBoolean(PREF_FAB_SWAPPED, isSwapped).apply()
+                                prefs.set(PREF_FAB_SWAPPED, isSwapped)
                             }
                             chatDragX = 0f
                         },
@@ -1519,7 +1519,7 @@ private fun DualFabRow(
                                 onDragEnd = {
                                     if (kotlin.math.abs(searchDragX) > swapThreshold) {
                                         isSwapped = !isSwapped
-                                        prefs.edit().putBoolean(PREF_FAB_SWAPPED, isSwapped).apply()
+                                        prefs.set(PREF_FAB_SWAPPED, isSwapped)
                                     }
                                     searchDragX = 0f
                                 },
@@ -3167,8 +3167,7 @@ private fun exportSession(
         } catch (t: Throwable) {
             android.widget.Toast.makeText(
                 context,
-                context.getString(R.string.export_progress_failed),
-                android.widget.Toast.LENGTH_LONG,
+                context.string(R.string.export_progress_failed), android.widget.Toast.LENGTH_LONG,
             ).show()
         }
     }
@@ -3183,8 +3182,7 @@ private fun shareZip(context: Context, uri: android.net.Uri, subject: String) {
     }
     val chooser = Intent.createChooser(
         intent,
-        context.getString(R.string.sessionlist_export),
-    ).apply { addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+        context.string(R.string.sessionlist_export),  ).apply { addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) }
     context.startActivity(chooser)
 }
 

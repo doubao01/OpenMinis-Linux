@@ -115,8 +115,7 @@ object VoiceModePrefs {
         get() = expandedState
         set(value) {
             expandedState = value
-            appContext?.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
-                ?.edit()?.putBoolean(KEY_EXPANDED, value)?.apply()
+            appContext?.let { com.openminis.app.config.Prefs.file(PREFS).set(KEY_EXPANDED, value) }
         }
 
     /** One-shot: text→voice entry opens expanded that one time. */
@@ -130,8 +129,7 @@ object VoiceModePrefs {
         if (appContext != null) return
         val ctx = context.applicationContext
         appContext = ctx
-        expandedState = ctx.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
-            .getBoolean(KEY_EXPANDED, true)
+        expandedState = com.openminis.app.config.Prefs.file(PREFS).bool(KEY_EXPANDED, true)
     }
 }
 

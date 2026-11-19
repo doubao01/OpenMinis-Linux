@@ -230,7 +230,10 @@
         "browser/WebViewEngine.kt",
         "ui/browser/BrowserSettingsSheet.kt"
       ],
-      "keys": {},
+      "keys": {
+        "LITERAL_custom_user_agent": "custom_user_agent",
+        "LITERAL_user_agent_profile": "user_agent_profile"
+      },
       "dyn_keys": [],
       "open_key_space": false,
       "ephemeral": false
@@ -422,7 +425,9 @@
       "usage_files": [
         "ui/sandbox/FileBrowserViewModel.kt"
       ],
-      "keys": {},
+      "keys": {
+        "PREF_KEY_SHOW_HIDDEN": "file_browser_show_hidden"
+      },
       "dyn_keys": [],
       "open_key_space": false,
       "ephemeral": false
@@ -713,7 +718,12 @@
         "ui/chat/ChatViewModel.kt"
       ],
       "keys": {},
-      "dyn_keys": [],
+      "dyn_keys": [
+        "closed:",
+        "enabled:",
+        "opening:",
+        "round:"
+      ],
       "open_key_space": false,
       "ephemeral": false
     },
@@ -1313,7 +1323,7 @@
       ],
       "keys": {},
       "dyn_keys": [],
-      "open_key_space": false,
+      "open_key_space": true,
       "ephemeral": false
     },
     {
@@ -1384,7 +1394,7 @@
       ],
       "keys": {},
       "dyn_keys": [],
-      "open_key_space": false,
+      "open_key_space": true,
       "ephemeral": false
     },
     {
@@ -5889,7 +5899,7 @@
   "totals": {
     "prefs_files": 91,
     "prefs_encrypted": 8,
-    "key_constants_attributed": 150,
+    "key_constants_attributed": 153,
     "orphan_keys": 33,
     "usage_sites": 166,
     "usage_files": 96,

@@ -37,19 +37,19 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Backupable categories selected for the NEXT export (all on by default,
      *  matching iOS `Set(BackupCategory.backupable)`). Persisted across launches. */
-    private val prefs = app.getSharedPreferences("backup_ui", android.content.Context.MODE_PRIVATE)
+    private val prefs = com.openminis.app.config.Prefs.file("backup_ui")
 
     private val _selected = MutableStateFlow(loadSelectedCategories())
     val selected: StateFlow<Set<BackupCategory>> = _selected.asStateFlow()
 
-    private val _encrypt = MutableStateFlow(prefs.getBoolean(KEY_ENCRYPT, false))
+    private val _encrypt = MutableStateFlow(prefs.bool(KEY_ENCRYPT, false))
     val encrypt: StateFlow<Boolean> = _encrypt.asStateFlow()
 
     /**
      * Max per-file size, in MB, using iOS's sentinel tags: -1 = don't back up
      * files, 0 = unlimited (the default), otherwise the MB cap. Persisted.
      */
-    private val _maxFileSizeMB = MutableStateFlow(prefs.getInt(KEY_MAX_FILE_MB, MAX_FILE_UNLIMITED))
+    private val _maxFileSizeMB = MutableStateFlow(prefs.int(KEY_MAX_FILE_MB, MAX_FILE_UNLIMITED))
     val maxFileSizeMB: StateFlow<Int> = _maxFileSizeMB.asStateFlow()
 
     private val _isRunning = MutableStateFlow(false)
@@ -190,14 +190,12 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
         _selected.value = _selected.value.toMutableSet().apply {
             if (on) add(category) else remove(category)
         }
-        prefs.edit().putString(
-            KEY_CATEGORIES, _selected.value.joinToString(",") { it.key }
-        ).apply()
+        prefs.set(KEY_CATEGORIES, _selected.value.joinToString(",") { it.key })
     }
 
     fun setEncrypt(on: Boolean) {
         _encrypt.value = on
-        prefs.edit().putBoolean(KEY_ENCRYPT, on).apply()
+        prefs.set(KEY_ENCRYPT, on)
     }
 
     // [T-backup-credentials-always] There used to be a setIncludeCredentials()
@@ -212,7 +210,7 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setMaxFileSizeMB(value: Int) {
         _maxFileSizeMB.value = value
-        prefs.edit().putInt(KEY_MAX_FILE_MB, value).apply()
+        prefs.set(KEY_MAX_FILE_MB, value)
     }
 
     /** Convert the MB sentinel tag to BackupExporter.Options.maxFileBytes:
@@ -237,7 +235,7 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
         // below that touches the disk moves into the coroutine.
         if (cats.isEmpty()) {
             _errorText.value = getApplication<Application>()
-                .getString(com.openminis.app.R.string.backup_err_choose_include)
+                .string(com.openminis.app.R.string.backup_err_choose_include)
             return
         }
         val encrypting = _encrypt.value
@@ -252,7 +250,7 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
         _isRunning.value = true
         _lastResult.value = null
         _statusText.value = getApplication<Application>()
-            .getString(com.openminis.app.R.string.backup_status_starting)
+            .string(com.openminis.app.R.string.backup_status_starting)
         exportJob = viewModelScope.launch {
             // [T-android-backup-destination-gate] Refuse to produce a package
             // that can only land in our own sandbox. Re-read here rather than
@@ -350,9 +348,7 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
                         // "cleaned up" from "the backup is gone". The line
                         // also lands in the record, because "did it clean up
                         // after itself?" is asked long after the card is gone.
-                        val msg = getApplication<Application>().getString(
-                            com.openminis.app.R.string.backup_local_removed,
-                            humanBytesPlain(freed),
+                        val msg = getApplication<Application>().string(com.openminis.app.R.string.backup_local_removed, humanBytesPlain(freed),
                         )
                         AppLogger.info(TAG, "[Backup] $msg")
                         note(msg)
@@ -360,8 +356,7 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
                 } else if (outcomes.isNotEmpty()) {
                     note(
                         getApplication<Application>()
-                            .getString(com.openminis.app.R.string.backup_local_kept),
-                    )
+                            .string(com.openminis.app.R.string.backup_local_kept),  )
                 }
 
                 _lastResult.value = RunResult(
@@ -633,7 +628,7 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
     fun loadPackage(uri: Uri) {
         _isRunning.value = true
         _statusText.value = getApplication<Application>()
-            .getString(com.openminis.app.R.string.backup_status_reading)
+            .string(com.openminis.app.R.string.backup_status_reading)
         _report.value = null
         viewModelScope.launch {
             try {
@@ -696,7 +691,7 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
     fun listServerPackages(remote: com.openminis.app.backup.remote.RcloneRemoteStore.Remote) {
         _isRunning.value = true
         _statusText.value = getApplication<Application>()
-            .getString(com.openminis.app.R.string.backup_status_listing)
+            .string(com.openminis.app.R.string.backup_status_listing)
         _serverPackages.value = emptyList()
         viewModelScope.launch {
             try {
@@ -991,7 +986,7 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
         val cats = _restoreSelected.value
         if (cats.isEmpty()) {
             _errorText.value = getApplication<Application>()
-                .getString(com.openminis.app.R.string.backup_err_choose_restore)
+                .string(com.openminis.app.R.string.backup_err_choose_restore)
             return
         }
         if (pending.manifest.encryption != null && passphrase.isNullOrEmpty()) {
@@ -1032,7 +1027,7 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
     // -- Persistence helpers ---------------------------------------------
 
     private fun loadSelectedCategories(): Set<BackupCategory> {
-        val raw = prefs.getString(KEY_CATEGORIES, null) ?: return BackupCategory.backupable.toSet()
+        val raw = prefs.stringOrNull(KEY_CATEGORIES) ?: return BackupCategory.backupable.toSet()
         val restored = raw.split(",").mapNotNull(BackupCategory::fromKey)
             .filter { it in BackupCategory.backupable }.toSet()
         return restored.ifEmpty { BackupCategory.backupable.toSet() }

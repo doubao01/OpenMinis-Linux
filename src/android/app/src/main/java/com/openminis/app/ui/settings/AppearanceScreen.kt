@@ -118,18 +118,18 @@ const val KEY_FONT_CHAT_INPUT = "font_chat_input"  // Int scale level -2..3
 const val KEY_FONT_MESSAGE = "font_message"        // Int scale level -2..3
 const val KEY_FONT_APP_BASE = "font_app_base"      // Int scale level -2..3
 /** True when Enter (without Shift) sends the message (iOS returnKeyBehavior == 1); default 0 = newline. */
-fun returnKeySendsMessage(context: Context): Boolean = getAppearancePrefs(context).getInt(KEY_RETURN_KEY_BEHAVIOR, 0) == 1
+fun returnKeySendsMessage(context: Context): Boolean = getAppearancePrefs(context).int(KEY_RETURN_KEY_BEHAVIOR, 0) == 1
 
-fun keepScreenAwakeEnabled(context: Context): Boolean = getAppearancePrefs(context).getBoolean(KEY_KEEP_SCREEN_AWAKE, false)
+fun keepScreenAwakeEnabled(context: Context): Boolean = getAppearancePrefs(context).bool(KEY_KEEP_SCREEN_AWAKE, false)
 
 /** [T-android-auto-grouping] Default ON — see [KEY_AUTO_GROUPING]. */
-fun autoGroupingEnabled(context: Context): Boolean = getAppearancePrefs(context).getBoolean(KEY_AUTO_GROUPING, true)
+fun autoGroupingEnabled(context: Context): Boolean = getAppearancePrefs(context).bool(KEY_AUTO_GROUPING, true)
 
 /** Default ON — pill shows up on scroll for everyone unless explicitly disabled. */
-fun showChatTitleEnabled(context: Context): Boolean = getAppearancePrefs(context).getBoolean(KEY_SHOW_CHAT_TITLE, true)
+fun showChatTitleEnabled(context: Context): Boolean = getAppearancePrefs(context).bool(KEY_SHOW_CHAT_TITLE, true)
 
 /** [T-thinking-auto-expand-toggle] Default ON: a new streaming thinking block opens expanded. */
-fun autoExpandThinkingEnabled(context: Context): Boolean = getAppearancePrefs(context).getBoolean(KEY_AUTO_EXPAND_THINKING, true)
+fun autoExpandThinkingEnabled(context: Context): Boolean = getAppearancePrefs(context).bool(KEY_AUTO_EXPAND_THINKING, true)
 
 /** Font scale levels matching iOS: XS(-2) Small(-1) Default(0) Medium(1) Large(2) XL(3) */
 // [T-android-app-icon-tile-max-width] Upper bound for one icon tile (matches the 192px rasterization; uncapped tiles blurred at ~380dp on tablets).
@@ -173,14 +173,14 @@ private val languageOptions = listOf(
     LanguageOption("pt-BR", "\uD83C\uDDE7\uD83C\uDDF7", "Portugu\u00EAs (Brasil)"),
 )
 
-fun getAppearancePrefs(context: Context): SharedPreferences =
-    context.getSharedPreferences(PREF_APPEARANCE, Context.MODE_PRIVATE)
+fun getAppearancePrefs(context: Context): com.openminis.app.config.PrefsHandle =
+    com.openminis.app.config.Prefs.file(PREF_APPEARANCE)
 
 fun getThemeMode(context: Context): Int =
-    getAppearancePrefs(context).getInt(KEY_THEME_MODE, 0)
+    getAppearancePrefs(context).int(KEY_THEME_MODE, 0)
 
 fun getFontScale(context: Context, key: String): Float =
-    fontScaleForLevel(getAppearancePrefs(context).getInt(key, 0))
+    fontScaleForLevel(getAppearancePrefs(context).int(key, 0))
 
 fun fontScaleForLevel(level: Int): Float {
     val idx = fontScaleValues.indexOf(level).coerceIn(0, fontScaleMultipliers.lastIndex)
