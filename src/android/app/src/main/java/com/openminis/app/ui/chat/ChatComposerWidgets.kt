@@ -67,6 +67,7 @@ import com.openminis.app.data.model.ThinkingLevel
 import com.openminis.app.R
 import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.theme.m3Icon
+import com.openminis.app.ui.tokens.MinisTypography
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -337,7 +338,7 @@ internal fun ToolActivityPill(
         Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = block.toolTitle.ifEmpty { block.toolName },
-            fontSize = 13.sp,
+            fontSize = MinisTypography.body,
             fontWeight = FontWeight.Medium,
             color = ChatColors.primaryText,
             maxLines = 1,
@@ -348,7 +349,7 @@ internal fun ToolActivityPill(
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = elapsedText,
-                fontSize = 11.sp,
+                fontSize = MinisTypography.codeSm,
                 fontFamily = FontFamily.Monospace,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -445,7 +446,7 @@ internal fun ThinkingLevelPicker(
             ) {
                 Text(
                     text = level.localizedName(context),
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.Normal,
                     color = fg,
                 )

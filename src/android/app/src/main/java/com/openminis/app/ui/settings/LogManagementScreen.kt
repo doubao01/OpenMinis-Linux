@@ -698,7 +698,7 @@ fun LogDetailScreen(
                         loadError ?: "",
                         style = TextStyle(
                             fontFamily = FontFamily.Monospace,
-                            fontSize = 12.sp,
+                            fontSize = MinisTypography.codeFoot,
                             color = MaterialTheme.colorScheme.error,
                         ),
                         modifier = Modifier.padding(12.dp),
@@ -722,7 +722,7 @@ fun LogDetailScreen(
                             text = log.readLine(i),
                             style = TextStyle(
                                 fontFamily = FontFamily.Monospace,
-                                fontSize = 11.sp,
+                                fontSize = MinisTypography.codeSm,
                                 lineHeight = MinisTypography.type.lineHeightMono(11f).sp,
                                 color = MaterialTheme.colorScheme.onSurface,
                             ),

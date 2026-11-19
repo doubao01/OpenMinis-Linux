@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import com.openminis.app.R
 import com.openminis.app.git.GitCli.GitCommit
 import com.openminis.app.git.GitCli.GitFileEntry
+import com.openminis.app.ui.tokens.MinisTypography
 
 // iOS system palette, matching the colours ChatToolDetailUI already uses for
 // tool status — the diff view should read like the rest of the app.
@@ -263,7 +264,7 @@ private fun FileEntryRow(
             Text(
                 entry.code.toString(),
                 color = Color.White,
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
                 fontWeight = FontWeight.Bold,
             )
         }
@@ -458,7 +459,7 @@ private fun DiffOverlay(diff: GitDiffView, onClose: () -> Unit) {
                         Text(
                             colored,
                             fontFamily = FontFamily.Monospace,
-                            fontSize = 11.sp,
+                            fontSize = MinisTypography.codeSm,
                             lineHeight = 15.sp,
                         )
                     }

@@ -61,6 +61,7 @@ import com.openminis.app.ui.chat.MarkdownClipboard
 import com.openminis.app.ui.components.MinisCenterTopBar
 import com.openminis.app.ui.theme.m3Icon
 import kotlinx.coroutines.delay
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * Live log panel (T-logcat-panel) — the in-app view of this process's own
@@ -326,7 +327,7 @@ private fun LogcatRow(line: LogcatLine) {
         },
         style = MaterialTheme.typography.bodySmall.copy(
             fontFamily = FontFamily.Monospace,
-            fontSize = 11.sp,
+            fontSize = MinisTypography.codeSm,
             lineHeight = 15.sp,
         ),
         maxLines = 4,

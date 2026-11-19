@@ -49,6 +49,7 @@ import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.tokens.MinisMotion
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * App-wide popup menu with a unified look: softer rounded corners, a lifted
@@ -247,7 +248,7 @@ fun MinisMenuSectionHeader(
     ) {
         Text(
             text = title,
-            fontSize = 11.sp,
+            fontSize = MinisTypography.cap,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

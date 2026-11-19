@@ -550,7 +550,7 @@ private fun ImageGalleryDialog(
                 Text(
                     text = "${pagerState.currentPage + 1} / ${uris.size}",
                     color = Color.White,
-                    fontSize = 12.sp,
+                    fontSize = MinisTypography.foot,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .padding(top = 16.dp)

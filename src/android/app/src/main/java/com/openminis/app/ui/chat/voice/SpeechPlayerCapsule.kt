@@ -64,6 +64,7 @@ import com.openminis.app.R
 import com.openminis.app.speech.VoiceOutputState
 import kotlinx.coroutines.delay
 import com.openminis.app.ui.theme.decorRotationAngle
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * [T-android-tts-capsule] Floating speech-player control for "Read replies"
@@ -484,7 +485,7 @@ private fun ExpandedCapsule(
             Spacer(Modifier.width(4.dp))
             Text(
                 modelLabel,
-                fontSize = 12.sp,
+                fontSize = MinisTypography.foot,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -525,7 +526,7 @@ private fun ExpandedCapsule(
                 else MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 style = androidx.compose.ui.text.TextStyle(
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 11.sp,
                     platformStyle = androidx.compose.ui.text.PlatformTextStyle(
@@ -555,7 +556,7 @@ private fun ExpandedCapsule(
                 else MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 style = androidx.compose.ui.text.TextStyle(
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 11.sp,
                     platformStyle = androidx.compose.ui.text.PlatformTextStyle(

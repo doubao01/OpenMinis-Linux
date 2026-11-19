@@ -53,6 +53,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.verticalScroll
+import com.openminis.app.ui.tokens.MinisType
 import com.openminis.app.ui.tokens.MinisTypography
 
 /**
@@ -102,11 +103,17 @@ fun CodeEditorField(
         PrecomputedTransformation(annotated, value.text)
     }
 
-    val editorStyle = remember(baseColor, monospace) {
+    // 令牌必须在 remember 之外读：CompositionLocal 只能在组合期间访问，
+    // 在 remember{} 的 lambda 里读会抛 IllegalStateException（而且只在缓存
+    // 未命中的第一次触发，最难复现的那种）。读出来当 key 传进去，语义等价。
+    val codeSp = MinisTypography.code
+    val bodySp = MinisTypography.bodyInput
+    val bodyLineSp = MinisType().lineHeight(bodySp.value).sp
+    val editorStyle = remember(baseColor, monospace, codeSp, bodySp, bodyLineSp) {
         if (monospace) {
             TextStyle(
                 fontFamily = FontFamily.Monospace,
-                fontSize = 14.sp,
+                fontSize = codeSp,
                 lineHeight = EditorLineHeightSp,
                 color = baseColor,
                 platformStyle = PlatformTextStyle(includeFontPadding = false),
@@ -116,8 +123,8 @@ fun CodeEditorField(
             // transition does not visually jump between typefaces.
             TextStyle(
                 fontFamily = FontFamily.Default,
-                fontSize = MinisTypography.type.bodyInput.sp,
-                lineHeight = MinisTypography.type.lineHeightMono(MinisTypography.type.bodyInput).sp,
+                fontSize = bodySp,
+                lineHeight = bodyLineSp,
                 color = baseColor,
                 platformStyle = PlatformTextStyle(includeFontPadding = false),
             )
@@ -188,7 +195,7 @@ private fun LineNumberGutter(
     val idleColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
     val style = TextStyle(
         fontFamily = FontFamily.Monospace,
-        fontSize = 13.sp,
+        fontSize = MinisTypography.code,
         lineHeight = EditorLineHeightSp,
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     )

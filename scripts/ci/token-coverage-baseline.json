@@ -23,7 +23,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/browser/BrowserHistorySheet.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 15
     },
     "src/android/app/src/main/java/com/openminis/app/ui/browser/BrowserSettingsSheet.kt": {
@@ -33,7 +33,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/browser/BrowserSheet.kt": {
       "color": 0,
-      "sp": 6,
+      "sp": 1,
       "dp": 52
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/AskUserQuestionsCard.kt": {
@@ -58,12 +58,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatComposerSection.kt": {
       "color": 0,
-      "sp": 17,
+      "sp": 8,
       "dp": 54
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatComposerWidgets.kt": {
       "color": 2,
-      "sp": 5,
+      "sp": 2,
       "dp": 40
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatFlatItems.kt": {
@@ -83,12 +83,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatIndicators.kt": {
       "color": 0,
-      "sp": 5,
+      "sp": 2,
       "dp": 8
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatMessageListSection.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 1,
       "dp": 2
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatMiscViews.kt": {
@@ -118,7 +118,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatSubAgentBar.kt": {
       "color": 5,
-      "sp": 20,
+      "sp": 5,
       "dp": 46
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatThinkingLevel.kt": {
@@ -133,12 +133,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatTopBarSection.kt": {
       "color": 1,
-      "sp": 5,
+      "sp": 2,
       "dp": 15
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatUserMessageUI.kt": {
       "color": 1,
-      "sp": 3,
+      "sp": 2,
       "dp": 35
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatVerticalScrollbar.kt": {
@@ -173,7 +173,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/MemoryDetailScreens.kt": {
       "color": 0,
-      "sp": 13,
+      "sp": 4,
       "dp": 17
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/MinisMarkdownTextToolbar.kt": {
@@ -193,7 +193,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/MoveToSessionSheet.kt": {
       "color": 8,
-      "sp": 3,
+      "sp": 2,
       "dp": 20
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/OffloadPermissionDialog.kt": {
@@ -228,12 +228,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ScheduledCountdownPill.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 0,
       "dp": 8
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/SessionMcpsSheet.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 0,
       "dp": 17
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/SessionMemorySheet.kt": {
@@ -243,7 +243,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/SessionSkillsSheet.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 0,
       "dp": 17
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/SoulChatAvatar.kt": {
@@ -253,7 +253,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/SpeechLanguagePickerSheet.kt": {
       "color": 0,
-      "sp": 5,
+      "sp": 2,
       "dp": 10
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StandardChatSheet.kt": {
@@ -268,12 +268,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownRenderAudio.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 0,
       "dp": 11
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownRenderBlock.kt": {
       "color": 4,
-      "sp": 1,
+      "sp": 0,
       "dp": 41
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownRenderMathDisplay.kt": {
@@ -283,12 +283,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownRenderVideo.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 11
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownTable.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 1,
       "dp": 7
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownText.kt": {
@@ -303,12 +303,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ThinkingFullDialog.kt": {
       "color": 1,
-      "sp": 2,
+      "sp": 1,
       "dp": 4
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/TokenUsageSheet.kt": {
       "color": 0,
-      "sp": 3,
+      "sp": 0,
       "dp": 9
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/VendorMark.kt": {
@@ -328,17 +328,17 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/voice/InlineVoicePanelParts.kt": {
       "color": 0,
-      "sp": 3,
+      "sp": 0,
       "dp": 30
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/voice/SpeechPlayerCapsule.kt": {
       "color": 0,
-      "sp": 7,
+      "sp": 4,
       "dp": 44
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/CodeEditorField.kt": {
       "color": 3,
-      "sp": 3,
+      "sp": 1,
       "dp": 6
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/DialogTextField.kt": {
@@ -353,12 +353,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/FullscreenImageViewer.kt": {
       "color": 1,
-      "sp": 1,
+      "sp": 0,
       "dp": 10
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/ImageGalleryViewer.kt": {
       "color": 1,
-      "sp": 1,
+      "sp": 0,
       "dp": 12
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/MinisAlertDialog.kt": {
@@ -378,7 +378,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/MinisMenu.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 17
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/MinisSheetDragHandle.kt": {
@@ -428,12 +428,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/git/GitPanelScreen.kt": {
       "color": 6,
-      "sp": 3,
+      "sp": 1,
       "dp": 21
     },
     "src/android/app/src/main/java/com/openminis/app/ui/markdown/KaTeXView.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 5
     },
     "src/android/app/src/main/java/com/openminis/app/ui/markdown/MarkdownMathFlow.kt": {
@@ -443,7 +443,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/markdown/MarkdownMedia.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 35
     },
     "src/android/app/src/main/java/com/openminis/app/ui/markdown/MarkdownText.kt": {
@@ -458,7 +458,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/media/InlineMediaPlayer.kt": {
       "color": 0,
-      "sp": 7,
+      "sp": 0,
       "dp": 27
     },
     "src/android/app/src/main/java/com/openminis/app/ui/navigation/ChatSplitScaffold.kt": {
@@ -468,12 +468,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/onboarding/OnboardingModelSelectionScreen.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 12
     },
     "src/android/app/src/main/java/com/openminis/app/ui/preview/WebPreviewBottomSheet.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 0,
       "dp": 8
     },
     "src/android/app/src/main/java/com/openminis/app/ui/preview/WebPreviewFullscreenScreen.kt": {
@@ -488,7 +488,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/quota/QuotaPickerHints.kt": {
       "color": 7,
-      "sp": 5,
+      "sp": 4,
       "dp": 11
     },
     "src/android/app/src/main/java/com/openminis/app/ui/quota/QuotaUi.kt": {
@@ -523,22 +523,22 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/scheduled/ScheduledTaskEditScreen.kt": {
       "color": 0,
-      "sp": 6,
+      "sp": 0,
       "dp": 18
     },
     "src/android/app/src/main/java/com/openminis/app/ui/scheduled/ScheduledTaskEditorParts.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 0,
       "dp": 12
     },
     "src/android/app/src/main/java/com/openminis/app/ui/scheduled/ScheduledTaskRunsScreen.kt": {
       "color": 0,
-      "sp": 4,
+      "sp": 1,
       "dp": 8
     },
     "src/android/app/src/main/java/com/openminis/app/ui/scheduled/ScheduledTasksScreen.kt": {
       "color": 0,
-      "sp": 4,
+      "sp": 2,
       "dp": 10
     },
     "src/android/app/src/main/java/com/openminis/app/ui/sessions/GroupPickerSheet.kt": {
@@ -608,7 +608,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/BackgroundSettingsScreen.kt": {
       "color": 0,
-      "sp": 5,
+      "sp": 2,
       "dp": 30
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/CheckUpdateSection.kt": {
@@ -638,7 +638,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/EnvironmentVariablesScreen.kt": {
       "color": 1,
-      "sp": 2,
+      "sp": 0,
       "dp": 28
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/EvolutionSettingsScreen.kt": {
@@ -653,12 +653,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/LogManagementScreen.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 0,
       "dp": 12
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/LogcatPanelScreen.kt": {
       "color": 4,
-      "sp": 2,
+      "sp": 1,
       "dp": 11
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/MCPIntegrationsScreen.kt": {
@@ -678,7 +678,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/McpApprovalSection.kt": {
       "color": 2,
-      "sp": 1,
+      "sp": 0,
       "dp": 18
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/MemoryManagementScreen.kt": {
@@ -843,12 +843,12 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulIconMenu.kt": {
       "color": 0,
-      "sp": 2,
+      "sp": 0,
       "dp": 0
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulPromptEditorScreen.kt": {
       "color": 0,
-      "sp": 1,
+      "sp": 0,
       "dp": 7
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulSettingsScreen.kt": {
@@ -943,7 +943,7 @@
     },
     "src/android/app/src/main/java/com/openminis/app/ui/terminal/TerminalScreen.kt": {
       "color": 7,
-      "sp": 3,
+      "sp": 1,
       "dp": 17
     },
     "src/android/app/src/main/java/com/openminis/app/ui/theme/AccentTokens.kt": {

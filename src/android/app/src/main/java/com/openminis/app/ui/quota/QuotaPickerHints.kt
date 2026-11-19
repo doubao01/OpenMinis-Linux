@@ -114,7 +114,7 @@ fun QuotaSectionHeaderBadge(instanceId: String, onTap: (() -> Unit)?) {
     ) {
         Text(
             text,
-            fontSize = 11.sp,
+            fontSize = MinisTypography.cap,
             lineHeight = MinisTypography.type.lineHeightTight(11f).sp,
             fontWeight = FontWeight.Medium,
             color = fg,

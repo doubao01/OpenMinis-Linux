@@ -37,6 +37,7 @@ import com.openminis.app.ui.settings.SettingsSection
 import com.openminis.app.ui.settings.SkillRowItem
 import com.openminis.app.ui.components.MinisTextButton
 import com.openminis.app.ui.tokens.MinisType
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * Bottom sheet showing all skills with per-session enable/disable toggles.
@@ -141,7 +142,7 @@ fun SessionSkillsSheet(
                             horizontal = 8.dp, vertical = 0.dp,
                         ),
                     ) {
-                        Text(stringResource(R.string.session_skills_enable_all), fontSize = 12.sp)
+                        Text(stringResource(R.string.session_skills_enable_all), fontSize = MinisTypography.foot)
                     }
                     MinisTextButton(
                         onClick = {
@@ -154,7 +155,7 @@ fun SessionSkillsSheet(
                             horizontal = 8.dp, vertical = 0.dp,
                         ),
                     ) {
-                        Text(stringResource(R.string.session_skills_disable_all), fontSize = 12.sp)
+                        Text(stringResource(R.string.session_skills_disable_all), fontSize = MinisTypography.foot)
                     }
                 }
 

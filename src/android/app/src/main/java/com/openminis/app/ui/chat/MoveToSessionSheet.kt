@@ -65,6 +65,7 @@ import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * Bottom sheet listing all chat sessions except the current one. Tapping
@@ -267,7 +268,7 @@ private fun MoveToPickerRow(
             )
             Text(
                 text = timeText,
-                fontSize = 12.sp,
+                fontSize = MinisTypography.foot,
                 color = MaterialTheme.colorScheme.outline,
                 maxLines = 1,
             )

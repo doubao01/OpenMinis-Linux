@@ -65,6 +65,7 @@ import com.openminis.app.MinisApp
 import com.openminis.app.R
 import com.openminis.app.power.PowerOptimizationManager
 import com.openminis.app.i18n.uppercaseForDisplay
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * T50 settings screen — surfaces the two pieces of background-keep-alive
@@ -368,7 +369,7 @@ fun BackgroundSettingsScreen(onBack: () -> Unit) {
 private fun BgSectionTitle(text: String) {
     Text(
         text = text.uppercaseForDisplay(),
-        fontSize = 12.sp,
+        fontSize = MinisTypography.foot,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 6.dp),
     )
@@ -378,7 +379,7 @@ private fun BgSectionTitle(text: String) {
 private fun BgFooter(text: String) {
     Text(
         text = text,
-        fontSize = 12.sp,
+        fontSize = MinisTypography.foot,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 6.dp),
     )
@@ -479,7 +480,7 @@ private fun BgRow(
             if (!subtitle.isNullOrEmpty()) {
                 Text(
                     text = subtitle,
-                    fontSize = 12.sp,
+                    fontSize = MinisTypography.foot,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

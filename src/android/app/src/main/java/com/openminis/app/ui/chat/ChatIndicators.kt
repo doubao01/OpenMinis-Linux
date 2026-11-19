@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.openminis.app.R
 import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.theme.decorPulse
+import com.openminis.app.ui.tokens.MinisTypography
 
 // [T-android-split-chat] Self-contained "thinking / streaming" dot indicators
 // extracted verbatim from ChatScreen.kt. `internal` so the chat package can
@@ -54,7 +55,7 @@ internal fun StreamingDotsText() {
             )
             Text(
                 text = ".",
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.offset(y = offset.dp),
@@ -132,13 +133,13 @@ internal fun CompactProgressIndicator(
                     elapsedSec,
                 )
             },
-            fontSize = 14.sp,
+            fontSize = MinisTypography.bodyLg,
             color = ChatColors.tertiaryText,
             modifier = Modifier.weight(1f),
         )
         Text(
             text = stringResource(R.string.cancel),
-            fontSize = 14.sp,
+            fontSize = MinisTypography.bodyLg,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier

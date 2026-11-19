@@ -235,7 +235,7 @@ internal fun ChatTopBarTitle(
                                         ) {
                                         Text(
                                             text = groupNameDisplay,
-                                            fontSize = 12.sp,
+                                            fontSize = MinisTypography.foot,
                                             lineHeight = MinisTypography.type.lineHeightTight(12f).sp,
                                             fontWeight = FontWeight.Medium,
                                             color = ChatColors.secondaryText,
@@ -262,7 +262,7 @@ internal fun ChatTopBarTitle(
                                 if (providerName.isNotEmpty()) {
                                     Text(
                                         text = providerName,
-                                        fontSize = 11.sp,
+                                        fontSize = MinisTypography.cap,
                                         lineHeight = 13.sp,
                                         color = ChatColors.tertiaryText,
                                         maxLines = 1,
@@ -305,7 +305,7 @@ internal fun ChatTopBarTitle(
                                         ModelBrandIcon(slug = brandSlug, sizeDp = 13.dp)
                                         Text(
                                             text = modelName.ifEmpty { providerName },
-                                            fontSize = 11.sp,
+                                            fontSize = MinisTypography.cap,
                                             lineHeight = MinisTypography.type.lineHeightTight(11f).sp,
                                             color = ChatColors.tertiaryText,
                                             maxLines = 1,

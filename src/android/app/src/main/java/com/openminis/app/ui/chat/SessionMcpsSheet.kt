@@ -38,6 +38,7 @@ import com.openminis.app.data.repository.MCPRepository
 import com.openminis.app.ui.settings.SettingsRow
 import com.openminis.app.ui.settings.SettingsSection
 import com.openminis.app.ui.tokens.MinisType
+import com.openminis.app.ui.tokens.MinisTypography
 
 private const val MCP_NOTE_TRUNC = 200
 
@@ -128,13 +129,13 @@ fun SessionMcpsSheet(
                         onClick = { setAll(true) },
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
                     ) {
-                        Text(stringResource(R.string.session_skills_enable_all), fontSize = 12.sp)
+                        Text(stringResource(R.string.session_skills_enable_all), fontSize = MinisTypography.foot)
                     }
                     MinisTextButton(
                         onClick = { setAll(false) },
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
                     ) {
-                        Text(stringResource(R.string.session_skills_disable_all), fontSize = 12.sp)
+                        Text(stringResource(R.string.session_skills_disable_all), fontSize = MinisTypography.foot)
                     }
                 }
 

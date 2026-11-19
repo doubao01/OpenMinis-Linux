@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.openminis.app.R
 import com.openminis.app.agent.ContextSaverRuntime
 import com.openminis.app.i18n.uppercaseForDisplay
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * Session Token Usage bottom sheet — mirrors iOS `TokenUsageSheet` and uses
@@ -164,7 +165,7 @@ private fun StatSection(title: String, content: @Composable () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
             text = title.uppercaseForDisplay(),
-            fontSize = 12.sp,
+            fontSize = MinisTypography.foot,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 6.dp),
@@ -183,14 +184,14 @@ private fun StatRow(label: String, value: String) {
     ) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = MinisTypography.bodyLg,
             color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.width(12.dp))
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = value,
-            fontSize = 14.sp,
+            fontSize = MinisTypography.codeLg,
             fontFamily = FontFamily.Monospace,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

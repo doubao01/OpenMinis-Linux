@@ -161,7 +161,7 @@ jobs:
 
       # [T-token-coverage] The generator proves the token file matches source;
       # it says nothing about whether code *uses* the tokens. Measured: 284
-      # unnamed color literals, 318 unnamed sp, 3490 unnamed dp remain. Without
+      # unnamed color literals, 189 unnamed sp, 3490 unnamed dp remain. Without
       # a ratchet those counts only grow — writing 16.sp is always cheaper than
       # finding the semantic slot, so the table drifts into decoration. Budget is
       # per-file (a total hides "A removed 20, B added 20") and may only go down.
@@ -185,6 +185,21 @@ jobs:
       # invisible at compile time and mostly invisible at runtime.
       - name: CompositionLocals are all provided
         run: python3 scripts/ci/check_composition_locals.py
+
+      # [T-token-scope] The layering guard above proves every CompositionLocal has
+      # a provider; it says nothing about *where* the token readers are called.
+      # `MinisTypography.body` is `@Composable`-only, and `remember {}` marks its
+      # lambda `@DisallowComposableCalls` — so `remember { MinisTypography.body }`
+      # throws at runtime. The nastier half: remember's lambda only runs on a
+      # cache miss, so the bug hides under incremental builds and detonates on
+      # the first cold start or font-scale change. Measured while migrating 13.sp
+      # (this guard found one live instance in CodeEditorField). inline lambdas
+      # (forEach / let / run) are NOT flagged — composable context does flow
+      # through them, and false positives are how a guard gets switched off.
+      - name: Token readers stay out of non-composable lambdas
+        run: |
+          python3 scripts/ci/check_token_scope.py --selftest
+          python3 scripts/ci/check_token_scope.py
 
       # [T-token-runtime-probe] The two checks above are static. This one
       # actually compiles MinisTokens.kt on a plain JVM and asserts the values:

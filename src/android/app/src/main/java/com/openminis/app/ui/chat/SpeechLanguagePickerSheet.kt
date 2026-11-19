@@ -36,6 +36,7 @@ import com.openminis.app.speech.SpeechRecognitionManager
 import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.theme.m3Icon
 import java.util.Locale
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * Modal sheet listing the active recognizer's supported languages. Tapping a
@@ -79,7 +80,7 @@ fun SpeechLanguagePickerSheet(
             if (ordered.isEmpty()) {
                 Text(
                     text = stringResource(R.string.speech_lang_picker_empty),
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     color = ChatColors.secondaryText,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
                 )
@@ -105,7 +106,7 @@ fun SpeechLanguagePickerSheet(
                             ) {
                                 Text(
                                     text = locale.language.uppercase().take(2),
-                                    fontSize = 11.sp,
+                                    fontSize = MinisTypography.cap,
                                     fontWeight = FontWeight.Bold,
                                     color = ChatColors.primaryText,
                                 )
@@ -119,7 +120,7 @@ fun SpeechLanguagePickerSheet(
                                 )
                                 Text(
                                     text = locale.toLanguageTag(),
-                                    fontSize = 12.sp,
+                                    fontSize = MinisTypography.foot,
                                     color = ChatColors.secondaryText,
                                 )
                             }
