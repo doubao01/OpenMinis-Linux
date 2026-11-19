@@ -1,0 +1,30 @@
+{
+  "_comment": [
+    "手工补充清单：扫描器抓不到、但确实合法存在的 prefs 键与前缀。",
+    "存在的理由有三类，每条都要在 reason 里写清楚属于哪一类：",
+    "  1) literal-key      —— 源码直接写字符串，没有 const val",
+    "  2) shared-file      —— 一个文件同时用了多个 prefs 文件，扫描器无法判定归属",
+    "  3) migrated-inline  —— 迁移后键由调用点拼接，静态扫描看不出完整形态",
+    "这份清单只进不退：删掉一条会让守卫开始拒绝活代码。"
+  ],
+  "files": {
+    "mirror_settings": {
+      "keys": {
+        "KEY_FRESH_INSTALL": "rootfs.freshInstall"
+      },
+      "reason": "literal-key + shared-file: RootfsManager 与 MirrorSettingsScreen 共用此文件，且该键在 RootfsManager 里以字面量写入（没有 const），扫描器的归属规则（文件唯一使用一个 prefs）不成立。"
+    },
+    "dpkg_world_retry": {
+      "keys": {
+        "KEY_STRIKES": "strikes"
+      },
+      "reason": "literal-key + shared-file: RootfsManager 单文件用了 4 个 prefs 文件，strikes 是单段字面量键，无法被归属规则抓到。"
+    },
+    "pip_world_retry": {
+      "keys": {
+        "KEY_STRIKES": "strikes"
+      },
+      "reason": "同上：RootfsManager 的 pip 侧重试计数，单段字面量键。"
+    }
+  }
+}

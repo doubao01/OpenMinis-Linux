@@ -129,7 +129,7 @@
     "src/android/app/src/main/java/com/openminis/app/provider/openai/OpenAIRequestBodies.kt": 1309,
     "src/android/app/src/main/java/com/openminis/app/provider/voice/VoiceProviderVendors.kt": 991,
     "src/android/app/src/main/java/com/openminis/app/sandbox/PRootKernel.kt": 1148,
-    "src/android/app/src/main/java/com/openminis/app/sandbox/RootfsManager.kt": 1715,
+    "src/android/app/src/main/java/com/openminis/app/sandbox/RootfsManager.kt": 1712,
     "src/android/app/src/main/java/com/openminis/app/sandbox/offload/AccessibilityOffloadHandler.kt": 1537,
     "src/android/app/src/main/java/com/openminis/app/sandbox/offload/ModelUseOffloadHandler.kt": 2191,
     "src/android/app/src/main/java/com/openminis/app/sandbox/offload/PhotosOffloadHandler.kt": 986,
