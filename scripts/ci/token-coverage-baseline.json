@@ -979,16 +979,16 @@
       "185": "24"
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ThinkingBlockUI.kt": {
-      "128": "0.5",
-      "153": "13",
-      "155": "1.5",
-      "264": "300"
+      "131": "0.5",
+      "156": "13",
+      "158": "1.5",
+      "267": "300"
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/CodeEditorField.kt": {
       "163": "20"
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/AppearanceFontScaleSlider.kt": {
-      "82": "0.5"
+      "83": "0.5"
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/AppearanceScreen.kt": {
       "773": "22 30"

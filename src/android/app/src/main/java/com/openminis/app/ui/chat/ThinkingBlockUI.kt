@@ -1,6 +1,8 @@
 package com.openminis.app.ui.chat
 
+import com.openminis.app.ui.settings.autoExpandThinkingEnabled
 import com.openminis.app.ui.tokens.RawSpace
+import com.openminis.app.ui.theme.m3Icon
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -40,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import androidx.compose.ui.unit.sp
 import com.openminis.app.R
 import com.openminis.app.cottranslate.CotTranslationPrefs

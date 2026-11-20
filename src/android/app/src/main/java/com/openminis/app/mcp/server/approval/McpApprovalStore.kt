@@ -139,7 +139,7 @@ class McpApprovalStore internal constructor(private val prefs: com.openminis.app
                     argumentsJson = o.optString("argumentsJson"),
                     status = enumOfOr(o.optString("status"), OperationStatus.REVOKED),
                     createdAtMs = o.optLong("createdAtMs"),
-                    approvedAtMs = if (o.has("approvedAtMs")) o.getLong("approvedAtMs") else null, sourceFileHash = if (o.has("sourceFileHash")) o.string("sourceFileHash") else null, operationFingerprint = if (o.has("operationFingerprint")) o.string("operationFingerprint") else null,  )
+                    approvedAtMs = if (o.has("approvedAtMs")) o.getLong("approvedAtMs") else null, sourceFileHash = if (o.has("sourceFileHash")) o.optString("sourceFileHash", "") else null, operationFingerprint = if (o.has("operationFingerprint")) o.optString("operationFingerprint", "") else null,  )
                 opMap[op.operationId] = op
             }
             val executedIds = mutableSetOf<String>()

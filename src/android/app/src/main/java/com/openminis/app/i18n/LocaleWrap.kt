@@ -40,8 +40,7 @@ object LocaleWrap {
      */
     fun wrap(base: Context): Context {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return base
-        val code = base
-            com.openminis.app.config.Prefs.file(PREF_APPEARANCE)
+        val code = com.openminis.app.config.Prefs.file(PREF_APPEARANCE)
             .string(KEY_LANGUAGE, "")
             .orEmpty()
         if (code.isEmpty()) return base

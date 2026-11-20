@@ -77,12 +77,12 @@ class PrefsHandle internal constructor(
     fun stringSet(key: String, default: Set<String> = emptySet()): Set<String> =
         backend.readStringSet(check(key), default) ?: default
 
-    fun set(key: String, value: String?) = backend.write { putString(check(key), value) }
-    fun set(key: String, value: Int) = backend.write { putInt(check(key), value) }
-    fun set(key: String, value: Long) = backend.write { putLong(check(key), value) }
-    fun set(key: String, value: Float) = backend.write { putFloat(check(key), value) }
-    fun set(key: String, value: Boolean) = backend.write { putBoolean(check(key), value) }
-    fun set(key: String, value: Set<String>?) = backend.write { putStringSet(check(key), value) }
+    fun set(key: String, value: String?): Boolean = backend.write { putString(check(key), value) }
+    fun set(key: String, value: Int): Boolean = backend.write { putInt(check(key), value) }
+    fun set(key: String, value: Long): Boolean = backend.write { putLong(check(key), value) }
+    fun set(key: String, value: Float): Boolean = backend.write { putFloat(check(key), value) }
+    fun set(key: String, value: Boolean): Boolean = backend.write { putBoolean(check(key), value) }
+    fun set(key: String, value: Set<String>?): Boolean = backend.write { putStringSet(check(key), value) }
 
     fun remove(key: String) = backend.write { remove(check(key)) }
 

@@ -38,8 +38,13 @@ interface PrefsBackend {
 
     /**
      * 批量写。[block] 里的所有 put/remove 在实现内部合成一次事务提交。
+     *
+     * 返回提交是否**成功落盘**。`SharedPreferences.commit()` 会在磁盘满、
+     * XML 损坏、或存储不可写时返回 false —— 调用方（ProviderRepository 的
+     * JSON 镜像）需要据此决定要不要报错重试，所以这个布尔不能吞掉。
+     * 内存后端永远返回 true：没有盘可写，也就没有失败。
      */
-    fun write(block: Writer.() -> Unit)
+    fun write(block: Writer.() -> Unit): Boolean
 
     /**
      * 订阅本文件的键变更，返回取消订阅的函数。
@@ -107,7 +112,7 @@ class SharedPrefsBackend(
      * 用 `commit()` 而非 `apply()`：见接口 KDoc。配置写入一局只有几次，
      * 主线程开销无关紧要；而丢一次写会产生极难复现的「设置不生效」报告。
      */
-    override fun write(block: PrefsBackend.Writer.() -> Unit) {
+    override fun write(block: PrefsBackend.Writer.() -> Unit): Boolean {
         val editor = prefs.edit()
         val w = object : PrefsBackend.Writer {
             override fun putBoolean(key: String, value: Boolean) { editor.putBoolean(key, value) }
@@ -123,7 +128,7 @@ class SharedPrefsBackend(
             override fun remove(key: String) { editor.remove(key) }
         }
         w.block()
-        editor.commit()
+        return editor.commit()
     }
 
     override fun observe(onChange: (key: String) -> Unit): () -> Unit {
@@ -177,7 +182,7 @@ class InMemoryPrefsBackend(
     override fun readStringSet(key: String, defaultValue: Set<String>?): Set<String>? =
         (data[key] as? Set<String>)?.toSet() ?: defaultValue
 
-    override fun write(block: PrefsBackend.Writer.() -> Unit) {
+    override fun write(block: PrefsBackend.Writer.() -> Unit): Boolean {
         val pending = LinkedHashMap<String, Any?>()
         val removed = LinkedHashSet<String>()
         val w = object : PrefsBackend.Writer {
@@ -198,6 +203,7 @@ class InMemoryPrefsBackend(
         w.block()
         removed.forEach { data.remove(it) }
         data.putAll(pending)
+        return true
     }
 }
 

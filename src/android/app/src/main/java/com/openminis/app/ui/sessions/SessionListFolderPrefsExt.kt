@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
  */
 internal fun SessionListViewModel.loadCollapsedFolderIds() {
     viewModelScope.launch(Dispatchers.IO) {
-        val ids = uiPrefs.getStringSet("collapsedFolderIds", emptySet())?.toSet() ?: emptySet()
+        val ids = uiPrefs.stringSet("collapsedFolderIds", emptySet())
         collapsedFolderIds.value = ids
     }
 }

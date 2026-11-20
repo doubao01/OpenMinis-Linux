@@ -79,8 +79,7 @@ object SandboxNotifyActions {
     }
 
     private fun loadDynamic(context: Context, token: String): String? {
-        val raw = context.applicationContext
-            com.openminis.app.config.Prefs.file(DYN_PREFS)
+        val raw = com.openminis.app.config.Prefs.file(DYN_PREFS)
             .stringOrNull(token) ?: return null
         return runCatching { JSONObject(raw).optString("cmd").takeIf { it.isNotBlank() } }.getOrNull()
     }

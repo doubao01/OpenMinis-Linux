@@ -38,7 +38,7 @@ internal suspend fun <T> persistLegacyProviderMirror(persist: suspend () -> T): 
      * always treat Room as authoritative and repair the copy when it diverges.
      */
 internal suspend fun ProviderRepository.loadConfigSuspending(): ProviderConfig {
-        val rawJson = prefs.getString("config", null)
+        val rawJson = prefs.stringOrNull("config")
         // [T-android-provider-empty-load-wipe] Distinguish "the DB says zero"
         // from "we could not ask the DB". Swallowing the exception as 0 made a
         // transient DAO failure (locked/mid-write file after a crash) look
@@ -133,7 +133,7 @@ internal suspend fun ProviderRepository.loadConfigSuspending(): ProviderConfig {
                 // lastUsedVisibleEntry() and the next new chat falls through
                 // to the newest-provider fallback — i.e. it looks like the
                 // upgrade "forgot" the user's recent selection.
-                val legacyLastUsed = prefs.getString(ProviderRepository.KEY_LAST_USED_ENTRY, null)
+                val legacyLastUsed = prefs.stringOrNull(ProviderRepository.KEY_LAST_USED_ENTRY)
                 if (legacyLastUsed != null && !legacyLastUsed.contains('/')) {
                     val rewritten = parsed.modelEntries
                         .firstOrNull { it.uuid == legacyLastUsed }

@@ -272,23 +272,22 @@ class BrowserTabPool(private val context: Context) {
 
     init {
         // Restore persisted User-Agent profile from SharedPreferences so pool-owned
-        // WebViews start in the correct mode (Mobile vs Desktop) and
-        // captureWebViewBitmap() uses the matching viewport.
-        val profileName = com.openminis.app.config.Prefs.file("browser_prefs").stringOrNull("user_agent_profile")
+        // WebViews start in Mobile vs Desktop mode; captureWebViewBitmap() uses this too.
+        val browserPrefs = com.openminis.app.config.Prefs.file("browser_prefs")
+        val profileName = browserPrefs.stringOrNull("user_agent_profile")
         if (profileName != null) {
             runCatching { UserAgentProfile.valueOf(profileName) }.getOrNull()?.let {
                 _userAgentProfile.value = it
             }
         }
-        customUserAgentString = prefs.getString("custom_user_agent", null)?.ifEmpty { null }
-
+        customUserAgentString = browserPrefs.stringOrNull("custom_user_agent")?.ifEmpty { null }
         // Restore global custom viewport (0 = unset → fall back to UA profile).
         // Mirrors iOS `BrowserCustomViewport{Width,Height}` UserDefaults keys.
-        _customViewportWidth.value = prefs.getInt(PREF_GLOBAL_VIEWPORT_WIDTH, 0).coerceAtLeast(0)
-        _customViewportHeight.value = prefs.getInt(PREF_GLOBAL_VIEWPORT_HEIGHT, 0).coerceAtLeast(0)
+        _customViewportWidth.value = browserPrefs.int(PREF_GLOBAL_VIEWPORT_WIDTH, 0).coerceAtLeast(0)
+        _customViewportHeight.value = browserPrefs.int(PREF_GLOBAL_VIEWPORT_HEIGHT, 0).coerceAtLeast(0)
 
         // Load user-configured idle timeout (default 15 min, matches iOS).
-        val storedMinutes = prefs.getInt(PREF_IDLE_TIMEOUT_MINUTES, DEFAULT_IDLE_TIMEOUT_MINUTES)
+        val storedMinutes = browserPrefs.int(PREF_IDLE_TIMEOUT_MINUTES, DEFAULT_IDLE_TIMEOUT_MINUTES)
         idleTimeoutMs = storedMinutes.coerceIn(MIN_IDLE_TIMEOUT_MINUTES, MAX_IDLE_TIMEOUT_MINUTES) * 60_000L
 
         // Start idle tab eviction timer (60-second interval, matching iOS)

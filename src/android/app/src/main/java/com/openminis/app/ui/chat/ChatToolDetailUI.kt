@@ -432,14 +432,12 @@ internal fun ToolDetailSheet(
                                         // tap them to open the in-app web preview (matches iOS
                                         // TerminalCanvasView.addURLLinks → MinisOpenURLBroker).
                                         val urlClick = LocalMarkdownUrlClickHandler.current
-                                        val linkified = remember(block.content, urlClick) {
-                                            if (urlClick != null) {
-                                                com.openminis.app.ui.util.linkifyUrls(
-                                                    text = block.content,
-                                                    onClick = urlClick,
-                                                    linkColor = MinisTokens.colors.terminalLink.tc,
-                                                )
-                                            } else androidx.compose.ui.text.AnnotatedString(block.content)
+                                        // @Composable getter — must be read in this scope.
+                                        val linkColor = MinisTokens.colors.terminalLink.tc
+                                        val linkified = remember(block.content, urlClick, linkColor) {
+                                            urlClick?.let {
+                                                com.openminis.app.ui.util.linkifyUrls(block.content, it, linkColor)
+                                            } ?: androidx.compose.ui.text.AnnotatedString(block.content)
                                         }
                                         Text(
                                             text = linkified,
