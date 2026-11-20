@@ -98,6 +98,43 @@ def check_catalog(catalog_path: Path) -> list[str]:
     return problems
 
 
+def check_accessors(android_root: Path) -> list[str]:
+    """扫描 build 脚本里的 `libs.<alias>` 访问器。
+
+    为什么要扫访问器而不只扫目录：别名含 `class` 时，访问器会展开成
+    `libs.androidx.material3.window.size.class` —— `class` 是 Kotlin
+    硬关键字，这一行**本身就是语法错误**，报错还是 "Name expected" /
+    "Unresolved reference: window" 这种完全指不到根因的形式（同文件
+    后面的报错全是解析器级联）。实测踩过两次：一次是目录里的别名，
+    一次是访问器。两边都必须查。
+    """
+    problems: list[str] = []
+    # 注意：`versions` / `plugins` / `bundles` 是访问器的**合法前缀段**
+    # （libs.versions.compileSdk、libs.plugins.kotlin.android），只有它们
+    # 出现在别名内部才算问题。所以 reserved 里不能含这三个词 ——
+    # 保留词检查只针对真正的「别名可能出现的关键字」。
+    keyword = {"class", "extensions", "convention"}
+    accessor = re.compile(r"libs(?:\.([A-Za-z0-9_]+))+")
+
+    for build in sorted(android_root.rglob("build.gradle.kts")):
+        for lineno, raw in enumerate(build.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            if raw.strip().startswith("//"):
+                continue
+            for m in accessor.finditer(raw):
+                text = m.group(0)
+                parts = [p for p in text.split(".")[1:] if p]
+                # 去掉前缀段，剩下的才是别名
+                while parts and parts[0] in ("versions", "plugins", "bundles"):
+                    parts.pop(0)
+                if any(p.lower() in keyword for p in parts):
+                    problems.append(
+                        f"{rel(build)}:{lineno}: 访问器 '{text}' 含 Kotlin 关键字 "
+                        f"→ 该行是语法错误，改别名（如 windowsize）"
+                    )
+                    break
+    return problems
+
+
 def selftest() -> int:
     cases = [
         ("一致应通过", {"versions": {"kotlin": "2.1.0"}}, {"versions": {"kotlin": "2.1.0"}}, 0),
@@ -131,7 +168,24 @@ def selftest() -> int:
             bad += 0 if ok else 1
             print(f"{'ok  ' if ok else 'FAIL'} [{label}] 期望 {want} 实际 {got}")
 
-    total = len(cases) + len(catalog_cases)
+        # 访问器形态：libs.androidx.material3.window.size.class 本身就是语法错误
+        acc_cases = [
+            ("访问器含 class 应抓出", "implementation(libs.a.b.class)\n", 1),
+            ("正常访问器应通过", "implementation(libs.androidx.core.ktx)\n", 0),
+            ("注释里的不算", "// implementation(libs.a.b.class)\n", 0),
+            ("versions 前缀应通过", "compileSdk = libs.versions.compileSdk.get().toInt()\n", 0),
+            ("plugins 前缀应通过", "alias(libs.plugins.kotlin.android) apply false\n", 0),
+        ]
+        for label, body, want in acc_cases:
+            root = Path(td) / "fake-root"
+            root.mkdir(exist_ok=True)
+            (root / "build.gradle.kts").write_text(body, encoding="utf-8")
+            got = len(check_accessors(root))
+            ok = got == want
+            bad += 0 if ok else 1
+            print(f"{'ok  ' if ok else 'FAIL'} [{label}] 期望 {want} 实际 {got}")
+
+    total = len(cases) + len(catalog_cases) + 5
     print(f"\n自测 {total - bad}/{total} 通过")
     return 0 if bad == 0 else 1
 
@@ -149,6 +203,7 @@ def main(argv: list[str]) -> int:
     problems = compare(load(MAIN), load(BUILD_LOGIC))
     problems += check_catalog(MAIN)
     problems += check_catalog(BUILD_LOGIC)
+    problems += check_accessors(ANDROID)
     if problems:
         print(f"version catalog check: FAILED ({len(problems)} 处)")
         for p in problems:

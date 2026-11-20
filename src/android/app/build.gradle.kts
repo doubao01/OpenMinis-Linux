@@ -406,7 +406,7 @@ dependencies {
     //
     // The adaptive-navigation3 artifact is NOT used — still alpha, and would
     // require migrating off classic Navigation Compose.
-    implementation(libs.androidx.material3.window.size.class)
+    implementation(libs.androidx.material3.windowsize)
     implementation(libs.androidx.material3.adaptive)
     implementation(libs.androidx.material3.adaptive.layout)
     implementation(libs.androidx.material3.adaptive.navigation)
