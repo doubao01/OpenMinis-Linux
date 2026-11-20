@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -21,6 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Psychology
@@ -110,6 +113,23 @@ fun ModelGroupDetailScreen(
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     var strategy by remember { mutableStateOf(group.strategy) }
+
+    // [T-routing-progressive-disclosure] 策略分两档：常用三种 + 折叠的高级四种。
+    // 当前选中项属于高级档时默认展开——折叠起来会让人以为配置丢了。
+    val commonStrategies = listOf(
+        RoutingStrategy.fallback,
+        RoutingStrategy.loadBalance,
+        RoutingStrategy.roundRobin,
+    )
+    val advancedStrategies = listOf(
+        RoutingStrategy.weighted,
+        RoutingStrategy.leastUsed,
+        RoutingStrategy.quotaWindow,
+        RoutingStrategy.smart,
+    )
+    var showAdvancedStrategies by remember(group.id) {
+        mutableStateOf(strategy in advancedStrategies)
+    }
     var fallbackStrategy by remember { mutableStateOf(group.fallbackStrategy) }
     // T312: keyed on group.id (stable across nav/config-refresh; `group` key would re-fire each recomposition).
     var defaultThinkingLevel by remember(group.id) {
@@ -210,12 +230,15 @@ fun ModelGroupDetailScreen(
 
             // ── Routing Strategy ──────────────────────────────────────
             item {
+                val visibleStrategies =
+                    if (showAdvancedStrategies) commonStrategies + advancedStrategies else commonStrategies
                 SettingsSection(
                     header = stringResource(R.string.model_group_detail_routing_strategy),
                     footer = stringResource(RoutingStrategyUi.footerRes(strategy)),
                 ) {
-                    // [T-routing-strategy-x] Shared choice-row template; labels in RoutingStrategyUi.
-                    RoutingStrategy.entries.forEach { candidate ->
+                    // [T-routing-progressive-disclosure] 常用三种直接给，其余折叠进「更多策略」。
+                    // 当前选中项若属于折叠项，进入时自动展开，避免「已选但看不见」。
+                    visibleStrategies.forEach { candidate ->
                         SettingsChoiceRow(
                             title = stringResource(RoutingStrategyUi.titleRes(candidate)),
                             selected = strategy == candidate,
@@ -223,9 +246,35 @@ fun ModelGroupDetailScreen(
                                 strategy = candidate
                                 providerRepository.updateGroup(group.copy(strategy = candidate))
                             },
-                            showDivider = candidate != RoutingStrategy.smart,
+                            showDivider = true,
                         )
                     }
+                    SettingsRow(
+                        title = stringResource(
+                            if (showAdvancedStrategies) {
+                                R.string.model_group_detail_fewer_strategies
+                            } else {
+                                R.string.model_group_detail_more_strategies
+                            },
+                        ),
+                        onClick = { showAdvancedStrategies = !showAdvancedStrategies },
+                        showChevron = false,
+                        showDivider = false,
+                        trailing = {
+                            Icon(
+                                m3Icon(
+                                    if (showAdvancedStrategies) {
+                                        Icons.Default.KeyboardArrowUp
+                                    } else {
+                                        Icons.Default.KeyboardArrowDown
+                                    },
+                                ),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.size(20.dp),
+                            )
+                        },
+                    )
                 }
             }
 

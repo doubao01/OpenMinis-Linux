@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.openminis.app.data.model.ModelGroup
+import com.openminis.app.data.repository.AutoModelGroups
 import com.openminis.app.data.repository.ProviderRepository
 import com.openminis.app.R
 import com.openminis.app.ui.components.MinisOutlinedButton
@@ -90,7 +91,9 @@ fun ModelGroupsScreen(
     onAddAgentLoopGroups: () -> Unit = {},
 ) {
     val config by providerRepository.config.collectAsStateWithLifecycle()
-    val groups = config.modelGroups
+    // [T-auto-model-groups] 隐式组（auto: 前缀）由供应商派生，只在聊天选择器出现，
+    // 不进管理列表——否则用户会把它当成可编辑的组。
+    val groups = AutoModelGroups.userGroups(config)
     var showNewGroupDialog by remember { mutableStateOf(false) }
     var newGroupName by remember { mutableStateOf("") }
     // [T-android-swipe-row-actions] Pending swipe-delete target, hoisted out of
@@ -139,7 +142,7 @@ fun ModelGroupsScreen(
             fromKey.startsWith("group:") && toKey.startsWith("group:") -> {
                 val fromId = fromKey.removePrefix("group:")
                 val toId = toKey.removePrefix("group:")
-                val cur = providerRepository.config.value.modelGroups.map { it.id }
+                val cur = AutoModelGroups.userGroups(providerRepository.config.value).map { it.id }
                 val fromIdx = cur.indexOf(fromId)
                 val toIdx = cur.indexOf(toId)
                 if (fromIdx < 0 || toIdx < 0) return@rememberReorderableLazyListState
@@ -371,7 +374,7 @@ fun ModelGroupsScreen(
                             val newGroup = ModelGroup(name = newGroupName.trim())
                             providerRepository.addGroup(newGroup)
                             // Auto-set as primary default if it's the first group
-                            if (config.modelGroups.size == 1 && config.defaultPrimaryGroupId == null) {
+                            if (AutoModelGroups.userGroups(config).size == 1 && config.defaultPrimaryGroupId == null) {
                                 providerRepository.defaultPrimaryGroupId = newGroup.id
                             }
                             newGroupName = ""

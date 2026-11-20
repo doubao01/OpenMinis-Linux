@@ -461,6 +461,7 @@ fun AppNavigation(
                 onBack = { navController.safePopBackStack() },
                 onProvidersClick = { navController.safeNavigate(Routes.PROVIDER_LIST) },
                 onModelGroupsClick = { navController.safeNavigate(Routes.MODEL_GROUPS) },
+                onModelConnectionClick = { navController.safeNavigate(Routes.MODEL_CONNECTION) },
                 onRootfsClick = { navController.safeNavigate(Routes.STORAGE) },
                 onBackupClick = { navController.safeNavigate(Routes.BACKUP) },
                 onNetworkClick = { navController.safeNavigate(Routes.NETWORK) },

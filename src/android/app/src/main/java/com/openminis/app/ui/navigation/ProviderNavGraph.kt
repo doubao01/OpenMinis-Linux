@@ -12,6 +12,7 @@ import com.openminis.app.ui.settings.AddAgentLoopModelsScreen
 import com.openminis.app.ui.settings.AddCustomModelScreen
 import com.openminis.app.ui.settings.AddModelsToGroupScreen
 import com.openminis.app.ui.settings.AddProviderScreen
+import com.openminis.app.ui.settings.ModelConnectionScreen
 import com.openminis.app.ui.settings.ModelEntryDetailScreen
 import com.openminis.app.ui.settings.ModelGroupDetailScreen
 import com.openminis.app.ui.settings.ModelGroupsScreen
@@ -86,6 +87,15 @@ internal fun NavGraphBuilder.providerRoutes(
             onVoiceServiceClick = { id ->
                 navController.safeNavigate(Routes.shadowVoiceDetail(id))
             },
+        )
+    }
+
+    composable(Routes.MODEL_CONNECTION) {
+        ModelConnectionScreen(
+            providerRepository = providerRepository,
+            onBack = { navController.safePopBackStack() },
+            onProvidersClick = { navController.safeNavigate(Routes.PROVIDER_LIST) },
+            onGroupsClick = { navController.safeNavigate(Routes.MODEL_GROUPS) },
         )
     }
 
