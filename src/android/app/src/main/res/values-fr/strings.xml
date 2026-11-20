@@ -329,7 +329,7 @@
     <string name="token_usage_block_memory">Mémoire</string>
     <string name="token_usage_block_runtime_tail">Contexte par tour</string>
     <string name="token_usage_block_goal_plan">Objectif et plan</string>
-    <string name="token_usage_block_tool_schemas">Schémas d'outils</string>
+    <string name="token_usage_block_tool_schemas">Schémas d\'outils</string>
     <string name="token_usage_block_history">Conversation</string>
     <string name="token_usage_block_pending">Pièces jointes non envoyées</string>
     <string name="token_usage_breakdown_estimated">Estimé</string>
