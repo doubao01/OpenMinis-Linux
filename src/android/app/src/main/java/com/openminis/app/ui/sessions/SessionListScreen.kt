@@ -381,16 +381,16 @@ private fun relativeDate(context: Context, timestamp: Long): String {
     val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
     val hours = TimeUnit.MILLISECONDS.toHours(diff)
 
-    if (seconds < 60) return context.string(R.string.time_just_now)
+    if (seconds < 60) return context.getString(R.string.time_just_now)
     if (minutes < 60) return context.getString(R.string.time_minutes_ago, minutes.toInt())
-    if (hours < 24) return context.string(R.string.time_hours_ago, hours.toInt())
+    if (hours < 24) return context.getString(R.string.time_hours_ago, hours.toInt())
 
     val dateCal = Calendar.getInstance().apply { time = Date(timestamp) }
     val yesterdayCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
     if (dateCal.get(Calendar.YEAR) == yesterdayCal.get(Calendar.YEAR) &&
         dateCal.get(Calendar.DAY_OF_YEAR) == yesterdayCal.get(Calendar.DAY_OF_YEAR)
     ) {
-        return context.string(R.string.time_yesterday)
+        return context.getString(R.string.time_yesterday)
     }
 
     val days = TimeUnit.MILLISECONDS.toDays(diff)
@@ -3166,7 +3166,7 @@ private fun exportSession(
         } catch (t: Throwable) {
             android.widget.Toast.makeText(
                 context,
-                context.string(R.string.export_progress_failed), android.widget.Toast.LENGTH_LONG,
+                context.getString(R.string.export_progress_failed), android.widget.Toast.LENGTH_LONG,
             ).show()
         }
     }
@@ -3181,7 +3181,7 @@ private fun shareZip(context: Context, uri: android.net.Uri, subject: String) {
     }
     val chooser = Intent.createChooser(
         intent,
-        context.string(R.string.sessionlist_export),  ).apply { addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+        context.getString(R.string.sessionlist_export),  ).apply { addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) }
     context.startActivity(chooser)
 }
 

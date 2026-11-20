@@ -143,6 +143,24 @@ object MinisTypography {
     val bodyInput: TextUnit
         @Composable @ReadOnlyComposable get() = LocalMinisType.current.bodyInput.sp
 
+    /** 展示档。20sp。Markdown h2、用量统计里的主数字。
+     *
+     *  20 之上不再是"功能文字"而是**展示**：出现频率低、占位大、不与 13sp
+     *  正文同行共存。混进 head(18) 会让「调大标题」误伤所有小节标题。 */
+    val display: TextUnit
+        @Composable @ReadOnlyComposable get() = LocalMinisType.current.display.sp
+
+    /** 展示大档。24sp。Markdown h1、emoji 头像字形。
+     *  到 24sp，字形细节（尤其 emoji 色块边缘）开始主导观感，再大就该用
+     *  Image 而非 fontSize 了。 */
+    val displayLg: TextUnit
+        @Composable @ReadOnlyComposable get() = LocalMinisType.current.displayLg.sp
+
+    /** 全大写小节标题的字距。0.5sp —— 全大写无 x-height 变化、字形边缘齐平，
+     *  密排时单词边界只能靠字间空隙区分。小写混排不需要这个补偿。 */
+    val sectionLabelSpacing: TextUnit
+        @Composable @ReadOnlyComposable get() = LocalMinisType.current.sectionLabelSpacing.sp
+
     // ─── 行距角色 ───────────────────────────────────────────────────────────
     // 以上是「字有多大」，以下是「行有多松」。两者必须分开：13sp 正文配 19、
     // 等宽 13sp 配 18、输入框 16.5sp 配 16.25 —— 同一个字号三个行高，

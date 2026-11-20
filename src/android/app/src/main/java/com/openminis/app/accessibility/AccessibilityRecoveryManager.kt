@@ -173,7 +173,7 @@ object AccessibilityRecoveryManager {
         cachedRevoked?.let { if (now - cachedAtMs < CHECK_CACHE_TTL_MS) return it }
 
         val revoked = try {
-            val enabled = Settings.Secure.string(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+            val enabled = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
             )
             isRevokedIn(
                 enabledValue = enabled,
@@ -251,7 +251,7 @@ object AccessibilityRecoveryManager {
         val target = componentId(context)
 
         val existing = try {
-            Settings.Secure.string(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
             )?.split(':')?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
         } catch (_: Throwable) { emptyList() }
 

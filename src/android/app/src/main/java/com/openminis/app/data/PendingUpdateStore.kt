@@ -104,7 +104,7 @@ object PendingUpdateStore {
             put("downloadedAtMs", pending.downloadedAtMs)
             put("installLaunchedAtMs", pending.installLaunchedAtMs)
         }
-        requirePrefs().set(KEY, json.toString())
+        requirePrefs(context).set(KEY, json.toString())
         AppLogger.info(
             TAG,
             "setPending version=${pending.targetVersionName} size=${pending.apkSize} sha256=${pending.sha256 != null}",
@@ -124,7 +124,7 @@ object PendingUpdateStore {
      * has caught up with [PendingUpdate.targetVersionName].
      */
     fun markInstallLaunched(context: Context) {
-        val p = requirePrefs()
+        val p = requirePrefs(context)
         val raw = p.stringOrNull(KEY) ?: return
         val obj = runCatching { JSONObject(raw) }.getOrNull() ?: return
         obj.put("installLaunchedAtMs", System.currentTimeMillis())
@@ -141,13 +141,13 @@ object PendingUpdateStore {
             if (intent.apkSha256 != null) put("apkSha256", intent.apkSha256) else put("apkSha256", JSONObject.NULL)
             if (intent.sourceId != null) put("sourceId", intent.sourceId) else put("sourceId", JSONObject.NULL)
         }
-        requirePrefs().set(KEY_INTENT, json.toString())
+        requirePrefs(context).set(KEY_INTENT, json.toString())
         AppLogger.info(TAG, "setPendingIntent version=${intent.targetVersionName} size=${intent.apkSize}")
     }
 
     /** Returns the outstanding download request, or null when none / expired. */
     fun getPendingIntent(context: Context): PendingIntent? {
-        val p = requirePrefs()
+        val p = requirePrefs(context)
         val raw = p.stringOrNull(KEY_INTENT) ?: return null
         val obj = runCatching { JSONObject(raw) }.getOrNull()
         if (obj == null) {
@@ -176,7 +176,7 @@ object PendingUpdateStore {
     }
 
     fun clearPendingIntent(context: Context) {
-        requirePrefs().remove(KEY_INTENT)
+        requirePrefs(context).remove(KEY_INTENT)
         AppLogger.info(TAG, "clearPendingIntent")
     }
 
@@ -192,7 +192,7 @@ object PendingUpdateStore {
      *  - target version no longer newer than the running build
      */
     fun getPending(context: Context): PendingUpdate? {
-        val p = requirePrefs()
+        val p = requirePrefs(context)
         val raw = p.stringOrNull(KEY) ?: return null
         val obj = runCatching { JSONObject(raw) }.getOrNull()
         if (obj == null) {
@@ -252,7 +252,7 @@ object PendingUpdateStore {
     }
 
     fun clearPending(context: Context) {
-        requirePrefs().remove(KEY)
+        requirePrefs(context).remove(KEY)
         AppLogger.info(TAG, "clearPending")
     }
 

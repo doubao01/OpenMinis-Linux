@@ -166,6 +166,25 @@ jobs:
           python3 scripts/ci/check_prefs_call_sites.py --selftest
           python3 scripts/ci/check_prefs_call_sites.py
 
+      # [T-prefs-encryption] `Prefs.file(name)` decides encrypted-vs-plain from
+      # the REGISTRY, not from the call site. So migrating a file from
+      # `EncryptedPrefsFactory.safeCreate(ctx, "x")` to `Prefs.file("x")` erases
+      # the only evidence the generator used to see — the file silently becomes
+      # PLAIN, every other check still passes, and credentials start landing in
+      # a cleartext XML. Measured: minis_network_secrets and
+      # backup_rclone_secrets were downgraded exactly this way in one migration.
+      # Pinned names may only be added, never removed.
+      - name: Encrypted prefs are not silently downgraded
+        run: python3 scripts/ci/check_prefs_encryption.py
+
+      # [T-prefs-api] PrefsHandle (int/bool/set/observe) and SharedPreferences
+      # (getInt/getBoolean/edit) share almost no method names. A migration that
+      # renames the call but leaves the receiver's declared type behind (or the
+      # reverse) fails as "unresolved reference: int" AT THE CALL SITE, which
+      # points at the symptom instead of the declaration.
+      - name: Prefs receivers match their API
+        run: python3 scripts/ci/check_prefs_api_usage.py
+
       # [T-ui-tokens] MinisTokens.kt aggregates every Color(0x...) literal in
       # ui/. Stale tokens fail at the call site (unresolved reference), which
       # reads like a normal typo rather than "the generator was not re-run".

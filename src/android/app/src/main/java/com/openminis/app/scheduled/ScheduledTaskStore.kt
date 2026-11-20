@@ -148,13 +148,12 @@ class ScheduledTaskStore(private val context: Context) {
      */
     fun observe(): Flow<List<ScheduledTask>> = callbackFlow {
         trySend(all())
-        val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == KEY_TASKS || key == null) {
+        val stopListening = prefs.observe { key ->
+            if (key == KEY_TASKS) {
                 trySend(all())
             }
         }
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-        awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
+        awaitClose { stopListening() }
     }
 
     companion object {

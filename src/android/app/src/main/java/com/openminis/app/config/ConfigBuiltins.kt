@@ -445,7 +445,7 @@ internal object ConfigBuiltins {
         path: String,
         displayName: String,
         description: String,
-        prefs: android.content.SharedPreferences,
+        prefs: com.openminis.app.config.PrefsBackend,
         key: String,
     ): ConfigField {
         val cases = listOf("xSmall", "small", "default", "medium", "large", "extraLarge")
@@ -457,7 +457,7 @@ internal object ConfigBuiltins {
             risk = ConfigRisk.NORMAL,
             revertable = true,
             reader = {
-                val level = prefs.getInt(key, 0)
+                val level = prefs.readInt(key, 0)
                 val token = when (level) {
                     -2 -> "xSmall"
                     -1 -> "small"
@@ -481,7 +481,7 @@ internal object ConfigBuiltins {
                     "extraLarge" -> 3
                     else -> throw ConfigError.InvalidValue("Unknown font scale: $token")
                 }
-                prefs.set(key, level)
+                prefs.write { putInt(key, level) }
             },
         )
     }

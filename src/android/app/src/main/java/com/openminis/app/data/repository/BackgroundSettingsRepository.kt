@@ -85,8 +85,8 @@ class BackgroundSettingsRepository(context: Context) {
     /** 横竖屏各记一份位置。没有单独记录时回退到旧的共用值。 */
     fun getOverlayPosition(portrait: Boolean): Pair<Int, Int> {
         val suffix = if (portrait) "Portrait" else "Landscape"
-        val x = prefs.getInt(KEY_BG_OVERLAY_X + suffix, -1)
-        val y = prefs.getInt(KEY_BG_OVERLAY_Y + suffix, -1)
+        val x = prefs.int(KEY_BG_OVERLAY_X + suffix, -1)
+        val y = prefs.int(KEY_BG_OVERLAY_Y + suffix, -1)
         return if (x >= 0 && y >= 0) x to y else getOverlayX() to getOverlayY()
     }
 

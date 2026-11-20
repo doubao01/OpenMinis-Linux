@@ -495,6 +495,19 @@ data class MinisType(
     val bodyInput: Float = 16.5f,
 ) {
     /**
+     * 全大写小节标题的字距（sp）。0.5。
+     *
+     * 只用于 `uppercaseForDisplay() + labelSmall + Medium` 这一种组合 ——
+     * 全仓 7 处 `letterSpacing = 0.5.sp` 全是它（MemoryDetailScreens /
+     * SessionMcpsSheet / SessionSkillsSheet / ProviderQuotaSection×2 /
+     * DetailRows / SettingsComponents）。
+     *
+     * 为什么不是巧合：全大写没有 x-height 变化，字形边缘齐平，密排时单词
+     * 边界只能靠字间空隙区分。小写混排不需要这个补偿。
+     */
+    val sectionLabelSpacing: Float = 0.5f
+
+    /**
      * 行高 = 字号代入实测曲线。**不是** 字号 × 单一比例 —— 真实设计不这样。
      *
      * 全仓实测 59 组多行 fontSize/lineHeight 配对（已排除单行标签，那些把

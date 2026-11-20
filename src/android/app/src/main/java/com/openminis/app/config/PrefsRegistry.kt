@@ -98,7 +98,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "minis_group_chat", module = "ui", scope = PrefsScope.PLAIN, dynamicPrefixes = listOf("closed:", "enabled:", "opening:", "round:"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_memory_prefs", module = "config", scope = PrefsScope.PLAIN, keys = mapOf("KEY_GLOBAL_ENABLED" to "memory.global.enabled"), note = "2 usages across 2 file(s)"),
         PrefsFileSpec(name = "minis_network", module = "network", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "network.settings.v1"), note = "2 usages across 1 file(s)"),
-        PrefsFileSpec(name = "minis_network_secrets", module = "network", scope = PrefsScope.ENCRYPTED, note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "minis_network_secrets", module = "network", scope = PrefsScope.ENCRYPTED, dynamicPrefixes = listOf("proxy."), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_phone_backup_folders", module = "backup", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "folders"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_plan_discussion_prefs", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "planDiscussionEnabled", "KEY_MODE" to "planDiscussionMode"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_quick", module = "quick", scope = PrefsScope.PLAIN, keys = mapOf("KEY_PANEL_AT" to "panel_session_at", "KEY_PANEL_SESSION" to "panel_session_id"), note = "1 usages across 1 file(s)"),

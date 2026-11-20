@@ -38,7 +38,7 @@ class AsyncPrefs private constructor(
 
     private val loaded = AtomicBoolean(false)
     @Volatile
-    private var prefs: com.openminis.app.config.PrefsHandle? = null
+    private var prefs: SharedPreferences? = null
     private val loadComplete = java.util.concurrent.CountDownLatch(1)
     // In-memory overrides written before the backing prefs finished loading,
     // so a read immediately after a write returns the written value. Replayed
@@ -96,7 +96,7 @@ class AsyncPrefs private constructor(
     fun putLong(key: String, value: Long) {
         overrides[key] = value
         val p = prefs
-        if (p != null) p.edit().putInt(key, value).apply() else retryLoad()
+        if (p != null) p.edit().putLong(key, value).apply() else retryLoad()
     }
 
     /**

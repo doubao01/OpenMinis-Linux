@@ -122,7 +122,7 @@ class McpApprovalStore internal constructor(private val prefs: com.openminis.app
             for (i in 0 until tasks.length()) {
                 val t = tasks.getJSONObject(i)
                 val task = Task(
-                    taskId = t.string("taskId"), name = t.optString("name"),
+                    taskId = t.getString("taskId"), name = t.optString("name"),
                     status = enumOf<TaskStatus>(t.optString("status")),
                     epoch = t.optLong("epoch", 1L),
                     createdAtMs = t.optLong("createdAtMs"),
@@ -133,17 +133,17 @@ class McpApprovalStore internal constructor(private val prefs: com.openminis.app
             for (i in 0 until ops.length()) {
                 val o = ops.getJSONObject(i)
                 val op = Operation(
-                    operationId = o.string("operationId"), taskId = o.optString("taskId"),
+                    operationId = o.getString("operationId"), taskId = o.optString("taskId"),
                     requestId = o.optString("requestId"),
                     tool = o.optString("tool"),
                     argumentsJson = o.optString("argumentsJson"),
                     status = enumOfOr(o.optString("status"), OperationStatus.REVOKED),
                     createdAtMs = o.optLong("createdAtMs"),
-                    approvedAtMs = if (o.has("approvedAtMs")) o.long("approvedAtMs") else null, sourceFileHash = if (o.has("sourceFileHash")) o.string("sourceFileHash") else null, operationFingerprint = if (o.has("operationFingerprint")) o.string("operationFingerprint") else null,  )
+                    approvedAtMs = if (o.has("approvedAtMs")) o.getLong("approvedAtMs") else null, sourceFileHash = if (o.has("sourceFileHash")) o.string("sourceFileHash") else null, operationFingerprint = if (o.has("operationFingerprint")) o.string("operationFingerprint") else null,  )
                 opMap[op.operationId] = op
             }
             val executedIds = mutableSetOf<String>()
-            for (i in 0 until executed.length()) executedIds.add(executed.string(i))
+            for (i in 0 until executed.length()) executedIds.add(executed.getString(i))
             State(epoch = epoch, tasks = taskMap, operations = opMap, executedOperationIds = executedIds)
         }.getOrNull()
 

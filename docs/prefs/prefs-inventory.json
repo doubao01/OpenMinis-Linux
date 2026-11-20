@@ -810,7 +810,9 @@
         "network/NetworkSettings.kt"
       ],
       "keys": {},
-      "dyn_keys": [],
+      "dyn_keys": [
+        "proxy."
+      ],
       "open_key_space": false,
       "ephemeral": false
     },

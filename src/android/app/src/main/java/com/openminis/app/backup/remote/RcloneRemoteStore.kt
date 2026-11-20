@@ -2,7 +2,6 @@ package com.openminis.app.backup.remote
 
 import android.content.Context
 import com.openminis.app.logging.AppLogger
-import com.openminis.app.util.EncryptedPrefsFactory
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
@@ -112,7 +111,7 @@ class RcloneRemoteStore(private val context: Context) {
     class StoreException(message: String) : Exception(message)
 
     private val prefs by lazy { com.openminis.app.config.Prefs.file(PREFS_NAME) }
-    private val secrets by lazy { EncryptedPrefsFactory.safeCreate(context, SECRETS_PREFS_NAME) }
+    private val secrets by lazy { com.openminis.app.config.Prefs.file(SECRETS_PREFS_NAME) }
 
     var remotes: List<Remote>
         get() = runCatching {

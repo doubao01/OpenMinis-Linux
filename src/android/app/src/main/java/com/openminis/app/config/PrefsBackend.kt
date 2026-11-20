@@ -41,6 +41,21 @@ interface PrefsBackend {
      */
     fun write(block: Writer.() -> Unit)
 
+    /**
+     * 订阅本文件的键变更，返回取消订阅的函数。
+     *
+     * 语义必须与 `SharedPreferences.OnSharedPreferenceChangeListener` 一致：
+     *  - 只在**写盘生效**后回调（不是 `write {}` 调用时），`key` 是被改的键；
+     *  - 批量写里的每个键各回调一次 —— 调用方按 key 分支判定的写法（ChatScreen
+     *    的 appearance 监听器）依赖这一点，合成一次会让它漏掉中间状态；
+     *  - 同进程内的写入**必须**触发，这是跨页面同步的唯一机制
+     *    （设置页改字号 → 聊天页监听器重读）。
+     *
+     * 默认空实现：`InMemoryPrefsBackend` 这类纯测试后端没有监听需求，
+     * 订阅等于无操作，不会让测试因为「没人发通知」而挂住。
+     */
+    fun observe(onChange: (key: String) -> Unit): () -> Unit = {}
+
     interface Writer {
         fun putBoolean(key: String, value: Boolean)
         fun putInt(key: String, value: Int)
@@ -109,6 +124,12 @@ class SharedPrefsBackend(
         }
         w.block()
         editor.commit()
+    }
+
+    override fun observe(onChange: (key: String) -> Unit): () -> Unit {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key -> onChange(key) }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        return { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 }
 

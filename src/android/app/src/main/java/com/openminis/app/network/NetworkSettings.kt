@@ -3,7 +3,6 @@ package com.openminis.app.network
 
 import android.content.Context
 import com.openminis.app.logging.AppLogger
-import com.openminis.app.util.EncryptedPrefsFactory
 import java.util.UUID
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -209,7 +208,7 @@ object NetworkSettingsStore {
 object NetworkSecrets {
     private const val FILE = "minis_network_secrets"
 
-    private fun prefs(context: Context) = EncryptedPrefsFactory.safeCreate(context.applicationContext, FILE)
+    private fun prefs(context: Context) = com.openminis.app.config.Prefs.file(FILE)
 
     fun password(context: Context, proxyId: String): String =
         runCatching { prefs(context).stringOrNull("proxy.$proxyId") }.getOrNull().orEmpty()

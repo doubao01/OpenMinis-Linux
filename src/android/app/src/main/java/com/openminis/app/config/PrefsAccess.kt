@@ -109,6 +109,16 @@ class PrefsHandle internal constructor(
 
     fun contains(key: String): Boolean = backend.contains(check(key))
 
+    /**
+     * 订阅本文件的键变更，返回取消订阅函数。
+     *
+     * 键不校验：监听器拿到的 key 是写盘时实际写入的键，其中可能包含
+     * 未登记的历史键（诊断/迁移路径会写这类键）。校验只会让"删掉一个
+     * 已退休键"的通知在 `check()` 里抛异常、直接崩掉 UI 线程。
+     */
+    fun observe(onChange: (key: String) -> Unit): () -> Unit =
+        backend.observe(onChange)
+
     /** 本文件已落盘的全部键（不校验，用于诊断/迁移）。 */
     fun rawKeys(): Set<String> = backend.keys()
 

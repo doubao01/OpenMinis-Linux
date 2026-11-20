@@ -1,9 +1,7 @@
 package com.openminis.app.mcp.oauth
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.openminis.app.logging.AppLogger
-import com.openminis.app.util.EncryptedPrefsFactory
 import org.json.JSONObject
 
 /**
@@ -26,14 +24,8 @@ object MCPOAuthStore {
         val expiresAtMs: Long,
     )
 
-    @Volatile
-    private var prefsRef: SharedPreferences? = null
-
     private fun prefs(context: Context): com.openminis.app.config.PrefsHandle =
-        prefsRef ?: synchronized(this) {
-            prefsRef ?: EncryptedPrefsFactory.safeCreate(context.applicationContext, FILE)
-                .also { prefsRef = it }
-        }
+        com.openminis.app.config.Prefs.file(FILE)
 
     private fun secretKey(server: String) = "secret::$server"
     private fun tokensKey(server: String) = "tokens::$server"
