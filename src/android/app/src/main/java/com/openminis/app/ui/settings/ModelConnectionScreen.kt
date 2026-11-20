@@ -73,6 +73,7 @@ fun ModelConnectionScreen(
                     onAddProvider = onAddProvider,
                     onProviderClick = onProviderClick,
                     onVoiceServiceClick = onVoiceServiceClick,
+                    embedded = true,
                 )
                 else -> ModelGroupsScreen(
                     providerRepository = providerRepository,
@@ -80,6 +81,7 @@ fun ModelConnectionScreen(
                     onGroupClick = onGroupClick,
                     onAddAgentLoopModels = onAddAgentLoopModels,
                     onAddAgentLoopGroups = onAddAgentLoopGroups,
+                    embedded = true,
                 )
             }
         }
