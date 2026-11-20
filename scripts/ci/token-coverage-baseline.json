@@ -54,7 +54,7 @@
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatAssistantMessageUI.kt": {
       "color": 0,
       "sp": 0,
-      "dp": 75
+      "dp": 57
     },
     "src/android/app/src/main/java/com/openminis/app/ui/chat/ChatComposerSection.kt": {
       "color": 0,
@@ -604,7 +604,7 @@
     "src/android/app/src/main/java/com/openminis/app/ui/settings/AppearanceScreen.kt": {
       "color": 1,
       "sp": 0,
-      "dp": 21
+      "dp": 15
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/BackgroundSettingsScreen.kt": {
       "color": 0,
@@ -978,11 +978,20 @@
       "184": "16",
       "185": "24"
     },
+    "src/android/app/src/main/java/com/openminis/app/ui/chat/ThinkingBlockUI.kt": {
+      "128": "0.5",
+      "153": "13",
+      "155": "1.5",
+      "264": "300"
+    },
     "src/android/app/src/main/java/com/openminis/app/ui/components/CodeEditorField.kt": {
       "163": "20"
     },
+    "src/android/app/src/main/java/com/openminis/app/ui/settings/AppearanceFontScaleSlider.kt": {
+      "82": "0.5"
+    },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/AppearanceScreen.kt": {
-      "766": "22 30"
+      "773": "22 30"
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulEmojiPickerSheet.kt": {
       "62": "17",

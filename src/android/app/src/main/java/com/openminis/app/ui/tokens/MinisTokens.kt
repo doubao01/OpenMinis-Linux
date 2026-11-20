@@ -3,8 +3,8 @@ package com.openminis.app.ui.tokens
 /**
  * 自动生成 —— 不要手改。生成器: scripts/ui/gen_tokens.py
  *
- * 扫描事实：420 个 ui 下的 .kt 文件 -> Color(0x...): 284 处 / 131 个不同色值；
- * dp 字面量 3488 处 / 83 个不同值；sp 0 处。
+ * 扫描事实：423 个 ui 下的 .kt 文件 -> Color(0x...): 284 处 / 131 个不同色值；
+ * dp 字面量 3464 处 / 83 个不同值；sp 0 处。
  * （已排除注释、字符串，以及标了 token-literal-ok 的行。）
  * 本文件命名 25 个色值，当前覆盖 123/284 = 43% 的颜色使用点。
  * 剩下的未命名字面量由 scripts/ci/check_token_coverage.py 的按文件预算
@@ -108,13 +108,13 @@ object RawColors {
 /** 间距 / 圆角 / 线宽原语（2dp 栅格）。未命名的值（如 3/5/7）由棘轮压制。 */
 object RawSpace {
     const val xxs: Float = 2f  // x 154
-    const val xs: Float = 4f  // x 267
-    const val sm: Float = 6f  // x 199
-    const val md: Float = 8f  // x 496
+    const val xs: Float = 4f  // x 264
+    const val sm: Float = 6f  // x 196
+    const val md: Float = 8f  // x 493
     const val md2: Float = 10f  // x 219
-    const val lg: Float = 12f  // x 360
-    const val lg2: Float = 14f  // x 207
-    const val xl: Float = 16f  // x 425
+    const val lg: Float = 12f  // x 355
+    const val lg2: Float = 14f  // x 204
+    const val xl: Float = 16f  // x 423
     const val xl2: Float = 18f  // x 102
     const val xxl: Float = 20f  // x 173
     const val xxl2: Float = 22f  // x 31
@@ -124,7 +124,7 @@ object RawSpace {
     const val huge2: Float = 40f  // x 17
     const val giant: Float = 48f  // x 24
     const val giant2: Float = 56f  // x 30
-    const val hairline: Float = 0.5f  // x 100
+    const val hairline: Float = 0.5f  // x 98
     const val thin: Float = 1f  // x 55
     const val thick: Float = 2f  // x 154
     const val touchTargetMin: Float = 48f  // 无障碍硬要求，不是审美

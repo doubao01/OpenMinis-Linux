@@ -350,6 +350,13 @@ internal fun ChatFlatItemRow(
                                         block = item.block,
                                         isStreaming = item.messageIsStreaming,
                                         isLast = item.isLast,
+                                        // [T-cot-translate-llm] Hand the live
+                                        // provider down so the LLM translate
+                                        // route works. Null (config not loaded,
+                                        // no model picked) degrades to the
+                                        // anonymous Bing route inside the handle.
+                                        llmProvider = viewModel.currentProvider,
+                                        llmModelName = viewModel.currentModel?.displayName ?: "",
                                     )
                                 }
                             }

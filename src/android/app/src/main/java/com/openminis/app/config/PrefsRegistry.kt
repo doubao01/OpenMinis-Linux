@@ -4,7 +4,7 @@ package com.openminis.app.config
  * 自动生成 —— 不要手改。
  * 生成器: scripts/prefs/gen_prefs_registry.py
  * 源目录: src/android/app/src/main/java/com/openminis/app
- * 规模:   91 个 prefs 文件（加密 9）/ 已归属键常量 162 / 165 处使用
+ * 规模:   92 个 prefs 文件（加密 9）/ 已归属键常量 166 / 166 处使用
  *
  * 目的: 把「SharedPreferences 文件名 + 键名」从 93 个文件里的裸字符串收敛为一处
  * 可枚举、可校验、可审计的数据表。
@@ -70,6 +70,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "browser_prefs", module = "browser", scope = PrefsScope.PLAIN, keys = mapOf("LITERAL_custom_user_agent" to "custom_user_agent", "LITERAL_user_agent_profile" to "user_agent_profile", "PREF_GLOBAL_VIEWPORT_HEIGHT" to "browser_custom_viewport_height", "PREF_GLOBAL_VIEWPORT_WIDTH" to "browser_custom_viewport_width", "PREF_IDLE_TIMEOUT_MINUTES" to "idle_timeout_minutes"), dynamicPrefixes = listOf("engine_stale_seen_"), note = "6 usages across 3 file(s)"),
         PrefsFileSpec(name = "collab_roles", module = "tools", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "roles_json"), note = "2 usages across 1 file(s)"),
         PrefsFileSpec(name = "composer_input_prefs", module = "ui", scope = PrefsScope.PLAIN, keys = mapOf("KEY_MODE" to "composer_input_mode_pref"), note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "cot_translation", module = "cottranslate", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "enabled", "KEY_LANGUAGE" to "language", "KEY_PRIVACY_ACK" to "privacy_ack", "KEY_PROVIDER" to "provider"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "crash_freq_prefs", module = "crash", scope = PrefsScope.PLAIN, keys = mapOf("KEY_DISMISSED_AT" to "dismissed_at", "KEY_FORCE_HOME_UNTIL" to "force_home_until", "KEY_SUPPRESS_UNTIL" to "suppress_until"), note = "6 usages across 1 file(s)"),
         PrefsFileSpec(name = "debug_server_prefs", module = "debug", scope = PrefsScope.PLAIN, keys = mapOf("LAN_LISTEN_KEY" to "lan_listen"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "dev_suite_state", module = "plugins", scope = PrefsScope.PLAIN, openKeySpace = true, note = "1 usages across 1 file(s)"),

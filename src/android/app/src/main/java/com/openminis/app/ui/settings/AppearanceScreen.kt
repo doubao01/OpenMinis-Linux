@@ -368,6 +368,11 @@ fun AppearanceScreen(
             }
         }
 
+        // [T-cot-translate] Reasoning translation sits right after the
+        // process-row styling block above: it changes how a thinking block
+        // reads, so it belongs with the other chat-content appearance knobs.
+        CotTranslationSection()
+
         // -- Keep Screen Awake --
         // Holds FLAG_KEEP_SCREEN_ON while a session has an active task (mirrors iOS). Default off.
         SettingsSection(

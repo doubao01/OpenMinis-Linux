@@ -283,6 +283,27 @@
       "ephemeral": false
     },
     {
+      "name": "cot_translation",
+      "module": "cottranslate",
+      "modules": [
+        "cottranslate"
+      ],
+      "encrypted": false,
+      "usage_count": 1,
+      "usage_files": [
+        "cottranslate/CotTranslationPrefs.kt"
+      ],
+      "keys": {
+        "KEY_ENABLED": "enabled",
+        "KEY_LANGUAGE": "language",
+        "KEY_PRIVACY_ACK": "privacy_ack",
+        "KEY_PROVIDER": "provider"
+      },
+      "dyn_keys": [],
+      "open_key_space": false,
+      "ephemeral": false
+    },
+    {
       "name": "crash_freq_prefs",
       "module": "crash",
       "modules": [
@@ -2232,11 +2253,38 @@
       ]
     },
     {
+      "name": "KEY_LANGUAGE",
+      "a": "app_language",
+      "b": "language",
+      "files": [
+        "config/PrefKeys.kt",
+        "cottranslate/CotTranslationPrefs.kt"
+      ]
+    },
+    {
       "name": "TAG",
       "a": "ConfigConfirmGate",
-      "b": "AsyncPrefs",
+      "b": "CotTranslateLLM",
       "files": [
         "config/confirm/ConfigConfirmationGate.kt",
+        "cottranslate/LlmTranslationRoute.kt"
+      ]
+    },
+    {
+      "name": "TAG",
+      "a": "CotTranslateLLM",
+      "b": "CotTranslateHandle",
+      "files": [
+        "cottranslate/LlmTranslationRoute.kt",
+        "cottranslate/ThinkingTranslationHandle.kt"
+      ]
+    },
+    {
+      "name": "TAG",
+      "a": "CotTranslateHandle",
+      "b": "AsyncPrefs",
+      "files": [
+        "cottranslate/ThinkingTranslationHandle.kt",
         "crash/AsyncPrefs.kt"
       ]
     },
@@ -2273,6 +2321,15 @@
       "b": "minis_auto_compact_prefs",
       "files": [
         "crash/CrashFrequencyDetector.kt",
+        "data/AutoCompactPrefs.kt"
+      ]
+    },
+    {
+      "name": "KEY_ENABLED",
+      "a": "enabled",
+      "b": "autoCompactOnThreshold",
+      "files": [
+        "cottranslate/CotTranslationPrefs.kt",
         "data/AutoCompactPrefs.kt"
       ]
     },
@@ -4869,6 +4926,15 @@
       ]
     },
     {
+      "name": "SYSTEM_PROMPT",
+      "a": "You are a translation engine. Translate the user's text into the ",
+      "b": "You fix speech-recognition errors in transcribed text. Output ONLY the ",
+      "files": [
+        "cottranslate/LlmTranslationRoute.kt",
+        "speech/correction/CorrectionStrategy.kt"
+      ]
+    },
+    {
       "name": "TAG",
       "a": "CorrectionStrategy",
       "b": "PinyinNormalizer",
@@ -5920,12 +5986,12 @@
     "UNKNOWN_MODEL_KEY"
   ],
   "totals": {
-    "prefs_files": 91,
+    "prefs_files": 92,
     "prefs_encrypted": 9,
-    "key_constants_attributed": 162,
+    "key_constants_attributed": 166,
     "orphan_keys": 31,
-    "usage_sites": 165,
-    "usage_files": 96,
-    "constant_conflicts": 459
+    "usage_sites": 166,
+    "usage_files": 97,
+    "constant_conflicts": 464
   }
 }
