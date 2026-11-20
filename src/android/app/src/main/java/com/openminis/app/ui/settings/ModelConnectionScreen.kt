@@ -26,9 +26,9 @@ import com.openminis.app.ui.components.SectionDesign
  * [T-model-connection] 「模型与连接」聚合页：设置里原本并列的「供应商管理」和
  * 「模型组」两个入口收成一个页面，用分段控件切换两段内容。
  *
- * 两个标签页直接复用 [ProviderListScreen] / [ModelGroupsScreen] 本体，不复制
- * 任何列表或配置逻辑——顶栏动作（同步全部、新建组）因此原样保留，避免出现
- * 「合并入口后某个操作悄悄消失」。
+ * 两个标签页直接复用 [ProviderListScreen] / [ModelGroupsScreen] 的正文
+ * （embedded = true：它们不再画自己的 Scaffold 顶栏），因此不复制任何列表或
+ * 配置逻辑，顶栏动作（同步全部、添加供应商、新建组）也作为行内操作条保留。
  */
 @Composable
 fun ModelConnectionScreen(
@@ -43,46 +43,52 @@ fun ModelConnectionScreen(
 ) {
     var tab by remember { mutableStateOf(0) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(SectionDesign.screenBackgroundColor()),
+    SettingsScaffold(
+        title = stringResource(R.string.model_connection_title),
+        onBack = onBack,
+        scrollable = false,
     ) {
-        SingleChoiceSegmentedButtonRow(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .fillMaxSize()
+                .background(SectionDesign.screenBackgroundColor()),
         ) {
-            SegmentedButton(
-                selected = tab == 0,
-                onClick = { tab = 0 },
-                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
-            ) { Text(stringResource(R.string.settings_manage_providers)) }
-            SegmentedButton(
-                selected = tab == 1,
-                onClick = { tab = 1 },
-                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
-            ) { Text(stringResource(R.string.settings_model_groups)) }
-        }
+            SingleChoiceSegmentedButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                SegmentedButton(
+                    selected = tab == 0,
+                    onClick = { tab = 0 },
+                    shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                ) { Text(stringResource(R.string.settings_manage_providers)) }
+                SegmentedButton(
+                    selected = tab == 1,
+                    onClick = { tab = 1 },
+                    shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                ) { Text(stringResource(R.string.settings_model_groups)) }
+            }
 
-        Box(modifier = Modifier.weight(1f)) {
-            when (tab) {
-                0 -> ProviderListScreen(
-                    providerRepository = providerRepository,
-                    onBack = onBack,
-                    onAddProvider = onAddProvider,
-                    onProviderClick = onProviderClick,
-                    onVoiceServiceClick = onVoiceServiceClick,
-                    embedded = true,
-                )
-                else -> ModelGroupsScreen(
-                    providerRepository = providerRepository,
-                    onBack = onBack,
-                    onGroupClick = onGroupClick,
-                    onAddAgentLoopModels = onAddAgentLoopModels,
-                    onAddAgentLoopGroups = onAddAgentLoopGroups,
-                    embedded = true,
-                )
+            Box(modifier = Modifier.weight(1f)) {
+                when (tab) {
+                    0 -> ProviderListScreen(
+                        providerRepository = providerRepository,
+                        onBack = onBack,
+                        onAddProvider = onAddProvider,
+                        onProviderClick = onProviderClick,
+                        onVoiceServiceClick = onVoiceServiceClick,
+                        embedded = true,
+                    )
+                    else -> ModelGroupsScreen(
+                        providerRepository = providerRepository,
+                        onBack = onBack,
+                        onGroupClick = onGroupClick,
+                        onAddAgentLoopModels = onAddAgentLoopModels,
+                        onAddAgentLoopGroups = onAddAgentLoopGroups,
+                        embedded = true,
+                    )
+                }
             }
         }
     }
