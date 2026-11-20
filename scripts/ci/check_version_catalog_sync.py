@@ -17,6 +17,7 @@ metadata 版本不匹配或 KotlinPluginVersion 冲突，报错信息完全指�
 
 from __future__ import annotations
 
+import re
 import sys
 import tomllib
 from pathlib import Path
@@ -25,6 +26,13 @@ ROOT = Path(__file__).resolve().parents[2]
 ANDROID = ROOT / "src" / "android"
 MAIN = ANDROID / "gradle" / "libs.versions.toml"
 BUILD_LOGIC = ANDROID / "build-logic" / "gradle" / "libs.versions.toml"
+
+
+def rel(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
 
 # build-logic 必须与根目录同值的版本键。
 # 只列真正会被两边同时解析进同一次编译的键 —— build-logic 的 convention plugin
@@ -56,6 +64,40 @@ def compare(main: dict, sub: dict, shared: tuple[str, ...] = SHARED_KEYS) -> lis
     return problems
 
 
+def check_catalog(catalog_path: Path) -> list[str]:
+    """校验版本目录里没有 Gradle 保留词别名。
+
+    为什么单列一条：`class` / `extensions` / `convention` 等词是 Gradle
+    版本目录的保留名，一旦出现在别名里，**整个构建在配置阶段就失败**，
+    报错是 "Alias '...' is a reserved name in Gradle which prevents
+    generation of accessors"。它和依赖是否正确无关 —— 即使该别名从未被
+    引用（死条目），照样炸。本轮实测踩过：`androidx-material3-window-size-class`
+    让 CI 编译步骤在 5 分 47 秒时失败，而本地静态守卫因为不解析 toml
+    语义完全看不见。
+    """
+    import tomllib
+
+    problems: list[str] = []
+    try:
+        data = tomllib.loads(catalog_path.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        return [f"{rel(catalog_path)}: 无法解析 TOML — {exc}"]
+
+    # Gradle 文档列出的保留名（小写比较，'-'/'_'/'.' 都视作分隔符）
+    reserved = {"class", "extensions", "convention", "bundles", "versions", "plugins"}
+
+    for section in ("libraries", "plugins", "bundles"):
+        for alias in data.get(section, {}):
+            for token in re.split(r"[-_.]", alias.lower()):
+                if token in reserved:
+                    problems.append(
+                        f"{rel(catalog_path)}: [{section}] 别名 '{alias}' 含保留词 "
+                        f"'{token}' → 改名（如 windowsize），否则整个构建在配置阶段失败"
+                    )
+                    break
+    return problems
+
+
 def selftest() -> int:
     cases = [
         ("一致应通过", {"versions": {"kotlin": "2.1.0"}}, {"versions": {"kotlin": "2.1.0"}}, 0),
@@ -69,7 +111,28 @@ def selftest() -> int:
         ok = got == want
         bad += 0 if ok else 1
         print(f"{'ok  ' if ok else 'FAIL'} [{label}] 期望 {want} 实际 {got}")
-    print(f"\n自测 {len(cases) - bad}/{len(cases)} 通过")
+    # 保留词别名：这条是 CI 实测踩出来的（androidx-material3-window-size-class
+    # 让整个构建在配置阶段失败，而当时所有本地守卫全绿）。
+    catalog_cases = [
+        ("保留词 class 应抓出", '[libraries]\nx-window-size-class = { module = "a:b" }\n', 1),
+        ("保留词 extensions 应抓出", '[libraries]\nx-extensions = { module = "a:b" }\n', 1),
+        ("改名后应通过", '[libraries]\nx-windowsize = { module = "a:b" }\n', 0),
+        ("plugins 段也要查", '[plugins]\nx-class = { id = "a.b" }\n', 1),
+        ("普通别名应通过", '[libraries]\nandroidx-core-ktx = { module = "a:b" }\n', 0),
+    ]
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as td:
+        for label, body, want in catalog_cases:
+            p = Path(td) / "libs.versions.toml"
+            p.write_text(body, encoding="utf-8")
+            got = len(check_catalog(p))
+            ok = got == want
+            bad += 0 if ok else 1
+            print(f"{'ok  ' if ok else 'FAIL'} [{label}] 期望 {want} 实际 {got}")
+
+    total = len(cases) + len(catalog_cases)
+    print(f"\n自测 {total - bad}/{total} 通过")
     return 0 if bad == 0 else 1
 
 
@@ -84,13 +147,15 @@ def main(argv: list[str]) -> int:
         return 1
 
     problems = compare(load(MAIN), load(BUILD_LOGIC))
+    problems += check_catalog(MAIN)
+    problems += check_catalog(BUILD_LOGIC)
     if problems:
         print(f"version catalog check: FAILED ({len(problems)} 处)")
         for p in problems:
             print(f"  - {p}")
-        print("\n修法：把两个 libs.versions.toml 的对应版本改成同一个值。")
+        print("\n修法：版本漂移就改成同一个值；保留词别名就改名。")
         return 1
-    print(f"version catalog check: OK（{'/'.join(SHARED_KEYS)} 与根目录一致）")
+    print(f"version catalog check: OK（{'/'.join(SHARED_KEYS)} 一致，无保留词别名）")
     return 0
 
 

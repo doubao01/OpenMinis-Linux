@@ -90,7 +90,9 @@ compose-material-icons-extended = { module = "androidx.compose.material:material
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 
 # Compose 自适应（BOM 不管理，必须显式版本）
-androidx-material3-window-size-class = { module = "androidx.compose.material3:material3-window-size-class" }
+# 注意：别名不能含 `class` —— Gradle 的保留词，会让访问器生成失败并报
+# "Alias ... is a reserved name"（不论它指向什么实际构件）。
+androidx-material3-windowsize = { module = "androidx.compose.material3:material3-window-size-class" }
 androidx-material3-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "material3Adaptive" }
 androidx-material3-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout", version.ref = "material3Adaptive" }
 androidx-material3-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation", version.ref = "material3Adaptive" }
