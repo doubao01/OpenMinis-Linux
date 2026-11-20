@@ -434,25 +434,6 @@ fun ModelGroupsScreen(
     }
 }
 
-/** Small colored badge label (e.g. "Primary", "Sub"). */
-@Composable
-private fun BadgeLabel(text: String, color: androidx.compose.ui.graphics.Color) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(color.copy(alpha = 0.12f))
-            .padding(horizontal = 6.dp, vertical = 2.dp),
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = color,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 11.sp,
-        )
-    }
-}
-
 /**
  * T182 — inline section embedded at the bottom of ModelGroupsScreen.
  * Mirrors iOS `AgentLoopModelsSection` from

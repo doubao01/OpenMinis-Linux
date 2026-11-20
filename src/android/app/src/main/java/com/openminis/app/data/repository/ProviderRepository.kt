@@ -211,13 +211,7 @@ class ProviderRepository(
     private val configLoadGuard = ProviderConfigLoadGuard()
     val configLoadFailed: StateFlow<Boolean> get() = configLoadGuard.failed
 
-    internal fun ensureConfigLoaded(): Boolean {
-        val loaded = configLoadGuard.ensure(configStore)
-        // [T-auto-model-groups] 冷启动第一次读到配置后补一次隐式组；之后每次
-        // saveConfig 都会重建，所以这里只需要覆盖「加载后还没保存过」的窗口。
-        if (loaded) AutoModelGroups.syncInPlace(_config.value)
-        return loaded
-    }
+    internal fun ensureConfigLoaded(): Boolean = configLoadGuard.ensure(configStore)
 
     // [T-android-provider-mutator-lock] Snapshot, not the live list. The
     // declared type is List, but the backing object is the MutableList that
