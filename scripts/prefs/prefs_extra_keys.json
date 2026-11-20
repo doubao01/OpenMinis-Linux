@@ -185,6 +185,14 @@
         "dyn:"
       ],
       "reason": "dynamic-prefix: 键是 \"dyn:<uuid16>\"，每次注册通知动作生成一个新键，用过即弃"
+    },
+    "mcp_oauth_secrets": {
+      "encrypted": true,
+      "dynPrefixes": [
+        "tokens::",
+        "secret::"
+      ],
+      "reason": "MCP OAuth 令牌库。键由 secretKey(server)/tokensKey(server) 两个函数拼出（\"secret::\"+server / \"tokens::\"+server），扫描器只认 `.getX(\"p\" + v)` 行内形态，看不见函数内的拼接。该文件曾被完全漏登记 —— 文件名常量 `FILE = \"mcp_oauth_secrets\"` 走的是 EncryptedPrefsFactory.safeCreate(ctx, FILE) 的标识符分支，而全局 consts 表里 PREFS/FILE 这类名字被十几个文件重名覆盖，解析结果指向了别的文件。"
     }
   }
 }

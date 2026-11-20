@@ -2,12 +2,12 @@ package com.openminis.app.config
 
 /*
  * 自动生成 —— 不要手改。
- * 生成器: refactor/tools/gen_prefs_registry.py
- * 源目录: /tmp/oml/src/android/app/src/main/java/com/openminis/app
- * 规模:   90 个 prefs 文件（加密 8）/ 已归属键常量 161 / 165 处使用
+ * 生成器: scripts/prefs/gen_prefs_registry.py
+ * 源目录: src/android/app/src/main/java/com/openminis/app
+ * 规模:   91 个 prefs 文件（加密 9）/ 已归属键常量 162 / 165 处使用
  *
  * 目的: 把「SharedPreferences 文件名 + 键名」从 93 个文件里的裸字符串收敛为一处
- * 可枚举、可校验、可审计的数据表。设计见 refactor/docs/01-config-unification.md。
+ * 可枚举、可校验、可审计的数据表。
  */
 
 /** 存储性质，决定迁移策略（不决定读写 API）。 */
@@ -61,7 +61,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "a2a_gateway", module = "data", scope = PrefsScope.PLAIN, openKeySpace = true, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "agent_fgs", module = "service", scope = PrefsScope.PLAIN, keys = mapOf("KEY_CHANNEL_RESTORED" to "channel_visible_restored"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "app_icon_prefs", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_SELECTED_ID" to "selected_icon_id"), note = "1 usages across 1 file(s)"),
-        PrefsFileSpec(name = "appearance_prefs", module = ".", scope = PrefsScope.PLAIN, keys = mapOf("KEY_AUTO_EXPAND_THINKING" to "chat.autoExpandThinking", "KEY_AUTO_FOCUS_AFTER_REPLY" to "chat.autoFocusAfterReply", "KEY_AUTO_GROUPING" to "autoGroupingEnabled", "KEY_COMPOSER_CONTEXT_GLOW" to "chat.composerContextGlow", "KEY_CURRENT_CHAT_SESSION_ID" to "minis.current_chat_session_id", "KEY_DYNAMIC_COLOR" to "chat.dynamicColor", "KEY_FOLD_AI_PROCESS" to "chat.foldAiProcess", "KEY_FONT_APP_BASE" to "font_app_base", "KEY_FONT_CHAT_INPUT" to "font_chat_input", "KEY_FONT_MESSAGE" to "font_message", "KEY_KEEP_SCREEN_AWAKE" to "keepScreenAwakeDuringTasks", "KEY_LAUNCH_SESSION" to "launch_session", "KEY_RETURN_KEY_BEHAVIOR" to "returnKeyBehavior", "KEY_SHOW_CHAT_TITLE" to "appearance.show_chat_title", "KEY_SHOW_COMPLETED_TOOL_CARDS" to "chat.showCompletedToolCards", "KEY_SHOW_FLOATING_TOOL_BAR" to "chat.showFloatingToolBar", "KEY_SHOW_MESSAGE_TOKEN_USAGE" to "chat.showMessageTokenUsage", "KEY_SHOW_MIC_BUTTON" to "chat.showMicButton", "KEY_SHOW_SUBAGENT_BAR" to "chat.showSubAgentBar", "KEY_THEME_MODE" to "theme_mode", "KEY_TOOL_PREVIEW" to "tool_preview"), note = "4 usages across 4 file(s)"),
+        PrefsFileSpec(name = "appearance_prefs", module = ".", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "chat.confirmBeforeStop", "KEY_AUTO_EXPAND_THINKING" to "chat.autoExpandThinking", "KEY_AUTO_FOCUS_AFTER_REPLY" to "chat.autoFocusAfterReply", "KEY_AUTO_GROUPING" to "autoGroupingEnabled", "KEY_COMPOSER_CONTEXT_GLOW" to "chat.composerContextGlow", "KEY_CURRENT_CHAT_SESSION_ID" to "minis.current_chat_session_id", "KEY_DYNAMIC_COLOR" to "chat.dynamicColor", "KEY_FOLD_AI_PROCESS" to "chat.foldAiProcess", "KEY_FONT_APP_BASE" to "font_app_base", "KEY_FONT_CHAT_INPUT" to "font_chat_input", "KEY_FONT_MESSAGE" to "font_message", "KEY_KEEP_SCREEN_AWAKE" to "keepScreenAwakeDuringTasks", "KEY_LANGUAGE" to "app_language", "KEY_LAUNCH_SESSION" to "launch_session", "KEY_RETURN_KEY_BEHAVIOR" to "returnKeyBehavior", "KEY_SHOW_CHAT_TITLE" to "appearance.show_chat_title", "KEY_SHOW_COMPLETED_TOOL_CARDS" to "chat.showCompletedToolCards", "KEY_SHOW_FLOATING_TOOL_BAR" to "chat.showFloatingToolBar", "KEY_SHOW_MESSAGE_TOKEN_USAGE" to "chat.showMessageTokenUsage", "KEY_SHOW_MIC_BUTTON" to "chat.showMicButton", "KEY_SHOW_SUBAGENT_BAR" to "chat.showSubAgentBar", "KEY_THEME_MODE" to "theme_mode", "KEY_TOOL_PREVIEW" to "tool_preview"), note = "6 usages across 5 file(s)"),
         PrefsFileSpec(name = "background_settings", module = "config", scope = PrefsScope.PLAIN, keys = mapOf("KEY_BG_OVERLAY_ENABLED" to "backgroundOverlayEnabled", "KEY_BG_OVERLAY_X" to "backgroundOverlayX", "KEY_BG_OVERLAY_Y" to "backgroundOverlayY", "KEY_DYNAMIC_ISLAND_ENABLED" to "dynamicIslandEnabled", "KEY_TASK_NOTIFICATIONS" to "taskNotificationsEnabled", "PRESENCE_KEEP_ALIVE_KEY" to "presenceKeepAliveEnabled"), dynamicPrefixes = listOf("backgroundOverlayX", "backgroundOverlayY"), note = "3 usages across 3 file(s)"),
         PrefsFileSpec(name = "backup_rclone_remotes", module = "backup", scope = PrefsScope.PLAIN, openKeySpace = true, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "backup_rclone_secrets", module = "backup", scope = PrefsScope.ENCRYPTED, openKeySpace = true, note = "1 usages across 1 file(s)"),
@@ -85,6 +85,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "local_tool_plugins", module = "plugins", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "tools_json"), note = "3 usages across 1 file(s)"),
         PrefsFileSpec(name = "logging_prefs", module = "logging", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "logging_enabled"), note = "3 usages across 1 file(s)"),
         PrefsFileSpec(name = "mcp_approvals", module = "mcp", scope = PrefsScope.PLAIN, keys = mapOf("KEY_STATE" to "state"), note = "1 usages across 1 file(s)"),
+        PrefsFileSpec(name = "mcp_oauth_secrets", module = "mcp", scope = PrefsScope.ENCRYPTED, dynamicPrefixes = listOf("secret::", "tokens::"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "mcp_server", module = "mcp", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "enabled", "KEY_PORT" to "port", "KEY_TOKEN" to "token"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "mcp_server_secrets", module = "mcp", scope = PrefsScope.ENCRYPTED, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_alarms_prefs", module = ".", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ALARMS" to "alarms_json"), note = "2 usages across 2 file(s)"),
@@ -97,7 +98,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "minis_group_chat", module = "ui", scope = PrefsScope.PLAIN, dynamicPrefixes = listOf("closed:", "enabled:", "opening:", "round:"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_memory_prefs", module = "config", scope = PrefsScope.PLAIN, keys = mapOf("KEY_GLOBAL_ENABLED" to "memory.global.enabled"), note = "2 usages across 2 file(s)"),
         PrefsFileSpec(name = "minis_network", module = "network", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "network.settings.v1"), note = "2 usages across 1 file(s)"),
-        PrefsFileSpec(name = "minis_network_secrets", module = "mcp", scope = PrefsScope.ENCRYPTED, note = "2 usages across 2 file(s)"),
+        PrefsFileSpec(name = "minis_network_secrets", module = "network", scope = PrefsScope.ENCRYPTED, note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_phone_backup_folders", module = "backup", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "folders"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_plan_discussion_prefs", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "planDiscussionEnabled", "KEY_MODE" to "planDiscussionMode"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_quick", module = "quick", scope = PrefsScope.PLAIN, keys = mapOf("KEY_PANEL_AT" to "panel_session_at", "KEY_PANEL_SESSION" to "panel_session_id"), note = "1 usages across 1 file(s)"),
@@ -106,7 +107,7 @@ object PrefsRegistry {
         PrefsFileSpec(name = "minis_storage_scan", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ROOTFS_BYTES" to "ubuntu_rootfs_bytes"), note = "2 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_tool_limits", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_CHARS" to "fileReadMaxChars", "KEY_LINES" to "fileReadMaxLines", "KEY_MAIN_TURNS" to "mainSessionMaxTurns", "KEY_SHELL" to "shellTimeoutSec", "KEY_TURNS" to "subagentMaxTurns", "LITERAL_autoConcurrency" to "autoConcurrency", "LITERAL_toolCallConcurrency" to "toolCallConcurrency"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "minis_unread_registry", module = "data", scope = PrefsScope.PLAIN, dynamicPrefixes = listOf("lastReadAt:"), note = "1 usages across 1 file(s)"),
-        PrefsFileSpec(name = "mirror_settings", module = "sandbox", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "chat.confirmBeforeStop", "KEY_FRESH_INSTALL" to "rootfs.freshInstall"), dynamicPrefixes = listOf("mirror.selected.", "mirror.useCustom."), note = "4 usages across 3 file(s)"),
+        PrefsFileSpec(name = "mirror_settings", module = "sandbox", scope = PrefsScope.PLAIN, keys = mapOf("KEY_FRESH_INSTALL" to "rootfs.freshInstall"), dynamicPrefixes = listOf("mirror.selected.", "mirror.useCustom."), note = "2 usages across 2 file(s)"),
         PrefsFileSpec(name = "multi_agent_settings", module = "data", scope = PrefsScope.PLAIN, keys = mapOf("KEY_ENABLED" to "enabled", "KEY_MAX_CONCURRENT" to "max_concurrent", "KEY_MODEL_IDS" to "model_entry_ids", "KEY_SUBAGENT_MAX_ATTEMPTS" to "subagent_max_attempts", "KEY_SUBAGENT_MAX_TURNS" to "subagent_max_turns", "KEY_SUPERVISOR_MAX_WORKER_TURNS" to "supervisor_max_worker_turns", "KEY_WORKER_MODEL_ID" to "worker_model_entry_id"), note = "1 usages across 1 file(s)"),
         PrefsFileSpec(name = "oauth_prefs", module = "auth", scope = PrefsScope.ENCRYPTED, keys = mapOf("KEY_MANUAL_BEARER" to "manual_bearer_token"), dynamicPrefixes = listOf("oauth_", "oauth_manual_bearer_token_", "oauth_tokens_"), note = "5 usages across 3 file(s)"),
         PrefsFileSpec(name = "offload_permissions", module = "offload", scope = PrefsScope.PLAIN, keys = mapOf("KEY" to "privacy_global_level"), dynamicPrefixes = listOf("level_"), note = "3 usages across 2 file(s)"),

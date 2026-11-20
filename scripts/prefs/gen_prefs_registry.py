@@ -36,6 +36,14 @@ RE_DYN_TMPL = re.compile(r'\.(?:getString|putString|getBoolean|putBoolean|getInt
 RE_DYN_IDENT_PLUS = re.compile(r'\.(?:getString|putString|getBoolean|putBoolean|getInt|putInt|getLong|putLong|getFloat|putFloat|getStringSet|putStringSet|contains|remove|string|stringOrNull|bool|int|long|float|stringSet)\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\+')
 # 任意 const val NAME = "literal"，用于解析上面那种前缀常量
 RE_ANY_CONST = re.compile(r'const\s+val\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*"([^"]*)"')
+# `const val PREFS = com.openminis.app.config.PREF_APPEARANCE` —— 指向另一个常量名。
+# 不解析这种间接引用就会退回全局 consts 表，而 `PREFS` 这个名字在十几个文件里
+# 各定义一次，全局表只剩排序最后一个 —— 于是 ChatStopOptions 的
+# `chat.confirmBeforeStop` 被登记到 mirror_settings 名下，运行期守卫直接抛
+# "key not registered in PrefsRegistry for appearance_prefs"。
+RE_ANY_CONST_REF = re.compile(
+    r'const\s+val\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*'
+    r'(?:[A-Za-z_][A-Za-z0-9_.]*\.)?([A-Z][A-Z0-9_]*)\s*$', re.M)
 
 # 键常量名：KEY_* 是主流写法，但 HostEventHooks 用的是裸 `KEY`，
 # 还有 *_KEY 后缀的形态。只认 KEY_* 会让这些文件的 keys 为空 ——
@@ -50,7 +58,11 @@ RE_KEY_CONST = re.compile(r'const\s+val\s+((?:KEY|key)[A-Za-z0-9_]*|[A-Za-z0-9_]
 GENERATED = {'PrefsRegistry.kt', 'PrefsAccess.kt', 'MinisTokens.kt', 'ComposeAdapters.kt', 'PrefsBackend.kt', 'PrefsSource.kt', 'TokenBridge.kt'}
 
 def iter_kt(root):
-    for dp, _dn, fn in os.walk(root):
+    for dp, dn, fn in os.walk(root):
+        # os.walk 的目录顺序由文件系统决定，不排序则遍历顺序不稳定。
+        # 常量名撞车时 const_owner 是"后者覆盖前者"，于是同一份源码
+        # 在不同 clone 目录会生成不同结果 —— `--check` 就会误报 STALE。
+        dn.sort()
         for f in sorted(fn):
             if f.endswith('.kt') and f not in GENERATED:
                 p = os.path.join(dp, f)
@@ -63,6 +75,35 @@ def iter_kt(root):
 def module_of(rel):
     parts = rel.replace('\\', '/').split('/')
     return parts[0] if len(parts) > 1 else '.'
+
+
+def repo_relative(src_root):
+    """把源目录写成仓库相对路径。
+
+    头部会进版本库，而 `--check` 是全文比对 —— 写绝对路径意味着
+    换个 clone 目录就必然 STALE（CI 在 /home/runner/work/… 下永远红）。
+    """
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    try:
+        rel = os.path.relpath(os.path.abspath(src_root), root)
+    except ValueError:
+        return os.path.abspath(src_root)
+    return src_root if rel.startswith('..') else rel.replace(os.sep, '/')
+
+
+def local_const_map(s, consts):
+    """本文件里 常量名 -> 字面量，含 `const val A = pkg.B` 的间接引用。
+
+    优先本文件定义：`PREFS` / `KEY` 这类名字全仓重名几十次，全局表不可信。
+    """
+    local = dict(RE_ANY_CONST.findall(s))
+    for n, ref in RE_ANY_CONST_REF.findall(s):
+        if n in local:
+            continue
+        v = consts.get(ref) or local.get(ref)
+        if v:
+            local[n] = v
+    return local
 
 
 def scan(src_root):
@@ -78,6 +119,19 @@ def scan(src_root):
                                   'files': [const_owner[n], rel]})
             consts[n] = lit
             const_owner[n] = rel
+    # 第二遍：把 `const val PREFS = pkg.PREF_X` 形式的间接引用解析成字面量。
+    # 走多轮是因为间接引用可能指向另一条间接引用。
+    for _ in range(3):
+        changed = False
+        for p, s in files:
+            for n, ref in RE_ANY_CONST_REF.findall(s):
+                if n in consts or ref not in consts:
+                    continue
+                consts[n] = consts[ref]
+                const_owner[n] = os.path.relpath(p, src_root)
+                changed = True
+        if not changed:
+            break
 
     prefs = {}
 
@@ -92,7 +146,7 @@ def scan(src_root):
         rel = os.path.relpath(p, src_root)
         for m in RE_GET_LIT.finditer(s):
             touch(m.group(1), rel, 'literal', False)
-        local_consts = dict(RE_ANY_CONST.findall(s))
+        local_consts = local_const_map(s, consts)
         for m in RE_GET_IDENT.finditer(s):
             ident = m.group(1)
             if ident in ('context', 'this'):
@@ -102,7 +156,7 @@ def scan(src_root):
                 continue
             touch(nm, rel, 'const:' + ident, False)
         for m in RE_SAFE_CREATE.finditer(s):
-            nm = m.group(1) or consts.get(m.group(2), '')
+            nm = m.group(1) or local_consts.get(m.group(2)) or consts.get(m.group(2), '')
             if nm:
                 touch(nm, rel, 'encrypted', True)
         for m in RE_TYPED_LIT.finditer(s):
@@ -114,7 +168,7 @@ def scan(src_root):
             # minis_unread_registry / ...），全局表只会留下最后一个 ——
             # 实测 UnreadRegistry 的 `Prefs.file(PREFS)` 因此被解析成
             # mirror_settings，然后整个文件从注册表里消失。
-            nm = dict(RE_ANY_CONST.findall(s)).get(ident) or consts.get(ident)
+            nm = local_consts.get(ident) or consts.get(ident)
             if nm:
                 touch(nm, rel, 'typed:' + ident, False)
 
@@ -134,7 +188,7 @@ def scan(src_root):
         dyn_prefixes = [m.group(1) for m in RE_DYN_PLUS.finditer(s) if m.group(1)]
         dyn_prefixes += [m.group(1) for m in RE_DYN_TMPL.finditer(s) if m.group(1)]
         # `PREFIX + x` 形态：把常量名解析成它的字面量
-        local_consts = dict(RE_ANY_CONST.findall(s))
+        local_consts = local_const_map(s, consts)
         for m in RE_DYN_IDENT_PLUS.finditer(s):
             v = local_consts.get(m.group(1))
             if v:
@@ -147,6 +201,21 @@ def scan(src_root):
             if dyn_prefixes:
                 bucket = prefs[target].setdefault('dyn_keys', set())
                 bucket.update(dyn_prefixes)
+        elif not local:
+            # 本文件不直接使用任何 prefs，只是**定义**常量供别处用
+            # （PrefKeys.kt：`PREF_APPEARANCE = "appearance_prefs"` + `KEY_LANGUAGE`）。
+            # 这类文件里的键必须归给唯一那个 prefs 文件名常量，否则：
+            #   MainActivity 用 `Prefs.file(PREF_APPEARANCE).string(KEY_LANGUAGE)`
+            # 读 app_language，而注册表里 appearance_prefs 没有这个键 ——
+            # 运行期直接抛 "key not registered"，且发生在启动路径上。
+            names = {v for v in local_const_map(s, consts).values() if v in prefs}
+            if len(names) == 1:
+                prefs[next(iter(names))].setdefault('keys', {})
+                for kn, kl in keys:
+                    prefs[next(iter(names))]['keys'][kn] = kl
+            else:
+                for kn, kl in keys:
+                    prefs.setdefault('__orphan_keys__', {'keys': {}})['keys'][kn] = kl
         else:
             for kn, kl in keys:
                 prefs.setdefault('__orphan_keys__', {'keys': {}})['keys'][kn] = kl
@@ -198,7 +267,7 @@ def scan(src_root):
 
     orphan = sorted(prefs.get('__orphan_keys__', {}).get('keys', {}).items())
     return {
-        'src_root': os.path.abspath(src_root),
+        'src_root': repo_relative(src_root),
         'prefs_files': out,
         'constant_conflicts': conflicts,
         'orphan_keys': [k for k, _ in orphan],
@@ -218,12 +287,12 @@ HEADER = '''package com.openminis.app.config
 
 /*
  * 自动生成 —— 不要手改。
- * 生成器: refactor/tools/gen_prefs_registry.py
+ * 生成器: scripts/prefs/gen_prefs_registry.py
  * 源目录: {src}
  * 规模:   {files} 个 prefs 文件（加密 {enc}）/ 已归属键常量 {keys} / {sites} 处使用
  *
  * 目的: 把「SharedPreferences 文件名 + 键名」从 93 个文件里的裸字符串收敛为一处
- * 可枚举、可校验、可审计的数据表。设计见 refactor/docs/01-config-unification.md。
+ * 可枚举、可校验、可审计的数据表。
  */
 
 /** 存储性质，决定迁移策略（不决定读写 API）。 */
