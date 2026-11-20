@@ -81,35 +81,80 @@ def accepts(spec, key):
     return any(key.startswith(p) for p in (spec.get('dyn_keys') or []))
 
 
+RE_IMPORT = re.compile(r'^import\s+([A-Za-z_][A-Za-z0-9_.]*)\s*$', re.M)
+
+
 def scan():
     """返回 (违规列表, 检查的调用点数)。"""
     specs = load_specs()
-    # 全局常量表：只用于跨文件引用（KEY_X 定义在 PrefKeys.kt 这类地方）
-    global_consts = {}
     files = sorted(p for p in SRC.rglob('*.kt'))
     texts = {}
+    # per-file constant table: path -> {name: value}, plus package + imports
+    consts_by_file = {}
+    pkg_by_file = {}
+    imports_by_file = {}
+    # name -> list of (path, value); ambiguity is explicit, not last-wins
+    by_name = {}
     for p in files:
         if p.name == 'PrefsRegistry.kt':
             continue
         raw = p.read_text(encoding='utf-8', errors='replace')
         texts[p] = strip_comments(raw)
+        found = {}
         for m in RE_CONST.finditer(raw):
-            global_consts[m.group(1)] = m.group(2)
+            found[m.group(1)] = m.group(2)
+            by_name.setdefault(m.group(1), []).append((p, m.group(2)))
+        consts_by_file[p] = found
+        pm = re.search(r'^package\s+([A-Za-z_][A-Za-z0-9_.]*)\s*$', raw, re.M)
+        pkg_by_file[p] = pm.group(1) if pm else ''
+        imports_by_file[p] = RE_IMPORT.findall(raw)
+
+    def resolve(p, name):
+        """按 Kotlin 的作用域顺序解析一个标识符，解析不出返回 None。"""
+        local = consts_by_file[p]
+        if name in local:
+            return local[name]
+        # 同包文件（无需 import）
+        pkg = pkg_by_file[p]
+        for q, qconsts in consts_by_file.items():
+            if q != p and pkg_by_file.get(q) == pkg and name in qconsts:
+                return qconsts[name]
+        # 显式 import 指向的声明文件
+        for imp in imports_by_file[p]:
+            head, _, last = imp.rpartition('.')
+            if last != name:
+                if imp.rsplit('.', 1)[0].endswith(name):
+                    pass
+                continue
+            target_pkg = head
+            for q, qconsts in consts_by_file.items():
+                if pkg_by_file.get(q) == target_pkg and name in qconsts:
+                    return qconsts[name]
+        # 兜底：全局唯一才算数；重名说明判断不了，交给人看
+        hits = by_name.get(name) or []
+        values = {v for _, v in hits}
+        if len(values) == 1:
+            return next(iter(values))
+        return None
 
     fails, checked = [], 0
     for p, s in texts.items():
-        local = dict(RE_CONST.findall(s))
+        local = dict(consts_by_file[p])
         for n, ref in RE_CONST_REF.findall(s):
             if n in local:
                 continue
-            v = global_consts.get(ref) or local.get(ref)
+            v = resolve(p, ref)
             if v:
                 local[n] = v
 
         for m in RE_CALL.finditer(s):
             file_lit, file_ident, method, key_lit, key_ident = m.groups()
-            fname = file_lit or local.get(file_ident) or global_consts.get(file_ident)
-            key = key_lit or local.get(key_ident) or global_consts.get(key_ident)
+            fname = file_lit or local.get(file_ident)
+            key = key_lit or local.get(key_ident)
+            if fname is None and file_ident:
+                fname = resolve(p, file_ident)
+            if key is None and key_ident:
+                key = resolve(p, key_ident)
             if not fname or not key:
                 continue          # 解析不出来的调用留给人看，不算违规
             spec = specs.get(fname)
