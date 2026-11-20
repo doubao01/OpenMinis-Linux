@@ -94,8 +94,18 @@ internal fun NavGraphBuilder.providerRoutes(
         ModelConnectionScreen(
             providerRepository = providerRepository,
             onBack = { navController.safePopBackStack() },
-            onProvidersClick = { navController.safeNavigate(Routes.PROVIDER_LIST) },
-            onGroupsClick = { navController.safeNavigate(Routes.MODEL_GROUPS) },
+            onAddProvider = { navController.safeNavigate(Routes.ADD_PROVIDER) },
+            onProviderClick = { instanceId ->
+                navController.safeNavigate(Routes.providerDetail(instanceId))
+            },
+            onVoiceServiceClick = { instanceId ->
+                navController.safeNavigate(Routes.shadowVoiceDetail(instanceId))
+            },
+            onGroupClick = { groupId ->
+                navController.safeNavigate(Routes.modelGroupDetail(groupId))
+            },
+            onAddAgentLoopModels = { navController.safeNavigate(Routes.ADD_MODELS_TO_AGENT_LOOP) },
+            onAddAgentLoopGroups = { navController.safeNavigate(Routes.ADD_GROUPS_TO_AGENT_LOOP) },
         )
     }
 
