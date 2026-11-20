@@ -161,7 +161,7 @@ jobs:
 
       # [T-token-coverage] The generator proves the token file matches source;
       # it says nothing about whether code *uses* the tokens. Measured: 284
-      # unnamed color literals, 189 unnamed sp, 3490 unnamed dp remain. Without
+      # unnamed color literals, 0 unnamed sp, 3488 unnamed dp remain. Without
       # a ratchet those counts only grow — writing 16.sp is always cheaper than
       # finding the semantic slot, so the table drifts into decoration. Budget is
       # per-file (a total hides "A removed 20, B added 20") and may only go down.
