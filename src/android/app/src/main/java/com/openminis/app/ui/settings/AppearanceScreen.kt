@@ -4,7 +4,6 @@ import com.openminis.app.config.KEY_LANGUAGE
 import com.openminis.app.config.PREF_APPEARANCE
 import com.openminis.app.R
 import com.openminis.app.ui.theme.*
-import com.openminis.app.ui.tokens.MinisTypography
 import com.openminis.app.data.repository.AppIconRepository
 import com.openminis.app.ui.components.MinisTextButton
 
@@ -56,12 +55,10 @@ import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,7 +78,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
-import kotlin.math.roundToInt
 
 const val KEY_THEME_MODE = "theme_mode"            // 0=System, 1=Light, 2=Dark
 const val KEY_LAUNCH_SESSION = "launch_session"    // 0=Auto, 1=LastSession, 2=NewChat, 3=Home
@@ -595,6 +591,8 @@ fun AppearanceScreen(
             FontScaleSliderRow(
                 label = stringResource(R.string.appearance_font_chat_input),
                 level = chatInputLevel,
+                fontScaleLabels = fontScaleLabels,
+                fontScaleValues = fontScaleValues,
                 onLevelChange = {
                     chatInputLevel = it
                     prefs.value.set(KEY_FONT_CHAT_INPUT, it)
@@ -604,6 +602,8 @@ fun AppearanceScreen(
             FontScaleSliderRow(
                 label = stringResource(R.string.appearance_font_message),
                 level = messageLevel,
+                fontScaleLabels = fontScaleLabels,
+                fontScaleValues = fontScaleValues,
                 onLevelChange = {
                     messageLevel = it
                     prefs.value.set(KEY_FONT_MESSAGE, it)
@@ -613,6 +613,8 @@ fun AppearanceScreen(
             FontScaleSliderRow(
                 label = stringResource(R.string.appearance_font_app_base),
                 level = appBaseLevel,
+                fontScaleLabels = fontScaleLabels,
+                fontScaleValues = fontScaleValues,
                 onLevelChange = {
                     appBaseLevel = it
                     prefs.value.set(KEY_FONT_APP_BASE, it)
@@ -779,57 +781,3 @@ fun AppearanceScreen(
     }
 }
 
-@Composable
-private fun FontScaleSliderRow(
-    label: String,
-    level: Int,
-    onLevelChange: (Int) -> Unit,
-    showDivider: Boolean,
-) {
-    val idx = fontScaleValues.indexOf(level).coerceIn(0, fontScaleValues.lastIndex)
-    var sliderPos by remember(level) { mutableFloatStateOf(idx.toFloat()) }
-    val currentLabel = fontScaleLabels.getOrElse(sliderPos.roundToInt()) { "Default" }
-
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(label, style = MaterialTheme.typography.bodyMedium)
-            Text(
-                currentLabel,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary,
-            )
-        }
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Text("A", fontSize = MinisTypography.foot, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Slider(
-                value = sliderPos,
-                onValueChange = { sliderPos = it },
-                onValueChangeFinished = {
-                    val newIdx = sliderPos.roundToInt().coerceIn(0, fontScaleValues.lastIndex)
-                    sliderPos = newIdx.toFloat()
-                    onLevelChange(fontScaleValues[newIdx])
-                },
-                valueRange = 0f..5f,
-                steps = 4,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp),
-            )
-            Text("A", fontSize = MinisTypography.type.display.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-    if (showDivider) {
-        val dividerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-        androidx.compose.foundation.layout.Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 14.dp)
-                .height(0.5.dp)
-                .background(dividerColor),
-        )
-    }
-}
