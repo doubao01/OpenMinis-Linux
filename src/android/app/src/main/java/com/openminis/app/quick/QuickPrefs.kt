@@ -21,11 +21,11 @@ class QuickPrefs(context: Context) {
 
     var panelSessionId: String?
         get() = sp.stringOrNull(KEY_PANEL_SESSION)
-        set(value) = sp.set(KEY_PANEL_SESSION, value)
+        set(value) { sp.set(KEY_PANEL_SESSION, value) }
 
     var panelUsedAtMs: Long
         get() = sp.long(KEY_PANEL_AT, 0L)
-        set(value) = sp.set(KEY_PANEL_AT, value)
+        set(value) { sp.set(KEY_PANEL_AT, value) }
 
     /** Record that the panel sent into [sessionId] right now (one write). */
     fun markPanelSession(sessionId: String) {

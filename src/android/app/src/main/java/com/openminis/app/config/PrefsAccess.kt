@@ -173,31 +173,31 @@ class PrefsHandle internal constructor(
     fun boolProp(key: String, default: Boolean = false): ReadWriteProperty<Any?, Boolean> =
         object : ReadWriteProperty<Any?, Boolean> {
             override fun getValue(thisRef: Any?, property: KProperty<*>) = bool(key, default)
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) = set(key, value)
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) { set(key, value) }
         }
 
     fun stringProp(key: String, default: String = ""): ReadWriteProperty<Any?, String> =
         object : ReadWriteProperty<Any?, String> {
             override fun getValue(thisRef: Any?, property: KProperty<*>) = string(key, default)
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: String) = set(key, value)
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: String) { set(key, value) }
         }
 
     fun intProp(key: String, default: Int = 0): ReadWriteProperty<Any?, Int> =
         object : ReadWriteProperty<Any?, Int> {
             override fun getValue(thisRef: Any?, property: KProperty<*>) = int(key, default)
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) = set(key, value)
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) { set(key, value) }
         }
 
     fun floatProp(key: String, default: Float = 0f): ReadWriteProperty<Any?, Float> =
         object : ReadWriteProperty<Any?, Float> {
             override fun getValue(thisRef: Any?, property: KProperty<*>) = float(key, default)
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Float) = set(key, value)
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Float) { set(key, value) }
         }
 
     fun longProp(key: String, default: Long = 0L): ReadWriteProperty<Any?, Long> =
         object : ReadWriteProperty<Any?, Long> {
             override fun getValue(thisRef: Any?, property: KProperty<*>) = long(key, default)
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) = set(key, value)
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) { set(key, value) }
         }
 
     /**

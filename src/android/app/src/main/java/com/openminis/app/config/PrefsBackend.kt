@@ -132,7 +132,9 @@ class SharedPrefsBackend(
     }
 
     override fun observe(onChange: (key: String) -> Unit): () -> Unit {
-        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key -> onChange(key) }
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            key?.let(onChange)
+        }
         prefs.registerOnSharedPreferenceChangeListener(listener)
         return { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
