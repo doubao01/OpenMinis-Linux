@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import com.openminis.app.ui.components.SectionDesign
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
@@ -99,6 +103,8 @@ fun ProviderListScreen(
     onAddProvider: () -> Unit,
     onProviderClick: (String) -> Unit,
     onVoiceServiceClick: (String) -> Unit,
+    /** [T-model-connection] true 时不画 Scaffold 顶栏，交给「模型与连接」聚合页承载分段控件。 */
+    embedded: Boolean = false,
 ) {
     val config by providerRepository.config.collectAsStateWithLifecycle()
     val credentialRevision by providerRepository.credentialRevision.collectAsStateWithLifecycle()
@@ -228,10 +234,7 @@ fun ProviderListScreen(
         }
     }
 
-    SettingsScaffold(
-        title = stringResource(R.string.provider_list_providers),
-        onBack = null,
-        actions = {
+    val listActions: @Composable () -> Unit = {
             IconButton(
                 onClick = {
                     if (isSyncing) return@IconButton
@@ -277,8 +280,9 @@ fun ProviderListScreen(
             IconButton(onClick = { showMenu = true }) {
                 Icon(m3Icon(Icons.Default.Add), contentDescription = stringResource(R.string.provider_list_add_provider))
             }
-        },
-    ) {
+    }
+
+    val listBody: @Composable () -> Unit = {
         // [FIX-R2-16] Persistent state banner (not dismissible — it tracks a
         // condition, not an event) shown while the provider configuration is
         // unreadable. Every config-protected mutation no-ops until a load
@@ -584,6 +588,36 @@ fun ProviderListScreen(
                 instanceToDelete = null
             },
         )
+    }
+
+    if (embedded) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(SectionDesign.screenBackgroundColor()),
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.End,
+            ) { listActions() }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                listBody()
+            }
+        }
+    } else {
+        SettingsScaffold(
+            title = stringResource(R.string.provider_list_providers),
+            onBack = null,
+            actions = listActions,
+        ) {
+            listBody()
+        }
     }
 }
 
