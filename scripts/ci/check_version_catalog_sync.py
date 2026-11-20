@@ -19,13 +19,166 @@ from __future__ import annotations
 
 import re
 import sys
-import tomllib
 from pathlib import Path
+
+try:  # Python 3.11+
+    import tomllib as _tomllib
+except ModuleNotFoundError:  # 3.10 及更早：CI runner 上就是这么崩的
+    _tomllib = None
 
 ROOT = Path(__file__).resolve().parents[2]
 ANDROID = ROOT / "src" / "android"
 MAIN = ANDROID / "gradle" / "libs.versions.toml"
 BUILD_LOGIC = ANDROID / "build-logic" / "gradle" / "libs.versions.toml"
+
+
+# ── 最小 TOML 子集解析器（Python < 3.11 的 tomllib 替代）───────────────────
+# 为什么需要：CI runner 上的 python3 是 3.10，没有 tomllib，守卫直接 NameError。
+# 只实现版本目录实际用到的语法：表头、键值、字符串、整数、布尔、数组、
+# 行内表（{ ... }）、注释。足够的判断依据是 —— 版本目录由 Gradle 校验，
+# 语法畸形的 TOML 本来就进不了构建。
+
+def _strip_comment(line: str) -> str:
+    out, quote = [], None
+    for ch in line:
+        if quote:
+            out.append(ch)
+            if ch == quote:
+                quote = None
+        elif ch in ("\"", "'"):
+            quote = ch
+            out.append(ch)
+        elif ch == "#":
+            break
+        else:
+            out.append(ch)
+    return "".join(out).strip()
+
+
+def _split_top(text: str, sep: str = ",") -> list[str]:
+    parts, buf, depth, quote = [], [], 0, None
+    for ch in text:
+        if quote:
+            buf.append(ch)
+            if ch == quote:
+                quote = None
+            continue
+        if ch in ("\"", "'"):
+            quote = ch
+            buf.append(ch)
+        elif ch in "[{":
+            depth += 1
+            buf.append(ch)
+        elif ch in "]}":
+            depth -= 1
+            buf.append(ch)
+        elif ch == sep and depth == 0:
+            parts.append("".join(buf))
+            buf = []
+        else:
+            buf.append(ch)
+    if buf:
+        parts.append("".join(buf))
+    return [p.strip() for p in parts if p.strip()]
+
+
+def _value(token: str):
+    token = token.strip()
+    if not token:
+        return ""
+    if token.startswith('"""') and token.endswith('"""'):
+        return token[3:-3]
+    if token[0] in ("\"", "'") and token[-1] == token[0]:
+        body = token[1:-1]
+        if token[0] == '"':
+            body = (body.replace('\\n', '\n').replace('\\t', '\t')
+                        .replace('\\"', '"').replace('\\\\', '\\'))
+        return body
+    if token.startswith("["):
+        inner = token[1:-1] if token.endswith("]") else token[1:]
+        return [_value(x) for x in _split_top(inner)]
+    if token.startswith("{"):
+        inner = token[1:-1] if token.endswith("}") else token[1:]
+        table = {}
+        for item in _split_top(inner):
+            k, _, v = item.partition("=")
+            # TOML 允许 inline table 里用点分键：{ module = "x", version.ref = "y" }
+            # 语义等价于 { module = "x", version = { ref = "y" } }
+            parts = [p.strip().strip('"\'') for p in k.split(".")]
+            node = table
+            for part in parts[:-1]:
+                nxt = node.get(part)
+                if not isinstance(nxt, dict):
+                    nxt = node[part] = {}
+                node = nxt
+            node[parts[-1]] = _value(v)
+        return table
+    low = token.lower()
+    if low in ("true", "false"):
+        return low == "true"
+    try:
+        return int(token, 0)
+    except ValueError:
+        pass
+    try:
+        return float(token)
+    except ValueError:
+        return token
+
+
+def _parse_toml(text: str) -> dict:
+    data: dict = {}
+    cur = data
+    for raw in text.splitlines():
+        line = _strip_comment(raw)
+        if not line:
+            continue
+        if line.startswith("[["):
+            name = line.strip("[]").strip()
+            node = data.setdefault(name, [])
+            if not isinstance(node, list):
+                node = data[name] = []
+            node.append({})
+            cur = node[-1]
+            continue
+        if line.startswith("["):
+            name = line.strip("[]").strip()
+            cur = data
+            for part in name.split("."):
+                part = part.strip().strip('"\'')
+                nxt = cur.get(part)
+                if not isinstance(nxt, dict):
+                    nxt = cur[part] = {}
+                cur = nxt
+            continue
+        key, sep, val = line.partition("=")
+        if not sep:
+            continue
+        key = key.strip().strip('"\'')
+        cur[key] = _value(val)
+    return data
+
+
+def _toml_loads(text: str) -> dict:
+    return _parse_toml(text)
+
+
+def _toml_load(path: Path) -> dict:
+    return _parse_toml(path.read_text(encoding="utf-8"))
+
+
+def parse_toml(path: Path) -> dict:
+    """统一入口：有 tomllib 用它，没有就用内置子集解析器。"""
+    if _tomllib is not None:
+        with path.open("rb") as fh:
+            return _tomllib.load(fh)
+    return _toml_load(path)
+
+
+def parse_toml_text(text: str) -> dict:
+    if _tomllib is not None:
+        return _tomllib.loads(text)
+    return _toml_loads(text)
 
 
 def rel(path: Path) -> str:
@@ -41,8 +194,7 @@ SHARED_KEYS = ("kotlin",)
 
 
 def load(path: Path) -> dict:
-    with path.open("rb") as fh:
-        return tomllib.load(fh)
+    return parse_toml(path)
 
 
 def compare(main: dict, sub: dict, shared: tuple[str, ...] = SHARED_KEYS) -> list[str]:
@@ -75,11 +227,9 @@ def check_catalog(catalog_path: Path) -> list[str]:
     让 CI 编译步骤在 5 分 47 秒时失败，而本地静态守卫因为不解析 toml
     语义完全看不见。
     """
-    import tomllib
-
     problems: list[str] = []
     try:
-        data = tomllib.loads(catalog_path.read_text(encoding="utf-8"))
+        data = parse_toml_text(catalog_path.read_text(encoding="utf-8"))
     except Exception as exc:  # noqa: BLE001
         return [f"{rel(catalog_path)}: 无法解析 TOML — {exc}"]
 
@@ -185,7 +335,34 @@ def selftest() -> int:
             bad += 0 if ok else 1
             print(f"{'ok  ' if ok else 'FAIL'} [{label}] 期望 {want} 实际 {got}")
 
-    total = len(cases) + len(catalog_cases) + 5
+    # 后备解析器自测：CI 的 python3 是 3.10，没有 tomllib，
+    # 这条路径在 CI 上是唯一被执行的实现，必须自证语义正确。
+    toml_cases = [
+        (
+            "点分键内联表",
+            '[versions]\nagp = "8.7.3"\n[plugins]\nx = { id = "a.b", version.ref = "agp" }\n',
+            {
+                "versions": {"agp": "8.7.3"},
+                "plugins": {"x": {"id": "a.b", "version": {"ref": "agp"}}},
+            },
+        ),
+        (
+            "注释与数组与布尔",
+            '# 注释\n[a]\nb = ["x", "y"] # 行尾注释\nc = true\n',
+            {"a": {"b": ["x", "y"], "c": True}},
+        ),
+        ("嵌套表头", '[libraries.foo]\nmodule = "a:b"\n', {"libraries": {"foo": {"module": "a:b"}}}),
+        ("字符串里的井号", '[a]\nb = "x#y"\n', {"a": {"b": "x#y"}}),
+        ("单引号字面量", "[a]\nb = 'x\\\\y'\n", {"a": {"b": "x\\\\y"}}),
+        ("多行表数组", '[[x]]\nn = 1\n[[x]]\nn = 2\n', {"x": [{"n": 1}, {"n": 2}]}),
+    ]
+    for label, body, want in toml_cases:
+        got = _toml_loads(body)
+        ok = got == want
+        bad += 0 if ok else 1
+        print(f"{'ok  ' if ok else 'FAIL'} [{label}]" + ("" if ok else f" 得到 {got!r}"))
+
+    total = len(cases) + len(catalog_cases) + len(acc_cases) + len(toml_cases)
     print(f"\n自测 {total - bad}/{total} 通过")
     return 0 if bad == 0 else 1
 
