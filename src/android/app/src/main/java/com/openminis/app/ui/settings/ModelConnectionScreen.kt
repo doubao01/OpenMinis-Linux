@@ -18,7 +18,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.openminis.app.R
+import com.openminis.app.data.repository.AutoModelGroups
 import com.openminis.app.data.repository.ProviderRepository
 import com.openminis.app.ui.components.SectionDesign
 
@@ -42,6 +44,9 @@ fun ModelConnectionScreen(
     onAddAgentLoopGroups: () -> Unit,
 ) {
     var tab by remember { mutableStateOf(0) }
+    // 槽位段的数据与回调都由本页持有：组件内部不再读仓库，保证单一写入路径。
+    val config by providerRepository.config.collectAsStateWithLifecycle()
+    val groups = AutoModelGroups.userGroups(config)
 
     SettingsScaffold(
         title = stringResource(R.string.model_connection_title),
@@ -61,13 +66,18 @@ fun ModelConnectionScreen(
                 SegmentedButton(
                     selected = tab == 0,
                     onClick = { tab = 0 },
-                    shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                    shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
                 ) { Text(stringResource(R.string.settings_manage_providers)) }
                 SegmentedButton(
                     selected = tab == 1,
                     onClick = { tab = 1 },
-                    shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                    shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
                 ) { Text(stringResource(R.string.settings_model_groups)) }
+                SegmentedButton(
+                    selected = tab == 2,
+                    onClick = { tab = 2 },
+                    shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
+                ) { Text(stringResource(R.string.model_groups_defaults)) }
             }
 
             Box(modifier = Modifier.weight(1f)) {
@@ -80,13 +90,22 @@ fun ModelConnectionScreen(
                         onVoiceServiceClick = onVoiceServiceClick,
                         embedded = true,
                     )
-                    else -> ModelGroupsScreen(
+                    1 -> ModelGroupsScreen(
                         providerRepository = providerRepository,
                         onBack = onBack,
                         onGroupClick = onGroupClick,
                         onAddAgentLoopModels = onAddAgentLoopModels,
                         onAddAgentLoopGroups = onAddAgentLoopGroups,
                         embedded = true,
+                    )
+                    else -> DefaultSlotsContent(
+                        config = config,
+                        groups = groups,
+                        onPrimaryChange = { providerRepository.defaultPrimaryGroupId = it },
+                        onVoiceInputChange = { providerRepository.voiceInputGroupId = it },
+                        onVoiceOutputChange = { providerRepository.voiceOutputGroupId = it },
+                        onVisionChange = { providerRepository.visionGroupId = it },
+                        onCompactFallbackChange = { providerRepository.compactFallbackGroupId = it },
                     )
                 }
             }
