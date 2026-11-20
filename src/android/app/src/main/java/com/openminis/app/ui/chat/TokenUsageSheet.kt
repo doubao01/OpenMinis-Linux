@@ -31,6 +31,7 @@ import com.openminis.app.R
 import com.openminis.app.agent.ContextSaverRuntime
 import com.openminis.app.i18n.uppercaseForDisplay
 import com.openminis.app.ui.tokens.MinisTypography
+import com.openminis.app.ui.tokens.RawSpace
 
 /**
  * Session Token Usage bottom sheet — mirrors iOS `TokenUsageSheet` and uses
@@ -54,6 +55,10 @@ fun TokenUsageSheet(
     onDismiss: () -> Unit,
 ) {
     var stats by remember { mutableStateOf<ChatViewModel.SessionTokenStats?>(null) }
+    // [T-context-breakdown] Composition of the NEXT request. Null until the
+    // first measurement lands; the section is skipped while null so the sheet
+    // never renders a half-built list.
+    var breakdown by remember { mutableStateOf<ContextBreakdown?>(null) }
     val contextUsage by viewModel.contextUsage.collectAsStateWithLifecycle()
     val contextWindow = viewModel.currentModelContextWindow
     val maxOutput = viewModel.currentModelMaxOutputTokens
@@ -69,6 +74,7 @@ fun TokenUsageSheet(
         // pre-compaction reading ([T-android-compact-stale-usage]).
         viewModel.refreshContextUsage()
         stats = viewModel.loadSessionTokenStats()
+        breakdown = viewModel.buildContextBreakdown()
     }
 
     StandardChatSheet(
@@ -108,6 +114,33 @@ fun TokenUsageSheet(
                     if (contextUsage.known) "${(contextUsage.ratio * 100).toInt()}%" else "?",
                 )
                 maxOutput?.let { StatRow(stringResource(R.string.token_usage_max_output), formatTokens(it)) }
+            }
+
+            breakdown?.let { bd ->
+                StatSection(title = stringResource(R.string.token_usage_section_breakdown)) {
+                    Text(
+                        text = stringResource(R.string.token_usage_breakdown_hint),
+                        fontSize = MinisTypography.cap,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = RawSpace.xs.dp),
+                    )
+                    for (block in bd.blocks) {
+                        StatRow(
+                            label = stringResource(block.key.labelRes()),
+                            value = formatTokens(block.tokens),
+                        )
+                    }
+                    StatRow(
+                        label = stringResource(
+                            if (bd.measuredPrefixTokens != null) {
+                                R.string.token_usage_breakdown_measured
+                            } else {
+                                R.string.token_usage_breakdown_estimated
+                            },
+                        ),
+                        value = formatTokens(bd.totalTokens),
+                    )
+                }
             }
 
             thinking?.let { t ->

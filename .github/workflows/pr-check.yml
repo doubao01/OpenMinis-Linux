@@ -114,6 +114,12 @@ jobs:
       # ran, taking down the whole app. SchemaMigrationDriftTest covers this
       # inside the unit-test job above; this standalone replay gives a
       # two-second local check with the same verdict before any gradle work.
+      # [T-verify-all] 单入口。逐条 step 保留（日志归属清晰），但本地与 CI
+      # 必须能一条命令跑完全部静态守卫，否则「改完自己没跑全」是常态。
+      # 这一步同时暴露静态检查（括号/引号配平），逐条 step 里没有对应项。
+      - name: All static gates (single entry)
+        run: python3 scripts/ci/verify_all.py -j 4
+
       - name: Migration DDL matches exported schema
         run: python3 scripts/ci/check_schema_drift.py
 
