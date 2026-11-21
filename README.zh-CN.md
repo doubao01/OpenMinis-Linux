@@ -66,7 +66,7 @@ cd src/android && ./gradlew :app:assembleRelease
 
 说明：
 
-- `deps/proot` 是 Android 构建唯一需要的子模块；`deps/ish` 为 iOS 遗留子模块，不参与编译。
+- `deps/proot` 是 Android 构建唯一需要的子模块。
 - 仅有 release 变体——`debug` 变体已在 `app/build.gradle.kts` 中全部停用。
 - 不要用 sdkmanager 的 x86_64 包覆盖客户机内的 aarch64 `aapt2`。网络镜像由内置技能 `android-sdk-mirrors` 提供。
 

@@ -4,10 +4,6 @@ import com.openminis.app.config.KEY_LANGUAGE
 import com.openminis.app.config.PREF_APPEARANCE
 import com.openminis.app.R
 import com.openminis.app.ui.theme.*
-import com.openminis.app.ui.theme.IosBlue
-import com.openminis.app.ui.theme.IosGreen
-import com.openminis.app.ui.theme.IosIndigo
-import com.openminis.app.ui.theme.IosOrange
 import com.openminis.app.data.repository.AppIconRepository
 import com.openminis.app.ui.components.MinisTextButton
 
@@ -59,12 +55,10 @@ import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,7 +78,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
-import kotlin.math.roundToInt
 
 const val KEY_THEME_MODE = "theme_mode"            // 0=System, 1=Light, 2=Dark
 const val KEY_LAUNCH_SESSION = "launch_session"    // 0=Auto, 1=LastSession, 2=NewChat, 3=Home
@@ -118,18 +111,18 @@ const val KEY_FONT_CHAT_INPUT = "font_chat_input"  // Int scale level -2..3
 const val KEY_FONT_MESSAGE = "font_message"        // Int scale level -2..3
 const val KEY_FONT_APP_BASE = "font_app_base"      // Int scale level -2..3
 /** True when Enter (without Shift) sends the message (iOS returnKeyBehavior == 1); default 0 = newline. */
-fun returnKeySendsMessage(context: Context): Boolean = getAppearancePrefs(context).getInt(KEY_RETURN_KEY_BEHAVIOR, 0) == 1
+fun returnKeySendsMessage(context: Context): Boolean = getAppearancePrefs(context).int(KEY_RETURN_KEY_BEHAVIOR, 0) == 1
 
-fun keepScreenAwakeEnabled(context: Context): Boolean = getAppearancePrefs(context).getBoolean(KEY_KEEP_SCREEN_AWAKE, false)
+fun keepScreenAwakeEnabled(context: Context): Boolean = getAppearancePrefs(context).bool(KEY_KEEP_SCREEN_AWAKE, false)
 
 /** [T-android-auto-grouping] Default ON — see [KEY_AUTO_GROUPING]. */
-fun autoGroupingEnabled(context: Context): Boolean = getAppearancePrefs(context).getBoolean(KEY_AUTO_GROUPING, true)
+fun autoGroupingEnabled(context: Context): Boolean = getAppearancePrefs(context).bool(KEY_AUTO_GROUPING, true)
 
 /** Default ON — pill shows up on scroll for everyone unless explicitly disabled. */
-fun showChatTitleEnabled(context: Context): Boolean = getAppearancePrefs(context).getBoolean(KEY_SHOW_CHAT_TITLE, true)
+fun showChatTitleEnabled(context: Context): Boolean = getAppearancePrefs(context).bool(KEY_SHOW_CHAT_TITLE, true)
 
 /** [T-thinking-auto-expand-toggle] Default ON: a new streaming thinking block opens expanded. */
-fun autoExpandThinkingEnabled(context: Context): Boolean = getAppearancePrefs(context).getBoolean(KEY_AUTO_EXPAND_THINKING, true)
+fun autoExpandThinkingEnabled(context: Context): Boolean = getAppearancePrefs(context).bool(KEY_AUTO_EXPAND_THINKING, true)
 
 /** Font scale levels matching iOS: XS(-2) Small(-1) Default(0) Medium(1) Large(2) XL(3) */
 // [T-android-app-icon-tile-max-width] Upper bound for one icon tile (matches the 192px rasterization; uncapped tiles blurred at ~380dp on tablets).
@@ -173,14 +166,14 @@ private val languageOptions = listOf(
     LanguageOption("pt-BR", "\uD83C\uDDE7\uD83C\uDDF7", "Portugu\u00EAs (Brasil)"),
 )
 
-fun getAppearancePrefs(context: Context): SharedPreferences =
-    context.getSharedPreferences(PREF_APPEARANCE, Context.MODE_PRIVATE)
+fun getAppearancePrefs(context: Context): com.openminis.app.config.PrefsHandle =
+    com.openminis.app.config.Prefs.file(PREF_APPEARANCE)
 
 fun getThemeMode(context: Context): Int =
-    getAppearancePrefs(context).getInt(KEY_THEME_MODE, 0)
+    getAppearancePrefs(context).int(KEY_THEME_MODE, 0)
 
 fun getFontScale(context: Context, key: String): Float =
-    fontScaleForLevel(getAppearancePrefs(context).getInt(key, 0))
+    fontScaleForLevel(getAppearancePrefs(context).int(key, 0))
 
 fun fontScaleForLevel(level: Int): Float {
     val idx = fontScaleValues.indexOf(level).coerceIn(0, fontScaleMultipliers.lastIndex)
@@ -225,28 +218,28 @@ fun AppearanceScreen(
     LaunchedEffect(Unit) {
         withContext(kotlinx.coroutines.Dispatchers.IO) {
             val p = prefs.value
-            themeMode = p.getInt(KEY_THEME_MODE, 0)
-            launchSession = p.getInt(KEY_LAUNCH_SESSION, 0)
-            returnKeyBehavior = p.getInt(KEY_RETURN_KEY_BEHAVIOR, 0)
-            keepScreenAwake = p.getBoolean(KEY_KEEP_SCREEN_AWAKE, false)
+            themeMode = p.int(KEY_THEME_MODE, 0)
+            launchSession = p.int(KEY_LAUNCH_SESSION, 0)
+            returnKeyBehavior = p.int(KEY_RETURN_KEY_BEHAVIOR, 0)
+            keepScreenAwake = p.bool(KEY_KEEP_SCREEN_AWAKE, false)
             highRefresh = com.openminis.app.ui.HighRefreshRate.enabled(context)
-            showFloatingToolBar = p.getBoolean(KEY_SHOW_FLOATING_TOOL_BAR, true)
-            showCompletedToolCards = p.getBoolean(KEY_SHOW_COMPLETED_TOOL_CARDS, false)
-            showSubAgentBar = p.getBoolean(KEY_SHOW_SUBAGENT_BAR, DEFAULT_SHOW_SUB_AGENT_BAR)
-            showMicButton = p.getBoolean(KEY_SHOW_MIC_BUTTON, DEFAULT_SHOW_MIC_BUTTON)
-            showMessageUsage = p.getBoolean(KEY_SHOW_MESSAGE_TOKEN_USAGE, true)
-            composerContextGlow = p.getBoolean(KEY_COMPOSER_CONTEXT_GLOW, true)
-            autoFocusAfterReply = p.getBoolean(KEY_AUTO_FOCUS_AFTER_REPLY, true)
-            autoExpandThinking = p.getBoolean(KEY_AUTO_EXPAND_THINKING, true)
-            showFullThinking = p.getBoolean(KEY_SHOW_FULL_THINKING, false)
-            foldAiProcess = p.getBoolean(KEY_FOLD_AI_PROCESS, DEFAULT_FOLD_AI_PROCESS)
-            dynamicColor = p.getBoolean(KEY_DYNAMIC_COLOR, false)
-            showChatTitle = p.getBoolean(KEY_SHOW_CHAT_TITLE, true)
-            autoGrouping = p.getBoolean(KEY_AUTO_GROUPING, true)
-            chatInputLevel = p.getInt(KEY_FONT_CHAT_INPUT, 0)
-            messageLevel = p.getInt(KEY_FONT_MESSAGE, 0)
-            appBaseLevel = p.getInt(KEY_FONT_APP_BASE, 0)
-            selectedLanguage = p.getString(KEY_LANGUAGE, "") ?: ""
+            showFloatingToolBar = p.bool(KEY_SHOW_FLOATING_TOOL_BAR, true)
+            showCompletedToolCards = p.bool(KEY_SHOW_COMPLETED_TOOL_CARDS, false)
+            showSubAgentBar = p.bool(KEY_SHOW_SUBAGENT_BAR, DEFAULT_SHOW_SUB_AGENT_BAR)
+            showMicButton = p.bool(KEY_SHOW_MIC_BUTTON, DEFAULT_SHOW_MIC_BUTTON)
+            showMessageUsage = p.bool(KEY_SHOW_MESSAGE_TOKEN_USAGE, true)
+            composerContextGlow = p.bool(KEY_COMPOSER_CONTEXT_GLOW, true)
+            autoFocusAfterReply = p.bool(KEY_AUTO_FOCUS_AFTER_REPLY, true)
+            autoExpandThinking = p.bool(KEY_AUTO_EXPAND_THINKING, true)
+            showFullThinking = p.bool(KEY_SHOW_FULL_THINKING, false)
+            foldAiProcess = p.bool(KEY_FOLD_AI_PROCESS, DEFAULT_FOLD_AI_PROCESS)
+            dynamicColor = p.bool(KEY_DYNAMIC_COLOR, false)
+            showChatTitle = p.bool(KEY_SHOW_CHAT_TITLE, true)
+            autoGrouping = p.bool(KEY_AUTO_GROUPING, true)
+            chatInputLevel = p.int(KEY_FONT_CHAT_INPUT, 0)
+            messageLevel = p.int(KEY_FONT_MESSAGE, 0)
+            appBaseLevel = p.int(KEY_FONT_APP_BASE, 0)
+            selectedLanguage = p.string(KEY_LANGUAGE, "")
             selectedAppIcon = AppIconRepository.current(context)
         }
     }
@@ -278,7 +271,7 @@ fun AppearanceScreen(
                     selected = themeMode == idx,
                     onSelect = {
                         themeMode = idx
-                        prefs.value.edit().putInt(KEY_THEME_MODE, idx).apply()
+                        prefs.value.set(KEY_THEME_MODE, idx)
                         onThemeChanged(idx)
                     },
                     leading = {
@@ -300,7 +293,7 @@ fun AppearanceScreen(
                 checked = dynamicColor && monetSupported,
                 onCheckedChange = {
                     dynamicColor = it
-                    prefs.value.edit().putBoolean(KEY_DYNAMIC_COLOR, it).apply()
+                    prefs.value.set(KEY_DYNAMIC_COLOR, it)
                 },
                 enabled = monetSupported,
                 showDivider = false,
@@ -326,7 +319,7 @@ fun AppearanceScreen(
                     selected = launchSession == idx,
                     onSelect = {
                         launchSession = idx
-                        prefs.value.edit().putInt(KEY_LAUNCH_SESSION, idx).apply()
+                        prefs.value.set(KEY_LAUNCH_SESSION, idx)
                     },
                     leading = {
                         androidx.compose.material3.Icon(
@@ -357,7 +350,7 @@ fun AppearanceScreen(
                     selected = returnKeyBehavior == row.value,
                     onSelect = {
                         returnKeyBehavior = row.value
-                        prefs.value.edit().putInt(KEY_RETURN_KEY_BEHAVIOR, row.value).apply()
+                        prefs.value.set(KEY_RETURN_KEY_BEHAVIOR, row.value)
                     },
                     leading = {
                         androidx.compose.material3.Icon(
@@ -370,6 +363,11 @@ fun AppearanceScreen(
                 )
             }
         }
+
+        // [T-cot-translate] Reasoning translation sits right after the
+        // process-row styling block above: it changes how a thinking block
+        // reads, so it belongs with the other chat-content appearance knobs.
+        CotTranslationSection()
 
         // -- Keep Screen Awake --
         // Holds FLAG_KEEP_SCREEN_ON while a session has an active task (mirrors iOS). Default off.
@@ -384,7 +382,7 @@ fun AppearanceScreen(
                 checked = keepScreenAwake,
                 onCheckedChange = {
                     keepScreenAwake = it
-                    prefs.value.edit().putBoolean(KEY_KEEP_SCREEN_AWAKE, it).apply()
+                    prefs.value.set(KEY_KEEP_SCREEN_AWAKE, it)
                 },
                 showDivider = false,
             )
@@ -421,7 +419,7 @@ fun AppearanceScreen(
                 checked = showFloatingToolBar,
                 onCheckedChange = {
                     showFloatingToolBar = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_FLOATING_TOOL_BAR, it).apply()
+                    prefs.value.set(KEY_SHOW_FLOATING_TOOL_BAR, it)
                 },
             )
             // [P0-4] "Tool Preview Window" switch removed (ToolActivityPill has no preview); KEY_TOOL_PREVIEW stays for compat.
@@ -433,7 +431,7 @@ fun AppearanceScreen(
                 checked = showCompletedToolCards,
                 onCheckedChange = {
                     showCompletedToolCards = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_COMPLETED_TOOL_CARDS, it).apply()
+                    prefs.value.set(KEY_SHOW_COMPLETED_TOOL_CARDS, it)
                 },
             )
             SettingsSwitchRow(
@@ -443,7 +441,7 @@ fun AppearanceScreen(
                 checked = showSubAgentBar,
                 onCheckedChange = {
                     showSubAgentBar = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_SUBAGENT_BAR, it).apply()
+                    prefs.value.set(KEY_SHOW_SUBAGENT_BAR, it)
                 },
             )
             SettingsSwitchRow(
@@ -454,7 +452,7 @@ fun AppearanceScreen(
                 checked = showMicButton,
                 onCheckedChange = {
                     showMicButton = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_MIC_BUTTON, it).apply()
+                    prefs.value.set(KEY_SHOW_MIC_BUTTON, it)
                 },
                 showDivider = true,
             )
@@ -467,7 +465,7 @@ fun AppearanceScreen(
                 checked = showMessageUsage,
                 onCheckedChange = {
                     showMessageUsage = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_MESSAGE_TOKEN_USAGE, it).apply()
+                    prefs.value.set(KEY_SHOW_MESSAGE_TOKEN_USAGE, it)
                 },
             )
             // [T-android-composer-context-glow] Composer edge glow near the context cap.
@@ -479,7 +477,7 @@ fun AppearanceScreen(
                 checked = composerContextGlow,
                 onCheckedChange = {
                     composerContextGlow = it
-                    prefs.value.edit().putBoolean(KEY_COMPOSER_CONTEXT_GLOW, it).apply()
+                    prefs.value.set(KEY_COMPOSER_CONTEXT_GLOW, it)
                 },
                 showDivider = false,
             )
@@ -498,11 +496,11 @@ fun AppearanceScreen(
                 checked = autoExpandThinking,
                 onCheckedChange = {
                     autoExpandThinking = it
-                    prefs.value.edit().putBoolean(KEY_AUTO_EXPAND_THINKING, it).apply()
+                    prefs.value.set(KEY_AUTO_EXPAND_THINKING, it)
                 },
                 showDivider = true,
             )
-            ShowFullThinkingRow(showFullThinking) { showFullThinking = it; prefs.value.edit().putBoolean(KEY_SHOW_FULL_THINKING, it).apply() }
+            ShowFullThinkingRow(showFullThinking) { showFullThinking = it; prefs.value.set(KEY_SHOW_FULL_THINKING, it) }
             SettingsSwitchRow(
                 icon = Icons.Outlined.ViewAgenda,
                 iconColor = tilePurple,
@@ -511,7 +509,7 @@ fun AppearanceScreen(
                 checked = foldAiProcess,
                 onCheckedChange = {
                     foldAiProcess = it
-                    prefs.value.edit().putBoolean(KEY_FOLD_AI_PROCESS, it).apply()
+                    prefs.value.set(KEY_FOLD_AI_PROCESS, it)
                 },
                 showDivider = false,
             )
@@ -530,7 +528,7 @@ fun AppearanceScreen(
                 checked = autoFocusAfterReply,
                 onCheckedChange = {
                     autoFocusAfterReply = it
-                    prefs.value.edit().putBoolean(KEY_AUTO_FOCUS_AFTER_REPLY, it).apply()
+                    prefs.value.set(KEY_AUTO_FOCUS_AFTER_REPLY, it)
                 },
                 showDivider = false,
             )
@@ -550,7 +548,7 @@ fun AppearanceScreen(
                 checked = showChatTitle,
                 onCheckedChange = {
                     showChatTitle = it
-                    prefs.value.edit().putBoolean(KEY_SHOW_CHAT_TITLE, it).apply()
+                    prefs.value.set(KEY_SHOW_CHAT_TITLE, it)
                 },
                 showDivider = false,
             )
@@ -570,7 +568,7 @@ fun AppearanceScreen(
                 checked = autoGrouping,
                 onCheckedChange = {
                     autoGrouping = it
-                    prefs.value.edit().putBoolean(KEY_AUTO_GROUPING, it).apply()
+                    prefs.value.set(KEY_AUTO_GROUPING, it)
                 },
                 showDivider = false,
             )
@@ -593,27 +591,33 @@ fun AppearanceScreen(
             FontScaleSliderRow(
                 label = stringResource(R.string.appearance_font_chat_input),
                 level = chatInputLevel,
+                fontScaleLabels = fontScaleLabels,
+                fontScaleValues = fontScaleValues,
                 onLevelChange = {
                     chatInputLevel = it
-                    prefs.value.edit().putInt(KEY_FONT_CHAT_INPUT, it).apply()
+                    prefs.value.set(KEY_FONT_CHAT_INPUT, it)
                 },
                 showDivider = true,
             )
             FontScaleSliderRow(
                 label = stringResource(R.string.appearance_font_message),
                 level = messageLevel,
+                fontScaleLabels = fontScaleLabels,
+                fontScaleValues = fontScaleValues,
                 onLevelChange = {
                     messageLevel = it
-                    prefs.value.edit().putInt(KEY_FONT_MESSAGE, it).apply()
+                    prefs.value.set(KEY_FONT_MESSAGE, it)
                 },
                 showDivider = true,
             )
             FontScaleSliderRow(
                 label = stringResource(R.string.appearance_font_app_base),
                 level = appBaseLevel,
+                fontScaleLabels = fontScaleLabels,
+                fontScaleValues = fontScaleValues,
                 onLevelChange = {
                     appBaseLevel = it
-                    prefs.value.edit().putInt(KEY_FONT_APP_BASE, it).apply()
+                    prefs.value.set(KEY_FONT_APP_BASE, it)
                 },
                 showDivider = fontsModified,
             )
@@ -626,11 +630,10 @@ fun AppearanceScreen(
                 ) {
                     MinisTextButton(onClick = {
                         chatInputLevel = 0; messageLevel = 0; appBaseLevel = 0
-                        prefs.value.edit()
-                            .putInt(KEY_FONT_CHAT_INPUT, 0)
-                            .putInt(KEY_FONT_MESSAGE, 0)
-                            .putInt(KEY_FONT_APP_BASE, 0)
-                            .apply()
+                        // 三个字号同事务：分开写会让界面短暂显示「聊天恢复、消息没恢复」
+                        prefs.value.write {
+                            putInt(KEY_FONT_CHAT_INPUT, 0); putInt(KEY_FONT_MESSAGE, 0); putInt(KEY_FONT_APP_BASE, 0)
+                        }
                     }) {
                         Text(stringResource(R.string.appearance_font_reset), color = MaterialTheme.colorScheme.error)
                     }
@@ -753,7 +756,7 @@ fun AppearanceScreen(
                     selected = selectedLanguage == lang.code,
                     onSelect = {
                         selectedLanguage = lang.code
-                        prefs.value.edit().putString(KEY_LANGUAGE, lang.code).apply()
+                        prefs.value.set(KEY_LANGUAGE, lang.code)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             val lm = context.getSystemService(LocaleManager::class.java)
                             lm?.applicationLocales = if (lang.code.isEmpty()) {
@@ -767,7 +770,7 @@ fun AppearanceScreen(
                         }
                     },
                     leading = {
-                        Text(lang.flag, fontSize = 22.sp, modifier = Modifier.width(30.dp))
+                        Text(lang.flag, fontSize = 22.sp, modifier = Modifier.width(30.dp))  // token-literal-ok: 旗帜 emoji 字形，字号即图形尺寸
                     },
                     showDivider = idx < languageOptions.size - 1,
                 )
@@ -778,57 +781,3 @@ fun AppearanceScreen(
     }
 }
 
-@Composable
-private fun FontScaleSliderRow(
-    label: String,
-    level: Int,
-    onLevelChange: (Int) -> Unit,
-    showDivider: Boolean,
-) {
-    val idx = fontScaleValues.indexOf(level).coerceIn(0, fontScaleValues.lastIndex)
-    var sliderPos by remember(level) { mutableFloatStateOf(idx.toFloat()) }
-    val currentLabel = fontScaleLabels.getOrElse(sliderPos.roundToInt()) { "Default" }
-
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(label, style = MaterialTheme.typography.bodyMedium)
-            Text(
-                currentLabel,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary,
-            )
-        }
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Text("A", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Slider(
-                value = sliderPos,
-                onValueChange = { sliderPos = it },
-                onValueChangeFinished = {
-                    val newIdx = sliderPos.roundToInt().coerceIn(0, fontScaleValues.lastIndex)
-                    sliderPos = newIdx.toFloat()
-                    onLevelChange(fontScaleValues[newIdx])
-                },
-                valueRange = 0f..5f,
-                steps = 4,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp),
-            )
-            Text("A", fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-    if (showDivider) {
-        val dividerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-        androidx.compose.foundation.layout.Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 14.dp)
-                .height(0.5.dp)
-                .background(dividerColor),
-        )
-    }
-}

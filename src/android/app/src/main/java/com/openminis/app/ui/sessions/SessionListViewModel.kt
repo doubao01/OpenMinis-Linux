@@ -221,7 +221,7 @@ class SessionListViewModel(
      * performs the first touch on IO, after which every main-thread access
      * returns the cached instance.
      */
-    internal val uiPrefs by lazy { context.getSharedPreferences("session_list_ui", Context.MODE_PRIVATE) }
+    internal val uiPrefs by lazy { com.openminis.app.config.Prefs.file("session_list_ui") }
     val collapsedFolderIds = MutableStateFlow<Set<String>>(emptySet())
 
     /**
@@ -419,7 +419,7 @@ class SessionListViewModel(
             chatRepository.deleteSession(id)
             ChatViewModelStore.release(id)
             com.openminis.app.service.SessionBadgeStore.clear(id)
-            com.openminis.app.data.UnreadRegistry.forget(context, id)
+            com.openminis.app.data.UnreadRegistry.forget(id)
         }
     }
 
@@ -1142,8 +1142,7 @@ class SessionListViewModel(
         all.firstOrNull { it.id == FolderEntity.DEFAULT_ID }?.id?.let { return it }
         all.firstOrNull()?.id?.let { return it }
         return chatRepository.ensureDefaultWorkspace(
-            context.getString(R.string.group_default_workspace),
-        ).id
+            context.getString(R.string.group_default_workspace),  ).id
     }
 
     fun createNewSession(groupId: String? = null, folderId: String? = null): String? {

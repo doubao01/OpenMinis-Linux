@@ -13,21 +13,19 @@ object ConnectorNetworkPolicy {
     private const val PRIVATE_PREFIX = "allow_private_"
 
     fun allowsPrivate(context: Context, plugin: PluginRegistry.RemotePlugin): Boolean =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getBoolean(PRIVATE_PREFIX + plugin.configurationKey(), true)
+        com.openminis.app.config.Prefs.file(PREFS).bool(PRIVATE_PREFIX + plugin.configurationKey(), true)
 
     fun setAllowsPrivate(context: Context, plugin: PluginRegistry.RemotePlugin, enabled: Boolean) {
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit().putBoolean(PRIVATE_PREFIX + plugin.configurationKey(), enabled).apply()
+        com.openminis.app.config.Prefs.file(PREFS).set(PRIVATE_PREFIX + plugin.configurationKey(), enabled)
     }
 
     internal fun clearPluginConfigurations(context: Context, pluginId: String) {
         val prefix = PRIVATE_PREFIX + connectorScopePrefix(pluginId)
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        prefs.edit().apply {
-            remove(PRIVATE_PREFIX + pluginId)
-            prefs.all.keys.filter { it.startsWith(prefix) }.forEach(::remove)
-        }.apply()
+        val prefs = com.openminis.app.config.Prefs.file(PREFS)
+        prefs.remove(PRIVATE_PREFIX + pluginId)
+        // 删掉该插件名下所有 scope 变体；前缀已由 PrefsRegistry 的
+        // dynamicPrefixes ("allow_private_") 声明，所以不会被守卫拦下。
+        prefs.removeAllWithPrefix(prefix)
     }
 
     fun configurationBlockedReason(url: String): String? {

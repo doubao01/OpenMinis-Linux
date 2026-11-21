@@ -44,7 +44,7 @@ object WebSearchSettings {
     }
 
     fun engine(context: Context): Engine {
-        val raw = prefs(context).getString(KEY_ENGINE, null)
+        val raw = prefs().stringOrNull(KEY_ENGINE)
         if (!raw.isNullOrBlank()) return Engine.fromId(raw)
         // [T-android-websearch-engine-sticky] Auto-pick the first configured
         // keyed engine ONLY until the user has ever made an explicit choice.
@@ -54,7 +54,7 @@ object WebSearchSettings {
         // launch — an unexplained behavior change. Once they touch the
         // picker (setEngine below), the flag latches and the auto-pick
         // stops applying, so "user chose DDG then added a key" stays DDG.
-        if (prefs(context).getBoolean(KEY_ENGINE_EXPLICIT, false)) return Engine.DDG
+        if (prefs().bool(KEY_ENGINE_EXPLICIT, false)) return Engine.DDG
         return firstConfigured(context) ?: Engine.DDG
     }
 
@@ -65,27 +65,26 @@ object WebSearchSettings {
     private fun firstConfigured(context: Context): Engine? = configuredKeyed(context).firstOrNull()
 
     fun setEngine(context: Context, engine: Engine) {
-        prefs(context).edit()
-            .putString(KEY_ENGINE, engine.id)
-            // [T-android-websearch-engine-sticky] Latch the explicit-choice
-            // flag so engine() stops auto-picking the first configured
-            // keyed backend from now on.
-            .putBoolean(KEY_ENGINE_EXPLICIT, true)
-            .apply()
+        // [T-android-websearch-engine-sticky] engine 与 explicit 标志必须同事务：
+        // 只写 engine 而不置位标志，下次启动会被自动挑选逻辑覆盖回第一个已配置引擎。
+        prefs().write {
+            putString(KEY_ENGINE, engine.id)
+            putBoolean(KEY_ENGINE_EXPLICIT, true)
+        }
     }
 
     fun searxngUrl(context: Context): String =
-        prefs(context).getString(KEY_SEARXNG_URL, "")?.trim().orEmpty()
+        prefs().string(KEY_SEARXNG_URL, "")?.trim().orEmpty()
 
     fun setSearxngUrl(context: Context, url: String) {
-        prefs(context).edit().putString(KEY_SEARXNG_URL, url.trim()).apply()
+        prefs().set(KEY_SEARXNG_URL, url.trim())
     }
 
     fun bingKey(context: Context): String =
-        prefs(context).getString(KEY_BING_KEY, "")?.trim().orEmpty()
+        prefs().string(KEY_BING_KEY, "")?.trim().orEmpty()
 
     fun setBingKey(context: Context, key: String) {
-        prefs(context).edit().putString(KEY_BING_KEY, key.trim()).apply()
+        prefs().set(KEY_BING_KEY, key.trim())
     }
 
     fun apiKey(context: Context, engine: Engine): String {
@@ -99,7 +98,7 @@ object WebSearchSettings {
             Engine.ZHIPU -> KEY_ZHIPU
             else -> return ""
         }
-        return prefs(context).getString(key, "")?.trim().orEmpty()
+        return prefs().string(key, "")?.trim().orEmpty()
     }
 
     fun setApiKey(context: Context, engine: Engine, value: String) {
@@ -113,35 +112,35 @@ object WebSearchSettings {
             Engine.ZHIPU -> KEY_ZHIPU
             else -> return
         }
-        prefs(context).edit().putString(key, value.trim()).apply()
+        prefs().set(key, value.trim())
     }
 
     fun customUrl(context: Context): String =
-        prefs(context).getString(KEY_CUSTOM_URL, "")?.trim().orEmpty()
+        prefs().string(KEY_CUSTOM_URL, "")?.trim().orEmpty()
 
     fun setCustomUrl(context: Context, url: String) {
-        prefs(context).edit().putString(KEY_CUSTOM_URL, url.trim()).apply()
+        prefs().set(KEY_CUSTOM_URL, url.trim())
     }
 
     fun customKey(context: Context): String =
-        prefs(context).getString(KEY_CUSTOM_KEY, "")?.trim().orEmpty()
+        prefs().string(KEY_CUSTOM_KEY, "")?.trim().orEmpty()
 
     fun setCustomKey(context: Context, key: String) {
-        prefs(context).edit().putString(KEY_CUSTOM_KEY, key.trim()).apply()
+        prefs().set(KEY_CUSTOM_KEY, key.trim())
     }
 
     fun customKeyHeader(context: Context): String =
-        prefs(context).getString(KEY_CUSTOM_KEY_HEADER, "")?.trim().orEmpty()
+        prefs().string(KEY_CUSTOM_KEY_HEADER, "")?.trim().orEmpty()
 
     fun setCustomKeyHeader(context: Context, header: String) {
-        prefs(context).edit().putString(KEY_CUSTOM_KEY_HEADER, header.trim()).apply()
+        prefs().set(KEY_CUSTOM_KEY_HEADER, header.trim())
     }
 
     fun fallbackEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_FALLBACK, true)
+        prefs().bool(KEY_FALLBACK, true)
 
     fun setFallbackEnabled(context: Context, enabled: Boolean) {
-        prefs(context).edit().putBoolean(KEY_FALLBACK, enabled).apply()
+        prefs().set(KEY_FALLBACK, enabled)
     }
 
     /**
@@ -151,12 +150,11 @@ object WebSearchSettings {
      * spend quota or shadow the user's chosen backend.
      */
     fun keylessFallbackEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_KEYLESS_CN, true)
+        prefs().bool(KEY_KEYLESS_CN, true)
 
     fun setKeylessFallbackEnabled(context: Context, enabled: Boolean) {
-        prefs(context).edit().putBoolean(KEY_KEYLESS_CN, enabled).apply()
+        prefs().set(KEY_KEYLESS_CN, enabled)
     }
 
-    private fun prefs(context: Context) =
-        context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private fun prefs() = com.openminis.app.config.Prefs.file(PREFS)
 }

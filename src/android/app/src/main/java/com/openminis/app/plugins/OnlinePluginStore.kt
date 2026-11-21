@@ -2,7 +2,6 @@ package com.openminis.app.plugins
 
 import android.content.Context
 import com.openminis.app.data.model.AgentToolDefinition
-import com.openminis.app.util.EncryptedPrefsFactory
 
 /**
  * Installed online OpenAPI plugins + encrypted API keys.
@@ -17,31 +16,28 @@ object OnlinePluginStore {
     private fun fingerprintKey(pluginId: String) = "fingerprint_$pluginId"
 
     fun isInstalled(context: Context, plugin: PluginRegistry.RemotePlugin): Boolean {
-        val prefs = context.getSharedPreferences(FLAGS, Context.MODE_PRIVATE)
-        return prefs.getBoolean(plugin.id, false) &&
-            prefs.getString(fingerprintKey(plugin.id), null) == plugin.configurationKey()
+        val prefs = com.openminis.app.config.Prefs.file(FLAGS)
+        return prefs.bool(plugin.id) &&
+            prefs.stringOrNull(fingerprintKey(plugin.id)) == plugin.configurationKey()
     }
 
     fun installedIds(context: Context): Set<String> {
-        val registry = PluginRegistry.cached(context)
+        val registry = PluginRegistry.cached()
         return registry.filter { isInstalled(context, it) }.mapTo(mutableSetOf()) { it.id }
     }
 
     fun setInstalled(context: Context, plugin: PluginRegistry.RemotePlugin, installed: Boolean) {
-        val prefs = context.getSharedPreferences(FLAGS, Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(plugin.id, installed)
-            .apply {
-                if (installed) putString(fingerprintKey(plugin.id), plugin.configurationKey())
-                else remove(fingerprintKey(plugin.id))
-            }
-            .apply()
+        val prefs = com.openminis.app.config.Prefs.file(FLAGS)
+        prefs.write {
+            putBoolean(plugin.id, installed)
+            if (installed) putString(fingerprintKey(plugin.id), plugin.configurationKey())
+            else remove(fingerprintKey(plugin.id))
+        }
         if (!installed) {
-            val keys = EncryptedPrefsFactory.safeCreate(context, KEYS_FILE)
+            val keys = com.openminis.app.config.Prefs.file(KEYS_FILE)
             val prefix = connectorScopePrefix(plugin.id)
-            keys.edit().apply {
-                remove(plugin.id)
-                keys.all.keys.filter { it.startsWith(prefix) }.forEach(::remove)
-            }.apply()
+            keys.remove(plugin.id)
+            keys.removeAllWithPrefix(prefix)
             ConnectorNetworkPolicy.clearPluginConfigurations(context, plugin.id)
             OnlineApiTool.evictNetworkClient(plugin)
         }
@@ -49,21 +45,21 @@ object OnlinePluginStore {
 
     fun apiKey(context: Context, plugin: PluginRegistry.RemotePlugin): String? {
         if (!isInstalled(context, plugin)) return null
-        val prefs = EncryptedPrefsFactory.safeCreate(context, KEYS_FILE)
-        return prefs.getString(plugin.configurationKey(), null)?.takeIf { it.isNotBlank() }
+        return com.openminis.app.config.Prefs.file(KEYS_FILE)
+            .stringOrNull(plugin.configurationKey())?.takeIf { it.isNotBlank() }
     }
 
     fun setApiKey(context: Context, plugin: PluginRegistry.RemotePlugin, key: String?) {
-        val prefs = EncryptedPrefsFactory.safeCreate(context, KEYS_FILE)
+        val prefs = com.openminis.app.config.Prefs.file(KEYS_FILE)
         val storageKey = plugin.configurationKey()
-        if (key.isNullOrBlank()) prefs.edit().remove(storageKey).apply()
-        else prefs.edit().putString(storageKey, key.trim()).apply()
+        if (key.isNullOrBlank()) prefs.remove(storageKey)
+        else prefs.set(storageKey, key.trim())
     }
 
     fun toolDefinitions(context: Context): List<AgentToolDefinition> {
         val installed = installedIds(context)
         if (installed.isEmpty()) return emptyList()
-        return PluginRegistry.cached(context)
+        return PluginRegistry.cached()
             .filter { it.id in installed && isInstalled(context, it) }
             .flatMap { plugin -> plugin.tools.map { OnlineApiTool.definition(plugin, it) } }
     }
@@ -75,9 +71,8 @@ object OnlinePluginStore {
      * the definitions, so the agent loop can key its memo on this per access.
      */
     fun toolDefinitionsStamp(context: Context): Long {
-        val flags = context.getSharedPreferences(FLAGS, Context.MODE_PRIVATE).all
-        val registry = context.getSharedPreferences("plugin_registry", Context.MODE_PRIVATE)
-            .getString("plugin_registry_cache", null)
+        val flags = com.openminis.app.config.Prefs.file(FLAGS).snapshot()
+        val registry = com.openminis.app.config.Prefs.file("plugin_registry").stringOrNull("plugin_registry_cache")
         return 31L * flags.hashCode() + (registry?.hashCode() ?: 0)
     }
 }

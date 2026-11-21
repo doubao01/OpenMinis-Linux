@@ -1572,6 +1572,7 @@ internal suspend fun ChatViewModel.runAgentLoopBody(
                 checkNotNull(activeRun) { "Agent loop has no persistence owner" }, turnParts, lastUsage, turnReasoningContent, blockMeta, accumulatedText,
             )
             if (activeRun?.isStopped == true) { loopExitedNormally = true; break }
+            if (trySteeringKeepAlive(turn)) continue
             // [T-error-persist-android] Empty-response hint: the model ended a
             // turn (finish=stop/end_turn) with no visible text anywhere in the
             // reply and no tool blocks — the user just sees a blank bubble.
@@ -1916,6 +1917,7 @@ internal suspend fun ChatViewModel.runAgentLoopBody(
             contentParts = resultParts,
             dbMessageId = toolResultDbId,
         ))
+        tryDrainSteeringAtBoundary()
         val turnUsageTokens = (lastUsage?.inputTokens ?: 0).toLong() + (lastUsage?.outputTokens ?: 0).toLong()
         val goalUsageResult = if (goalMountedForCurrentRequest) runCatching {
             goalManager.recordUsage(
@@ -1954,8 +1956,8 @@ internal suspend fun ChatViewModel.runAgentLoopBody(
             // normal next-turn dispatch so the queue doesn't pin the loop.
         }
     }
-    // Two ways to leave the for-loop above:
-    //   (a) `break` from the "no tool calls" happy-path → loopExitedNormally=true,
+    tryFlushSteeringOnExit()
+    // Leave paths: (a) `break` on no-tool-calls → loopExitedNormally=true; (b) turn cap.
     uiBatcher.flush()
     uiBatcher.stop()
     if (!loopExitedNormally) {
@@ -2020,11 +2022,9 @@ internal fun ChatViewModel.persistFallbackModelSelection(
     // Flash ONLY on a genuine model switch — never on a transparent
     // same-model endpoint retry.
     if (isRealModelChange) _fallbackTrigger.value++
-    // [T-android-cross-window-compact] REVERTED by design: auto-compacting
-    // on a model switch silently dropped context the user could still see
-    // (reads as data loss). The new model's own provider error, the
-    // in-loop threshold guard, and dynamicMaxTokens() handle the smaller
-    // window without surprise truncation.
+    // [T-android-cross-window-compact] REVERTED by design: auto-compacting on a
+    // model switch silently dropped context the user could still see (reads as
+    // data loss); the in-loop threshold guard and dynamicMaxTokens() suffice.
     // Persist the fallback model so re-entering the session starts from here
     val groupId = _selectedGroupId.value
     if (groupId != null && newEntry != null) {

@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -45,10 +44,14 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.DropdownMenuItem
+import com.openminis.app.ui.tokens.MinisTypography
 import com.openminis.app.R
 import com.openminis.app.ui.settings.autoExpandThinkingEnabled
+import com.openminis.app.cottranslate.CotTranslationPrefs
+import com.openminis.app.cottranslate.OkHttpTranslationHttp
+import com.openminis.app.cottranslate.ReasoningTranslationController
+import com.openminis.app.cottranslate.ThinkingTranslationHandle
 import com.openminis.app.ui.components.MinisMenu
-import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -57,6 +60,7 @@ import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,7 +76,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -88,10 +91,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import kotlinx.coroutines.delay
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.sp
 import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.theme.m3Icon
-import com.openminis.app.ui.components.MinisTextButton
 import com.openminis.app.ui.theme.decorLinearSweep
 
 @Composable
@@ -137,7 +138,7 @@ internal fun AssistantHeader(speakerName: String? = null, speakerVendor: String?
         Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = displayName,
-            fontSize = 16.sp,
+            fontSize = MinisTypography.titleLg,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -180,7 +181,7 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
             .widthIn(min = 200.dp)
             .padding(top = 4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFFF3B30).copy(alpha = 0.12f))
+            .background(RawC.systemRed.tc.copy(alpha = 0.12f))
             .combinedClickable(
                 onClick = {},
                 onLongClick = {
@@ -193,15 +194,15 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
         Icon(
             imageVector = m3Icon(Icons.Default.Error),
             contentDescription = null,
-            tint = Color(0xFFFF3B30),
+            tint = RawC.systemRed.tc,
             modifier = Modifier.size(14.dp),
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = error,
-            color = Color(0xFFFF3B30),
-            fontSize = 12.sp,
-            lineHeight = 16.sp,
+            color = RawC.systemRed.tc,
+            fontSize = MinisTypography.foot,
+            lineHeight = MinisTypography.lineNote,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
@@ -212,7 +213,7 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
                 modifier = Modifier
                     .minimumInteractiveComponentSize()
                     .clip(RoundedCornerShape(50))
-                    .background(Color(0xFFFF3B30).copy(alpha = 0.15f))
+                    .background(RawC.systemRed.tc.copy(alpha = 0.15f))
                     .clickable(onClick = onRetry)
                     .padding(horizontal = 10.dp, vertical = 3.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -220,11 +221,11 @@ internal fun InlineErrorBanner(error: String, onRetry: (() -> Unit)? = null) {
                 Icon(
                     imageVector = m3Icon(Icons.Default.Refresh),
                     contentDescription = null,
-                    tint = Color(0xFFFF3B30),
+                    tint = RawC.systemRed.tc,
                     modifier = Modifier.size(10.dp),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(stringResource(R.string.chat_longpress_retry), color = Color(0xFFFF3B30), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.chat_longpress_retry), color = RawC.systemRed.tc, fontSize = MinisTypography.cap, fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -269,7 +270,7 @@ private fun ToolStopButton(
                 modifier = Modifier
                     .size(10.dp)
                     .clip(RoundedCornerShape(2.dp))
-                    .background(Color(0xFFFF3B30)),
+                    .background(RawC.systemRed.tc),
             )
         }
     }
@@ -483,7 +484,7 @@ internal fun ToolCallPill(
             ) {
                 Text(
                     text = block.toolTitle.ifEmpty { block.toolName },
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     fontWeight = FontWeight.Medium,
                     // [P-process-card] A failed call tints its OWN row's title
                     // (matching the icon) — the reference card colours the
@@ -507,7 +508,7 @@ internal fun ToolCallPill(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = durationText,
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontFamily = FontFamily.Monospace,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     softWrap = false,
@@ -597,202 +598,7 @@ internal fun ToolCallPill(
 
 // ─── Thinking Block (iOS: collapsible "Deep Thinking" section, blue tint) ────
 
-@Composable
-internal fun ThinkingBlock(block: AssistantBlock, isStreaming: Boolean, isLast: Boolean = true) {
-    // Per-block expand state, keyed by block.id so the user's manual toggle on
-    // an earlier (finished) thinking block survives recomposition while a
-    // later block is still streaming. The previous LaunchedEffect snapped
-    // every non-last block back to collapsed on each `isLast` flip, which
-    // fought the user's tap and produced a flicker that read as "tapping the
-    // earlier block shows the streaming block's content."
-    // [T-thinking-auto-expand-toggle] The initial auto-expand of a new
-    // streaming block is gated on the Appearance setting (default ON =
-    // historical behavior). When the user turned it off, a new streaming block
-    // starts collapsed; a manual header tap still expands it (setting
-    // userTouched, so neither the stream-end auto-collapse nor anything else
-    // fights the user). Read once at mount — mirrors iOS ThinkingBlockView,
-    // where the same UserDefaults gate sits at the one-shot auto-expand site.
-    val context = LocalContext.current
-    val autoExpandThinking = remember { autoExpandThinkingEnabled(context) }
-    val showFullThinking = remember { com.openminis.app.ui.settings.showFullThinkingEnabled(context) }
-    var expanded by remember(block.id) {
-        mutableStateOf(if (isStreaming) showFullThinking || (autoExpandThinking && isLast) else false)
-    }
-    var userTouched by remember(block.id) { mutableStateOf(false) }
-    var wasStreaming by remember(block.id) { mutableStateOf(isStreaming) }
-    LaunchedEffect(block.id, isStreaming) {
-        // Collapse only on a real active->finished edge (showFullThinking keeps it open).
-        if (wasStreaming && !isStreaming && !userTouched && !showFullThinking) {
-            delay(500)
-            expanded = false
-        }
-        wasStreaming = isStreaming
-    }
-    val thinkingBlue = Color(0xFF007AFF)
-    val charCount = block.content.length
-    val charLabel = when {
-        charCount >= 1000 -> "${charCount / 1000}K"
-        else -> "$charCount"
-    }
-
-    val thinkingHardCap = 100_000
-    val overHardCap = charCount > thinkingHardCap
-    var showFullContent by remember(block.id) { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            // [P1-3] vertical self-padding removed: the row rhythm owns
-            // inter-row gaps (2.5dp between consecutive process rows).
-            .background(thinkingBlue.copy(alpha = 0.06f), RoundedCornerShape(12.dp))
-            .border(0.5.dp, thinkingBlue.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-    ) {
-        // Header row — only the header reacts to taps. Mirrors iOS, where
-        // .onTapGesture is on the header HStack, not the whole VStack. With
-        // clickable on the outer Column, a release after dragging in the
-        // inner scroller registered as a tap and toggled `expanded`.
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    userTouched = true
-                    // [T-thinking-render-perf-android] Over the hard cap the
-                    // inline scroller is bypassed entirely; tapping the header
-                    // opens the native full-content viewer instead of toggling
-                    // the (never-shown) inline expansion.
-                    if (overHardCap) showFullContent = true
-                    else expanded = !expanded
-                },
-        ) {
-            if (isStreaming && block.toolStatus != ToolBlockStatus.SUCCESS) {
-                // iOS: ProgressView().controlSize(.mini) while streaming
-                CircularProgressIndicator(
-                    modifier = Modifier.size(13.dp),
-                    color = thinkingBlue,
-                    strokeWidth = 1.5.dp,
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-            } else {
-                Icon(
-                    imageVector = m3Icon(Icons.Default.Psychology),
-                    contentDescription = null,
-                    tint = thinkingBlue,
-                    modifier = Modifier.size(14.dp),
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-            }
-            Text(
-                text = stringResource(R.string.chat_thinking_header),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = thinkingBlue,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            // [P-process-card] Thinking duration, settled by the agent loop
-            // when the first text/tool call ends the reasoning phase. Same
-            // slot family as the char count so the header reads
-            // "思考 · 4m 59s · 11k" like the reference card.
-            formatProcessDuration(block.durationMs)?.let { dur ->
-                Text(
-                    text = dur,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = FontFamily.Monospace,
-                    color = thinkingBlue.copy(alpha = 0.6f),
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-            }
-            if (charCount > 0) {
-                Text(
-                    text = charLabel,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = FontFamily.Monospace,
-                    color = thinkingBlue.copy(alpha = 0.6f),
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-            }
-            if (overHardCap) {
-                // [T-thinking-render-perf-android] No expand/collapse chevron —
-                // the content is too large for the inline Compose scroller.
-                // Offer the native full-content viewer instead.
-                Text(
-                    text = stringResource(R.string.thinking_view_full),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = thinkingBlue,
-                )
-            } else {
-                Icon(
-                    imageVector = if (expanded) m3Icon(Icons.Default.KeyboardArrowUp) else m3Icon(Icons.Default.KeyboardArrowDown),
-                    contentDescription = if (expanded) "Collapse" else "Expand",
-                    tint = thinkingBlue.copy(alpha = 0.5f),
-                    modifier = Modifier.size(14.dp),
-                )
-            }
-        }
-
-        // Expanded content. Mirrors iOS ThinkingBlockView (AssistantBlockView.swift:648):
-        // an inner scroller capped at 300dp, auto-follow to the bottom while the
-        // block is streaming, manual drag at any time, and pause-on-user-scroll
-        // so a user reading earlier reasoning isn't yanked back to the tail by
-        // the next token.
-        AnimatedVisibility(visible = expanded && !overHardCap) {
-            val scrollState = rememberScrollState()
-            // [T-thinking-render-perf-android] Render only the tail window (O(window) not O(total));
-            // UiUpdateBatcher already paces recomposition at 200-500ms.
-            val renderedContent = block.content
-            val effectiveWindow = if (showFullThinking) thinkingHardCap else 8000 // 8k tail window
-            val isTruncated = renderedContent.length > effectiveWindow
-            val displayContent = visibleThinkingTail(renderedContent, effectiveWindow)
-            ThinkingAutoFollow(
-                blockId = block.id,
-                contentVersionValue = block.content.length,
-                isStreaming = isStreaming,
-                scrollState = scrollState,
-            )
-            Column(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .heightIn(max = 300.dp)
-                    .verticalScroll(scrollState),
-            ) {
-                if (isTruncated) {
-                    Text(
-                        text = stringResource(
-                            R.string.thinking_truncated_hint,
-                            displayContent.length / 1000,
-                            charCount / 1000,
-                        ),
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f),
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                    )
-                }
-                Text(
-                    text = displayContent,
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
-                    lineHeight = 19.sp,
-                )
-            }
-        }
-
-        // [T-thinking-render-perf-android] Hard-cap full-content viewer. A
-        // native TextView (selectable, scrollable) renders arbitrarily large
-        // thinking text without the Compose `Text` measure freeze.
-        if (overHardCap && showFullContent) {
-            ThinkingFullContentDialog(
-                content = block.content,
-                onDismiss = { showFullContent = false },
-            )
-        }
-    }
-}
-
+// [T-thinking-block-extract] ThinkingBlock moved to ThinkingBlockUI.kt.
 @Composable
 internal fun ProcessSummaryBar(
     thinkingCount: Int,
@@ -816,7 +622,7 @@ internal fun ProcessSummaryBar(
     // not a visual break: same blue, same 12dp radius, same 6%/15% tint and
     // 0.5dp hairline, same 12×8 padding as ThinkingBlock. The old 22dp
     // backgroundless capsule looked nothing like the blocks it replaced.
-    val thinkingBlue = Color(0xFF007AFF)
+    val thinkingBlue = RawC.systemBlue.tc
     val shape = RoundedCornerShape(12.dp)
     // [P-process-card] Failure tints ONLY the failed tool rows inside the
     // card (user direction): the header keeps its normal blue title — the
@@ -879,7 +685,7 @@ internal fun ProcessSummaryBar(
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = header,
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
                 fontWeight = FontWeight.SemiBold,
                 color = thinkingBlue,
                 modifier = Modifier.weight(1f),
@@ -937,7 +743,7 @@ internal fun ProcessSummaryBar(
  */
 @Composable
 private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
-    val thinkingBlue = Color(0xFF007AFF)
+    val thinkingBlue = RawC.systemBlue.tc
     val muted = MaterialTheme.colorScheme.onSurfaceVariant
     val isThinking = step.kind == "thinking"
     val isFailed = !isThinking && step.status == ToolBlockStatus.FAILED
@@ -986,7 +792,7 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
             Text(
                 text = if (isThinking) stringResource(R.string.chat_thinking_header)
                     else block.toolTitle.ifEmpty { block.toolName },
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
                 fontWeight = FontWeight.Medium,
                 color = if (isFailed) ToolErrorColor else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f),
@@ -998,7 +804,7 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
                 if (charCount > 0) {
                     Text(
                         text = if (charCount >= 1000) "${charCount / 1000}K" else "$charCount",
-                        fontSize = 11.sp,
+                        fontSize = MinisTypography.cap,
                         fontFamily = FontFamily.Monospace,
                         color = muted,
                     )
@@ -1008,7 +814,7 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
             formatProcessDuration(step.durationMs)?.let { dur ->
                 Text(
                     text = dur,
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontFamily = FontFamily.Monospace,
                     color = muted,
                 )
@@ -1017,7 +823,7 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
             if (!isThinking) {
                 Text(
                     text = stringResource(R.string.chat_process_step_view),
-                    fontSize = 12.sp,
+                    fontSize = MinisTypography.foot,
                     color = thinkingBlue,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -1058,14 +864,14 @@ private fun ProcessStepRow(step: ProcessStepRef, onOpen: () -> Unit) {
                                 displayContent.length / 1000,
                                 block.content.length / 1000,
                             ),
-                            fontSize = 11.sp,
+                            fontSize = MinisTypography.cap,
                             color = muted.copy(alpha = 0.75f),
                         )
                     }
                     Text(
                         text = displayContent,
-                        fontSize = 12.sp,
-                        lineHeight = 17.sp,
+                        fontSize = MinisTypography.foot,
+                        lineHeight = MinisTypography.lineCaption,
                         color = muted,
                     )
                 }

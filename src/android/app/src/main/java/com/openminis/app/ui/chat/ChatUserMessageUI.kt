@@ -80,6 +80,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.openminis.app.ui.DisplayBitmapLimits.limitDisplaySize
 import com.openminis.app.ui.theme.ChatColors
+import com.openminis.app.ui.tokens.MinisTypography
 
 // ─── User Message (right-aligned, iOS: tertiarySystemFill bubble, 18dp radius) ─
 
@@ -231,7 +232,12 @@ internal fun UserMessageBubble(
                                         com.openminis.app.agent.DisplayRegex.Scope.USER,
                                     ),
                                     color = textColor,
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.5.sp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontSize = MinisTypography.type.bodyInput.sp,
+                                        lineHeight = MinisTypography.type.lineHeight(
+                                            MinisTypography.type.bodyInput
+                                        ).sp,
+                                    ),
                                     modifier = bubbleModifier
                                         .background(bubbleBg, shape)
                                         .clip(shape)
@@ -464,8 +470,8 @@ private fun FileAttachmentTile(
         Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = fileName,
-            fontSize = 9.sp,
-            lineHeight = 11.sp,
+            fontSize = MinisTypography.cap2,
+            lineHeight = MinisTypography.lineBadge,
             color = ChatColors.primaryText,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
@@ -544,7 +550,7 @@ private fun ImageGalleryDialog(
                 Text(
                     text = "${pagerState.currentPage + 1} / ${uris.size}",
                     color = Color.White,
-                    fontSize = 12.sp,
+                    fontSize = MinisTypography.foot,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .padding(top = 16.dp)

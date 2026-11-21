@@ -148,6 +148,14 @@ class MinisApp : Application(), ImageLoaderFactory {
         // T-android-safemode-lateinit-crash: prime AppLogger's Context before any early-return skips init.
         AppLogger.primeContext(this)
 
+        // 类型化 prefs 入口的装配点。必须在这里而不是 AppGraph.create ——
+        // 后者在字段初始化时执行，拿不到 Context。装上之后 `Prefs.file(name)`
+        // 才能工作：文件名走 PrefsRegistry 校验，加密与否由 spec 决定。
+        // 幂等：重复 install 只是换一个 source 并清空句柄缓存。
+        com.openminis.app.config.Prefs.install(
+            com.openminis.app.config.AndroidPrefsSource(this)
+        )
+
         // Application subclasses run in EVERY process: sub-processes get minimal boot (rest is main-only).
         if (ProcessChecks.shouldSkipMainInit(this)) return
         com.openminis.app.crash.LaunchPhaseProbes.startLaunchScan(this, appCoroutineScopes.io)
@@ -634,12 +642,12 @@ class MinisApp : Application(), ImageLoaderFactory {
 
     // T268: replay pre-T266 alarms/timers from prefs through SET_ALARM/SET_TIMER, then clear the blob (idempotent, past-dated dropped).
     private fun migrateGhostAlarms() {
-        val prefs = getSharedPreferences("minis_alarms_prefs", Context.MODE_PRIVATE)
-        val raw = prefs.getString("alarms_json", null) ?: return
+        val prefs = com.openminis.app.config.Prefs.file("minis_alarms_prefs")
+        val raw = prefs.stringOrNull("alarms_json") ?: return
         if (raw.isBlank() || raw == "[]") return
         val arr = org.json.JSONArray(raw)
         if (arr.length() == 0) {
-            prefs.edit().remove("alarms_json").apply()
+            prefs.remove("alarms_json")
             return
         }
         val now = System.currentTimeMillis()
@@ -684,7 +692,7 @@ class MinisApp : Application(), ImageLoaderFactory {
         // Clear the blob unconditionally — entries we couldn't replay are
         // still useless ghosts, and leaving the blob would re-trigger
         // migration on every launch.
-        prefs.edit().remove("alarms_json").apply()
+        prefs.remove("alarms_json")
         Log.i("MinisApp", "T268 ghost alarm migration: migrated=$migrated skipped=$skipped (prefs cleared)")
     }
 

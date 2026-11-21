@@ -60,6 +60,7 @@ import com.openminis.app.scheduled.ScheduledTargetMode
 import com.openminis.app.scheduled.ScheduledTask
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * [T-android-scheduled-tasks-design / T-android-scheduled-tasks-full]
@@ -448,7 +449,7 @@ private fun EditFormBody(
                         selected = targetKind == kind,
                         onClick = { onTargetKindChange(kind) },
                         shape = SegmentedButtonDefaults.itemShape(idx, targetOpts.size),
-                    ) { Text(stringResource(resId), fontSize = 13.sp) }
+                    ) { Text(stringResource(resId), fontSize = MinisTypography.body) }
                 }
             }
             if (targetKind != TargetKind.NEW) {
@@ -484,7 +485,7 @@ private fun EditFormBody(
                         label = {
                             Text(
                                 stringResource(R.string.chat_menu_perm_ask),
-                                fontSize = 12.sp,
+                                fontSize = MinisTypography.foot,
                                 maxLines = 1,
                             )
                         },
@@ -496,7 +497,7 @@ private fun EditFormBody(
                         label = {
                             Text(
                                 stringResource(R.string.chat_menu_perm_yoyo),
-                                fontSize = 12.sp,
+                                fontSize = MinisTypography.foot,
                                 maxLines = 1,
                             )
                         },
@@ -535,7 +536,7 @@ private fun EditFormBody(
                         selected = repeatMode == mode,
                         onClick = { onRepeatModeChange(mode) },
                         shape = SegmentedButtonDefaults.itemShape(idx, options.size),
-                    ) { Text(stringResource(resId), fontSize = 13.sp) }
+                    ) { Text(stringResource(resId), fontSize = MinisTypography.body) }
                 }
             }
             if (repeatMode == ScheduledRepeatMode.CUSTOM) {
@@ -559,7 +560,7 @@ private fun EditFormBody(
                                 }
                                 onCustomDaysChange(next)
                             },
-                            label = { Text(name, fontSize = 12.sp) },
+                            label = { Text(name, fontSize = MinisTypography.foot) },
                             modifier = Modifier.weight(1f),
                         )
                     }
@@ -606,7 +607,7 @@ private fun EditFormBody(
         } else {
             Text(
                 stringResource(R.string.scheduled_task_rerun_note),
-                fontSize = 12.sp,
+                fontSize = MinisTypography.foot,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
