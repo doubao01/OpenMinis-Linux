@@ -414,7 +414,7 @@
     "src/android/app/src/main/java/com/openminis/app/ui/components/SettingsSection.kt": {
       "color": 0,
       "sp": 0,
-      "dp": 8
+      "dp": 0
     },
     "src/android/app/src/main/java/com/openminis/app/ui/components/SwipeRowActions.kt": {
       "color": 0,
@@ -696,20 +696,35 @@
       "sp": 0,
       "dp": 2
     },
+    "src/android/app/src/main/java/com/openminis/app/ui/settings/ModelConnectionScreen.kt": {
+      "color": 0,
+      "sp": 0,
+      "dp": 2
+    },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/ModelEntryDetailScreen.kt": {
       "color": 0,
       "sp": 0,
       "dp": 8
+    },
+    "src/android/app/src/main/java/com/openminis/app/ui/settings/ModelGroupBadges.kt": {
+      "color": 0,
+      "sp": 0,
+      "dp": 3
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/ModelGroupDetailScreen.kt": {
       "color": 0,
       "sp": 0,
       "dp": 16
     },
+    "src/android/app/src/main/java/com/openminis/app/ui/settings/ModelGroupRows.kt": {
+      "color": 0,
+      "sp": 0,
+      "dp": 11
+    },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/ModelGroupsScreen.kt": {
       "color": 0,
       "sp": 0,
-      "dp": 41
+      "dp": 29
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/ModelSlotPicker.kt": {
       "color": 0,
@@ -759,7 +774,7 @@
     "src/android/app/src/main/java/com/openminis/app/ui/settings/PluginMarketScreen.kt": {
       "color": 0,
       "sp": 0,
-      "dp": 8
+      "dp": 2
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/ProviderDetailPoolSection.kt": {
       "color": 0,
@@ -781,6 +796,11 @@
       "sp": 0,
       "dp": 44
     },
+    "src/android/app/src/main/java/com/openminis/app/ui/settings/RoutingStrategyCard.kt": {
+      "color": 0,
+      "sp": 0,
+      "dp": 1
+    },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SettingsActionIcon.kt": {
       "color": 0,
       "sp": 0,
@@ -789,7 +809,7 @@
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SettingsComponents.kt": {
       "color": 0,
       "sp": 0,
-      "dp": 44
+      "dp": 28
     },
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SettingsScreen.kt": {
       "color": 0,

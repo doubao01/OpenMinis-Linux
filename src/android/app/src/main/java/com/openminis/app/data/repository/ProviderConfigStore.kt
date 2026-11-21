@@ -239,6 +239,8 @@ internal class ProviderConfigStore(
                 throw IllegalStateException("Provider configuration could not be loaded; mutation aborted", e)
             }
             repo._config.value = loaded
+            // [T-auto-model-groups] 首次加载后补隐式组；之后由 saveConfig 重建。
+            AutoModelGroups.syncInPlace(repo._config.value)
             repo._configLoaded.value = true
         }
         // [T-android-thinking-rules-phase2] Warm the resolver's custom-rule cache once
