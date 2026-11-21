@@ -162,3 +162,6 @@ __pycache__/
 
 # Mimosa security-scanner hook-state snapshots (per-session per-file baselines)
 .mimosa/
+
+# 验证脚本的临时产物（scripts/ci/verify_all.py 生成，不应入库）
+.verify_tokens_tmp/
