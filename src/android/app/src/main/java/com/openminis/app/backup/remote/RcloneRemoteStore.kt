@@ -2,7 +2,6 @@ package com.openminis.app.backup.remote
 
 import android.content.Context
 import com.openminis.app.logging.AppLogger
-import com.openminis.app.util.EncryptedPrefsFactory
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
@@ -111,15 +110,15 @@ class RcloneRemoteStore(private val context: Context) {
 
     class StoreException(message: String) : Exception(message)
 
-    private val prefs by lazy { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }
-    private val secrets by lazy { EncryptedPrefsFactory.safeCreate(context, SECRETS_PREFS_NAME) }
+    private val prefs by lazy { com.openminis.app.config.Prefs.file(PREFS_NAME) }
+    private val secrets by lazy { com.openminis.app.config.Prefs.file(SECRETS_PREFS_NAME) }
 
     var remotes: List<Remote>
         get() = runCatching {
-            prefs.getString(KEY_REMOTES, null)?.let { JSON.decodeFromString(REMOTE_LIST, it) }
+            prefs.stringOrNull(KEY_REMOTES)?.let { JSON.decodeFromString(REMOTE_LIST, it) }
         }.getOrNull() ?: emptyList()
         private set(value) {
-            prefs.edit().putString(KEY_REMOTES, JSON.encodeToString(REMOTE_LIST, value)).apply()
+            prefs.set(KEY_REMOTES, JSON.encodeToString(REMOTE_LIST, value))
         }
 
     fun remote(name: String): Remote? = remotes.firstOrNull { it.name == name }
@@ -157,7 +156,7 @@ class RcloneRemoteStore(private val context: Context) {
     /** Remove a remote and its credential. */
     fun remove(name: String) {
         remotes = remotes.filterNot { it.name == name }
-        secrets.edit().remove(name).apply()
+        secrets.remove(name)
         AppLogger.info(TAG, "[Rclone] remote removed: $name")
     }
 
@@ -230,10 +229,13 @@ class RcloneRemoteStore(private val context: Context) {
 
         // Verified (or nothing to verify): commit. Secret first, then the
         // record, so the record never names a credential that isn't there yet.
-        val edit = secrets.edit()
-        if (targetName != null) edit.remove(name)
-        if (nextSecret.isNullOrEmpty()) edit.remove(updated.name) else edit.putString(updated.name, nextSecret)
-        edit.apply()
+        // 「先写 secret、再写 record」的顺序必须保留：record 里存的是 remote 元数据，
+        // 如果 record 先落盘而后面的 secret 失败，record 会指向一个不存在的凭据，
+        // 之后每次连接都报认证错误，用户只能手动删了重建。
+        secrets.write {
+            if (targetName != null) remove(name)
+            if (nextSecret.isNullOrEmpty()) remove(updated.name) else putString(updated.name, nextSecret)
+        }
         remotes = all.toMutableList().also { it[i] = updated }
         if (targetName != null) dropRcloneSection(name)
         AppLogger.info(TAG, "[Rclone] remote updated: $name -> ${updated.name}:/${updated.path}")
@@ -308,10 +310,10 @@ class RcloneRemoteStore(private val context: Context) {
     // MARK: - Secrets
 
     private fun storeSecret(name: String, secret: String) {
-        secrets.edit().putString(name, secret).apply()
+        secrets.set(name, secret)
     }
 
-    private fun loadSecret(name: String): String? = secrets.getString(name, null)
+    private fun loadSecret(name: String): String? = secrets.stringOrNull(name)
 
     /**
      * Which parameter carries the secret, per backend. rclone names these

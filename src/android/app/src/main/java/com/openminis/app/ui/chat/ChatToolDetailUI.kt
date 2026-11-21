@@ -91,6 +91,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.sp
 import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.theme.m3Icon
+import com.openminis.app.ui.tokens.MinisTypography
 /**
  * The page URL a `browser_use` block points at: [block]'s live `browserURL` →
  * its own `url` argument ([argsUrl]) → the nearest PRECEDING `browser_use`
@@ -197,7 +198,7 @@ internal fun ToolDetailSheet(
                 // user is already scanning timing info.
                 Text(
                     text = "Minis Computer",
-                    fontSize = 15.sp,
+                    fontSize = MinisTypography.title,
                     fontWeight = FontWeight.SemiBold,
                     color = ChatColors.primaryText,
                 )
@@ -399,10 +400,10 @@ internal fun ToolDetailSheet(
                                     .fillMaxHeight()
                                     .heightIn(min = cardMinHeight)
                                     .clip(RoundedCornerShape(10.dp))
-                                    .background(Color.Black)
+                                    .background(MinisTokens.colors.terminalBg.tc)
                                     .border(
                                         width = 0.5.dp,
-                                        color = Color(0xFF404040),
+                                        color = MinisTokens.colors.terminalBorder.tc,
                                         shape = RoundedCornerShape(10.dp),
                                     ),
                             ) {
@@ -420,32 +421,30 @@ internal fun ToolDetailSheet(
                                 ) {
                                     Text(
                                         text = "$ $command",
-                                        fontSize = 13.sp,
+                                        fontSize = MinisTypography.code,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = FontFamily.Monospace,
                                         color = Color.White,
-                                        lineHeight = 18.sp,
+                                        lineHeight = MinisTypography.lineCode,
                                     )
                                     if (block.content.isNotEmpty()) {
                                         // T38: linkify http/https URLs in shell output so the user can
                                         // tap them to open the in-app web preview (matches iOS
                                         // TerminalCanvasView.addURLLinks → MinisOpenURLBroker).
                                         val urlClick = LocalMarkdownUrlClickHandler.current
-                                        val linkified = remember(block.content, urlClick) {
-                                            if (urlClick != null) {
-                                                com.openminis.app.ui.util.linkifyUrls(
-                                                    text = block.content,
-                                                    onClick = urlClick,
-                                                    linkColor = Color(0xFF7CC4FF), // light blue on dark terminal bg
-                                                )
-                                            } else androidx.compose.ui.text.AnnotatedString(block.content)
+                                        // @Composable getter — must be read in this scope.
+                                        val linkColor = MinisTokens.colors.terminalLink.tc
+                                        val linkified = remember(block.content, urlClick, linkColor) {
+                                            urlClick?.let {
+                                                com.openminis.app.ui.util.linkifyUrls(block.content, it, linkColor)
+                                            } ?: androidx.compose.ui.text.AnnotatedString(block.content)
                                         }
                                         Text(
                                             text = linkified,
-                                            fontSize = 13.sp,
+                                            fontSize = MinisTypography.code,
                                             fontFamily = FontFamily.Monospace,
-                                            color = Color(0xFF34C759),  // iOS .green
-                                            lineHeight = 18.sp,
+                                            color = RawC.systemGreen.tc,  // iOS .green
+                                            lineHeight = MinisTypography.lineCode,
                                         )
                                     }
                                 }
@@ -458,24 +457,24 @@ internal fun ToolDetailSheet(
                                         modifier = Modifier
                                             .align(Alignment.BottomCenter)
                                             .fillMaxWidth()
-                                            .background(Color(0xFF141414))
+                                            .background(MinisTokens.colors.terminalHudBg.tc)
                                             .padding(vertical = 2.5.dp),
                                         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Text(
                                             text = sheetMonitor.formattedCpu(),
-                                            fontSize = 11.sp,
+                                            fontSize = MinisTypography.codeSm,
                                             fontWeight = FontWeight.Medium,
                                             fontFamily = FontFamily.Monospace,
-                                            color = Color(0xFF34C759),  // iOS .green
+                                            color = RawC.systemGreen.tc,  // iOS .green
                                         )
                                         Text(
                                             text = sheetMonitor.formattedMem(),
-                                            fontSize = 11.sp,
+                                            fontSize = MinisTypography.codeSm,
                                             fontWeight = FontWeight.Medium,
                                             fontFamily = FontFamily.Monospace,
-                                            color = Color(0xFF34C759),
+                                            color = RawC.systemGreen.tc,
                                         )
                                     }
                                 }
@@ -495,15 +494,15 @@ internal fun ToolDetailSheet(
                         val oldStr = toolArgsResolved.oldString
                         val newStr = toolArgsResolved.newString
 
-                        // T126-fix: ChatPalette.isDark follows the in-app theme
-                        // override, isSystemInDarkTheme() doesn't.
-                        val isDark = ChatColors.isDark
-                        val cardBg = if (isDark) Color(0xFF1A1A1A) else Color(0xFFF0F0F0)
-                        val cardBorder = if (isDark) Color(0xFF404040) else Color(0xFFD1D1D1)
-                        val redBg = if (isDark) Color(0xFF4D1414) else Color(0xFFFFE5E5)
-                        val redText = if (isDark) Color(0xFFFF6666) else Color(0xFFCC1A1A)
-                        val greenBg = if (isDark) Color(0xFF144D14) else Color(0xFFE5FFE5)
-                        val greenText = if (isDark) Color(0xFF66FF66) else Color(0xFF1A991A)
+                        // T126-fix: the in-app theme override wins over the system
+                        // setting; the light/dark pairs live in MinisColors now.
+                        val tk = MinisTokens.colors
+                        val cardBg = tk.editorCardBg.tc
+                        val cardBorder = tk.editorCardBorder.tc
+                        val redBg = tk.diffRemovedBg.tc
+                        val redText = tk.diffRemovedText.tc
+                        val greenBg = tk.diffAddedBg.tc
+                        val greenText = tk.diffAddedText.tc
 
                         val bytes = (oldStr.toByteArray(Charsets.UTF_8).size +
                             newStr.toByteArray(Charsets.UTF_8).size)
@@ -556,13 +555,13 @@ internal fun ToolDetailSheet(
                                     Icon(
                                         Icons.Default.EditNote,
                                         contentDescription = null,
-                                        tint = Color(0xFFFF9500),
+                                        tint = RawC.systemOrange.tc,
                                         modifier = Modifier.size(12.dp),
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = if (fileName.isNotEmpty()) fileName else "(file)",
-                                        fontSize = 13.sp,
+                                        fontSize = MinisTypography.code,
                                         fontWeight = FontWeight.Medium,
                                         fontFamily = FontFamily.Monospace,
                                         color = ChatColors.primaryText,
@@ -573,8 +572,9 @@ internal fun ToolDetailSheet(
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = "($sizeLabel)",
-                                        fontSize = 11.sp,
-                                        color = if (isLive) Color(0xCCFF9500) else ChatColors.tertiaryText,
+                                        fontSize = MinisTypography.cap,
+                                        color = if (isLive) MinisTokens.colors.statusWarn.tc.copy(alpha = 0.80f)
+                                                else ChatColors.tertiaryText,
                                     )
                                 }
                                 HorizontalDivider(thickness = 0.5.dp, color = cardBorder)
@@ -595,10 +595,10 @@ internal fun ToolDetailSheet(
                                         oldStr.lines().forEach { line ->
                                             Text(
                                                 text = "- $line",
-                                                fontSize = 13.sp,
+                                                fontSize = MinisTypography.code,
                                                 fontFamily = FontFamily.Monospace,
                                                 color = redText,
-                                                lineHeight = 17.sp,
+                                                lineHeight = MinisTypography.lineCodeDiff,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .background(redBg)
@@ -610,10 +610,10 @@ internal fun ToolDetailSheet(
                                         newStr.lines().forEach { line ->
                                             Text(
                                                 text = "+ $line",
-                                                fontSize = 13.sp,
+                                                fontSize = MinisTypography.code,
                                                 fontFamily = FontFamily.Monospace,
                                                 color = greenText,
-                                                lineHeight = 17.sp,
+                                                lineHeight = MinisTypography.lineCodeDiff,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .background(greenBg)
@@ -637,7 +637,7 @@ internal fun ToolDetailSheet(
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = stringResource(R.string.chat_tool_edited),
-                                                fontSize = 13.sp,
+                                                fontSize = MinisTypography.body,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = ChatColors.primaryText,
                                             )
@@ -645,7 +645,7 @@ internal fun ToolDetailSheet(
                                                 Spacer(modifier = Modifier.width(6.dp))
                                                 Text(
                                                     text = path,
-                                                    fontSize = 12.sp,
+                                                    fontSize = MinisTypography.codeFoot,
                                                     fontFamily = FontFamily.Monospace,
                                                     color = ChatColors.secondaryText,
                                                     maxLines = 1,
@@ -657,7 +657,7 @@ internal fun ToolDetailSheet(
                                         if (resultDetail != null) {
                                             Text(
                                                 text = resultDetail,
-                                                fontSize = 12.sp,
+                                                fontSize = MinisTypography.foot,
                                                 color = ChatColors.tertiaryText,
                                                 modifier = Modifier.padding(top = 2.dp),
                                             )
@@ -757,11 +757,11 @@ internal fun ToolDetailSheet(
                                     if (action.isNotEmpty()) {
                                         Text(
                                             text = action,
-                                            fontSize = 12.sp,
+                                            fontSize = MinisTypography.foot,
                                             fontWeight = FontWeight.SemiBold,
                                             color = Color.White,
                                             modifier = Modifier
-                                                .background(Color(0xFF007AFF), CircleShape)
+                                                .background(RawC.systemBlue.tc, CircleShape)
                                                 .padding(horizontal = 10.dp, vertical = 2.dp),
                                         )
                                     }
@@ -771,13 +771,13 @@ internal fun ToolDetailSheet(
                                         // Color(white: 0.35) text — distinct pill against sheet bg.
                                         Text(
                                             text = resolvedUrl,
-                                            fontSize = 12.sp,
-                                            color = Color(0xFF595959),
+                                            fontSize = MinisTypography.foot,
+                                            color = MinisTokens.colors.urlCapsuleText.tc,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis,
                                             modifier = Modifier
                                                 .weight(1f)
-                                                .background(Color(0xFFD9D9D9), CircleShape)
+                                                .background(MinisTokens.colors.urlCapsuleBg.tc, CircleShape)
                                                 .clip(CircleShape)
                                                 .clickable { clipboardManager.setText(AnnotatedString(resolvedUrl)) }
                                                 .padding(horizontal = 10.dp, vertical = 2.dp),
@@ -826,7 +826,7 @@ internal fun ToolDetailSheet(
                                             strokeWidth = 2.dp,
                                             color = ChatColors.link,
                                         )
-                                        Text(stringResource(R.string.loading), fontSize = 12.sp, color = ChatColors.tertiaryText)
+                                        Text(stringResource(R.string.loading), fontSize = MinisTypography.foot, color = ChatColors.tertiaryText)
                                     }
                                 }
                             }
@@ -857,7 +857,7 @@ internal fun ToolDetailSheet(
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(
                                             text = stringResource(R.string.chat_tool_result_label),
-                                            fontSize = 13.sp,
+                                            fontSize = MinisTypography.body,
                                             fontWeight = FontWeight.Medium,
                                             color = ChatColors.secondaryText,
                                         )
@@ -865,10 +865,10 @@ internal fun ToolDetailSheet(
                                     HorizontalDivider(thickness = 0.5.dp, color = ChatColors.separator)
                                     Text(
                                         text = block.content,
-                                        fontSize = 13.sp,
+                                        fontSize = MinisTypography.code,
                                         fontFamily = FontFamily.Monospace,
                                         color = ChatColors.primaryText,
-                                        lineHeight = 16.sp,
+                                        lineHeight = MinisTypography.type.lineHeightMono(13f).sp,
                                         modifier = Modifier.padding(14.dp),
                                     )
                                 }
@@ -948,10 +948,10 @@ internal fun ToolDetailSheet(
                             if (block.content.isNotEmpty()) {
                                 Text(
                                     text = block.content,
-                                    fontSize = 13.sp,
+                                    fontSize = MinisTypography.code,
                                     fontFamily = FontFamily.Monospace,
                                     color = ChatColors.primaryText,
-                                    lineHeight = 18.sp,
+                                    lineHeight = MinisTypography.lineCode,
                                 )
                             }
                         }
@@ -999,7 +999,7 @@ internal fun ToolDetailSheet(
                                     Text(
                                         text = if (isLive) "Running..." else "No output",
                                         color = ChatColors.tertiaryText,
-                                        fontSize = 14.sp,
+                                        fontSize = MinisTypography.bodyLg,
                                     )
                                 }
                             }
@@ -1046,12 +1046,11 @@ internal fun ToolDetailSheet(
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    // Title + subtitle
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = toolTitleLabel(block.toolName),
-                            fontSize = 14.sp,
-                            lineHeight = 16.sp,
+                            fontSize = MinisTypography.bodyLg,
+                            lineHeight = MinisTypography.type.lineHeightTight(14f).sp,
                             fontWeight = FontWeight.SemiBold,
                             color = ChatColors.primaryText,
                             maxLines = 1,
@@ -1059,8 +1058,8 @@ internal fun ToolDetailSheet(
                         )
                         Text(
                             text = block.toolTitle.ifEmpty { block.toolName },
-                            fontSize = 12.sp,
-                            lineHeight = 14.sp,
+                            fontSize = MinisTypography.foot,
+                            lineHeight = MinisTypography.type.lineHeightTight(12f).sp,
                             color = ChatColors.secondaryText,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -1081,7 +1080,7 @@ internal fun ToolDetailSheet(
                             if (block.durationMs > 0 && !isLive) {
                                 Text(
                                     text = formatToolDuration(block.durationMs),
-                                    fontSize = 11.sp,
+                                    fontSize = MinisTypography.codeSm,
                                     fontFamily = FontFamily.Monospace,
                                     color = ChatColors.tertiaryText,
                                 )
@@ -1089,7 +1088,7 @@ internal fun ToolDetailSheet(
                             if (block.startTimeMs > 0L) {
                                 Text(
                                     text = formatStepTimestamp(block.startTimeMs),
-                                    fontSize = 9.sp,
+                                    fontSize = MinisTypography.cap2,
                                     fontFamily = FontFamily.Monospace,
                                     color = ChatColors.tertiaryText.copy(alpha = 0.75f),
                                 )
@@ -1131,11 +1130,11 @@ internal fun ToolDetailSheet(
                             Box(
                                 modifier = Modifier
                                     .size(7.dp)
-                                    .background(Color(0xFF34C759), CircleShape),
+                                    .background(RawC.systemGreen.tc, CircleShape),
                             )
                             Text(
                                 "Live",
-                                fontSize = 13.sp,
+                                fontSize = MinisTypography.body,
                                 fontWeight = FontWeight.Medium,
                                 color = ChatColors.primaryText,
                             )
@@ -1143,7 +1142,7 @@ internal fun ToolDetailSheet(
                     } else {
                         Text(
                             "${currentIdx + 1} / ${toolBlocks.size}",
-                            fontSize = 13.sp,
+                            fontSize = MinisTypography.code,
                             fontWeight = FontWeight.Medium,
                             fontFamily = FontFamily.Monospace,
                             color = ChatColors.secondaryText,
@@ -1299,10 +1298,10 @@ private fun LazyRevealToolText(
     Column(modifier = modifier) {
         Text(
             text = displayed,
-            fontSize = 13.sp,
+            fontSize = MinisTypography.code,
             fontFamily = FontFamily.Monospace,
             color = color,
-            lineHeight = 18.sp,
+            lineHeight = MinisTypography.lineCode,
             modifier = Modifier.fillMaxWidth(),
         )
         if (revealed < total) {
@@ -1317,7 +1316,7 @@ private fun LazyRevealToolText(
             ) {
                 Text(
                     text = stringResource(R.string.chat_tool_load_more, nextLines),
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     fontWeight = FontWeight.Medium,
                     color = color.copy(alpha = 0.9f),
                     modifier = Modifier.clickable {
@@ -1326,7 +1325,7 @@ private fun LazyRevealToolText(
                 )
                 Text(
                     text = stringResource(R.string.chat_tool_load_all, remainingLines),
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     fontWeight = FontWeight.Medium,
                     color = color.copy(alpha = 0.9f),
                     modifier = Modifier.clickable { revealed = total },
@@ -1355,48 +1354,41 @@ private fun EditorCard(
         bytes >= 1024 -> String.format("%.1f KB", bytes / 1024.0)
         else -> "$bytes B"
     }
-    // Match iOS fileEditorContent (ToolLiveSheet.swift:1350) instead of the
-    // generic chat palette: the editor card needs its own dark/light grayscale
-    // ramp so the body stands out from the sheet container and the header
-    // strip reads as one notch lighter than the body.
-    //   iOS dark  : body white:0.10 (#1A1A1A), header white:0.13 (#212121),
-    //               border white:0.25 (#404040)
-    //   iOS light : body white:0.94 (#F0F0F0), header white:0.92 (#EBEBEB),
-    //               border white:0.82 (#D1D1D1)
-    // T126-fix: use ChatPalette.isDark so the in-app theme override (Settings →
-    // Appearance) wins over the system setting. Otherwise users on Light system
-    // + Dark in-app would see white card on black chat.
-    val isDark = ChatColors.isDark
-    val cardBg = if (isDark) Color(0xFF1A1A1A) else Color(0xFFF0F0F0)
-    val headerBg = if (isDark) Color(0xFF212121) else Color(0xFFEBEBEB)
-    val cardBorder = if (isDark) Color(0xFF404040) else Color(0xFFD1D1D1)
+    // T126-fix: in-app Appearance wins over the OS setting; the light/dark
+    // pairs live in MinisColors and check_token_semantics keeps them honest.
+    // 尺寸同理走 dimens 令牌（Compact 档在平板分栏时整条阶梯缩一档）。
+    val tokens = MinisTokens.colors
+    val dim = Dims.dimens
+    val cardBg = tokens.editorCardBg.tc
+    val headerBg = tokens.editorCardHeaderBg.tc
+    val cardBorder = tokens.editorCardBorder.tc
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(horizontal = 12.dp, vertical = 12.dp),
+            .padding(horizontal = dim.spaceLg.dp, vertical = dim.spaceLg.dp),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(dim.radiusMd3.dp))
                 .background(cardBg)
-                .border(0.5.dp, cardBorder, RoundedCornerShape(10.dp)),
+                .border(0.5.dp, cardBorder, RoundedCornerShape(dim.radiusMd3.dp)),
         ) {
             // Header row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(headerBg)
-                    .padding(vertical = 10.dp, horizontal = 14.dp),
+                    .padding(vertical = dim.spaceMd2.dp, horizontal = dim.spaceLg2.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(dim.spaceSm.dp),
             ) {
                 Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(14.dp))
                 Text(
                     text = title,
-                    fontSize = 13.sp,
+                    fontSize = MinisTypography.body,
                     fontWeight = FontWeight.Medium,
                     color = titleColor,
                     maxLines = 1,
@@ -1406,8 +1398,8 @@ private fun EditorCard(
                 if (sizeLabel != null) {
                     Text(
                         text = if (isStreaming) "($sizeLabel received)" else "($sizeLabel)",
-                        fontSize = 11.sp,
-                        color = if (isStreaming) Color(0xFFFF9500).copy(alpha = 0.8f) else sizeColor,
+                        fontSize = MinisTypography.cap,
+                        color = if (isStreaming) RawC.systemOrange.tc.copy(alpha = 0.8f) else sizeColor,
                     )
                 }
             }
@@ -1450,7 +1442,7 @@ private fun EditorCard(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = trailingText,
-                fontSize = 12.sp,
+                fontSize = MinisTypography.foot,
                 color = ChatColors.tertiaryText,
                 modifier = Modifier.padding(horizontal = 4.dp),
             )

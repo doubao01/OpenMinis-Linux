@@ -53,6 +53,7 @@ import com.openminis.app.service.SubAgentActivityTracker
 import com.openminis.app.tools.SubAgentRunner
 import com.openminis.app.ui.markdown.MarkdownText
 import com.openminis.app.ui.theme.ChatColors
+import com.openminis.app.ui.tokens.MinisTypography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -110,7 +111,7 @@ fun SubAgentLiveBar(
                 Text(
                     text = label,
                     color = Color.White,
-                    fontSize = 11.sp,
+                    fontSize = MinisTypography.cap,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -178,7 +179,7 @@ private fun SubAgentDetailSheet(
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
                     text = memberLabel(member),
-                    fontSize = 16.sp,
+                    fontSize = MinisTypography.titleLg,
                     fontWeight = FontWeight.SemiBold,
                     color = ChatColors.primaryText,
                     maxLines = 1,
@@ -197,7 +198,7 @@ private fun SubAgentDetailSheet(
                             )
                         } else null,
                     ).joinToString(" · "),
-                    fontSize = 12.sp,
+                    fontSize = MinisTypography.foot,
                     color = ChatColors.primaryText.copy(alpha = 0.55f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -222,7 +223,7 @@ private fun SubAgentDetailSheet(
                             TypingIndicator()
                             Text(
                                 text = stringResource(R.string.subagent_waiting_first_output),
-                                fontSize = 13.sp,
+                                fontSize = MinisTypography.body,
                                 color = ChatColors.primaryText.copy(alpha = 0.6f),
                                 modifier = Modifier.padding(start = 8.dp),
                             )
@@ -251,8 +252,8 @@ private fun SubAgentDetailSheet(
                             markdown = step.body,
                             color = ChatColors.primaryText,
                             style = TextStyle(
-                                fontSize = 15.sp,
-                                lineHeight = 22.sp,
+                                fontSize = MinisTypography.title,
+                                lineHeight = MinisTypography.lineTitle,
                                 color = ChatColors.primaryText,
                             ),
                         )
@@ -286,9 +287,9 @@ private fun SubAgentSteerRow(
             androidx.compose.material3.OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
-                placeholder = { Text(stringResource(R.string.subagent_steer_hint), fontSize = 13.sp, maxLines = 1) },
+                placeholder = { Text(stringResource(R.string.subagent_steer_hint), fontSize = MinisTypography.body, maxLines = 1) },
                 modifier = Modifier.weight(1f),
-                textStyle = TextStyle(fontSize = 14.sp, color = ChatColors.primaryText),
+                textStyle = TextStyle(fontSize = MinisTypography.bodyLg, color = ChatColors.primaryText),
                 singleLine = true,
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -307,7 +308,7 @@ private fun SubAgentSteerRow(
         }
         feedback?.let {
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = it, fontSize = 11.sp, color = ChatColors.primaryText.copy(alpha = 0.55f))
+            Text(text = it, fontSize = MinisTypography.cap, color = ChatColors.primaryText.copy(alpha = 0.55f))
         }
         Spacer(modifier = Modifier.height(4.dp))
         androidx.compose.material3.TextButton(
@@ -317,7 +318,7 @@ private fun SubAgentSteerRow(
             Text(
                 text = stringResource(R.string.subagent_stop_in_sheet),
                 color = Color(0xFFFF3B30),
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
             )
         }
     }
@@ -339,7 +340,7 @@ private fun PhaseBanner(phase: String, tool: String) {
                 .background(color, RoundedCornerShape(999.dp))
                 .padding(horizontal = 8.dp, vertical = 2.dp),
         ) {
-            Text(text = phase, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = phase, color = Color.White, fontSize = MinisTypography.foot, fontWeight = FontWeight.SemiBold)
         }
         if (phase == "思考中" || phase == "回复中" || phase == "执行中") {
             Spacer(modifier = Modifier.padding(start = 4.dp))
@@ -348,7 +349,7 @@ private fun PhaseBanner(phase: String, tool: String) {
         if (tool.isNotBlank()) {
             Text(
                 text = subAgentToolTitle(tool, ""),
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
                 fontWeight = FontWeight.Medium,
                 color = ChatColors.primaryText,
                 maxLines = 1,
@@ -380,7 +381,7 @@ private fun ToolStepBody(step: SubAgentActivityTracker.Step) {
     ) {
         Text(
             text = status,
-            fontSize = 11.sp,
+            fontSize = MinisTypography.cap,
             fontWeight = FontWeight.SemiBold,
             color = phaseColor(
                 when (step.status) {
@@ -393,10 +394,10 @@ private fun ToolStepBody(step: SubAgentActivityTracker.Step) {
         )
         if (step.toolArgs.isNotBlank()) {
             Spacer(modifier = Modifier.height(6.dp))
-            Text(text = stringResource(R.string.subagent_args_label), fontSize = 11.sp, color = ChatColors.primaryText.copy(alpha = 0.5f))
+            Text(text = stringResource(R.string.subagent_args_label), fontSize = MinisTypography.codeSm, color = ChatColors.primaryText.copy(alpha = 0.5f))
             Text(
                 text = step.toolArgs,
-                fontSize = 12.sp,
+                fontSize = MinisTypography.codeFoot,
                 fontFamily = FontFamily.Monospace,
                 color = ChatColors.primaryText,
                 modifier = Modifier
@@ -406,11 +407,11 @@ private fun ToolStepBody(step: SubAgentActivityTracker.Step) {
         }
         if (step.body.isNotBlank()) {
             Spacer(modifier = Modifier.height(6.dp))
-            Text(text = stringResource(R.string.subagent_result_label), fontSize = 11.sp, color = ChatColors.primaryText.copy(alpha = 0.5f))
+            Text(text = stringResource(R.string.subagent_result_label), fontSize = MinisTypography.cap, color = ChatColors.primaryText.copy(alpha = 0.5f))
             Text(
                 text = step.body,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
+                fontSize = MinisTypography.foot,
+                lineHeight = MinisTypography.lineNote,
                 color = ChatColors.primaryText,
                 modifier = Modifier
                     .heightIn(max = 180.dp)
@@ -426,8 +427,8 @@ private fun UserTaskBubble(title: String) {
         Text(
             text = title.ifBlank { stringResource(R.string.subagent_task_fallback) },
             color = ChatColors.primaryText,
-            fontSize = 14.sp,
-            lineHeight = 20.sp,
+            fontSize = MinisTypography.bodyLg,
+            lineHeight = MinisTypography.lineBodyLg,
             modifier = Modifier
                 .widthIn(max = 280.dp)
                 .background(ChatColors.userBubble, RoundedCornerShape(16.dp))

@@ -63,4 +63,19 @@
          configuration cannot be loaded — config-protected mutations are
          locked until a load succeeds (state in ProviderRepository). -->
     <string name="provider_list_config_load_failed_banner">Provider configuration failed to load. Changes are locked until the app can read it again — try a provider action to retry.</string>
+
+    <!-- [T-cot-translate] Reasoning (CoT) translation — per-block trigger in
+         the thinking block header plus the Appearance section toggle. -->
+    <string name="cot_translate_show_translation">Translate</string>
+    <string name="cot_translate_show_original">Original</string>
+    <string name="cot_translate_retry">Retry</string>
+    <string name="cot_translate_failed">Translation unavailable</string>
+    <string name="cot_translate_settings_header">Reasoning translation</string>
+    <string name="cot_translate_settings_enabled">Enable reasoning translation</string>
+    <string name="cot_translate_settings_provider">Provider</string>
+    <string name="cot_translate_settings_language">Target language</string>
+    <string name="cot_translate_privacy_notice">Expanded reasoning is sent to the selected translation service. It may contain private code or conversation details.</string>
+    <string name="cot_translate_anonymous_notice">Bing and Google need no translation login or API key. Their anonymous endpoints may reject or limit requests.</string>
+    <string name="cot_translate_privacy_accept">Turn on</string>
+    <string name="cot_translate_privacy_decline">Cancel</string>
 </resources>

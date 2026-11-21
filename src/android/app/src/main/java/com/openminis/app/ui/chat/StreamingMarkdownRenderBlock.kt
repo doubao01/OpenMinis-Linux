@@ -57,6 +57,7 @@ import coil.request.ImageRequest
 import com.openminis.app.ui.DisplayBitmapLimits.limitDisplaySize
 import com.openminis.app.ui.theme.ChatColors
 import com.openminis.app.ui.theme.m3Icon
+import com.openminis.app.ui.tokens.MinisTypography
 
 @Composable
 internal fun RenderBlock(block: MdBlock) {
@@ -151,7 +152,7 @@ internal fun RenderBlock(block: MdBlock) {
                         } else {
                             "⚠ " + block.language.ifEmpty { "code" }
                         },
-                        fontSize = 11.sp,
+                        fontSize = MinisTypography.cap,
                         color = if (block.closed) MdCodeLangColor else ToolCancelColor,
                         modifier = Modifier.weight(1f),
                     )

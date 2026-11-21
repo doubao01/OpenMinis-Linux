@@ -25,9 +25,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.openminis.app.R
 import com.openminis.app.ui.theme.ChatColors
+import com.openminis.app.ui.tokens.MinisTypography
+import com.openminis.app.ui.tokens.RawSpace
 import com.openminis.app.ui.util.expandToggleClickable
 
 /**
@@ -69,14 +70,14 @@ internal fun ToolGroupRow(item: FlatChatItem.AssistantToolGroup, onToggle: () ->
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .height(28.dp)
+                .height(RawSpace.xxl4.dp)
                 // [ISS-017] Expand/collapse row: no ripple (expandToggleClickable).
                 .expandToggleClickable(onClick = onToggle)
                 // [T-fold-row-chevron-align] No start inset: the chevron's
                 // visible left edge sits on the same line as the reply text and
                 // the tool pills above and below. The 4 dp moved to the end, so
                 // the tap target keeps its old width (was 4 + content + 4).
-                .padding(start = 0.dp, end = 8.dp)
+                .padding(start = 0.dp, end = RawSpace.md.dp) // token-literal-ok: 0 表示无起始内缩，不是尺寸档位
                 .clearAndSetSemantics {
                     contentDescription = spoken
                     stateDescription = hint
@@ -85,10 +86,10 @@ internal fun ToolGroupRow(item: FlatChatItem.AssistantToolGroup, onToggle: () ->
                 },
         ) {
             FoldChevron(angle = chevronAngle.value, color = ChatColors.secondaryText)
-            Spacer(Modifier.width(5.dp))
+            Spacer(Modifier.width(5.dp)) // token-literal-ok: chevron 与文案的视觉间距，非 2dp 栅格档位
             Text(
                 text = text,
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
                 color = ChatColors.secondaryText,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -134,6 +135,6 @@ private fun FoldChevron(angle: Float, color: androidx.compose.ui.graphics.Color)
 }
 
 /** Visible size of the chevron (iOS chevron.right at 10 pt semibold). */
-internal val FoldChevronWidth = 5.5.dp
-internal val FoldChevronHeight = 10.dp
-private val FoldChevronStroke = 1.6.dp
+internal val FoldChevronWidth = 5.5.dp // token-literal-ok: 箭头几何，按视觉微调不是栅格档位
+internal val FoldChevronHeight = RawSpace.md2.dp
+private val FoldChevronStroke = 1.6.dp // token-literal-ok: 描边宽度跟字号走，非尺寸档位

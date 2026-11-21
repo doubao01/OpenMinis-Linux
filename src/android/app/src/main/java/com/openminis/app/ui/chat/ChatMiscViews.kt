@@ -46,6 +46,7 @@ import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import com.openminis.app.ui.tokens.MinisTypography
 import com.openminis.app.R
 import com.openminis.app.ui.components.MinisAlertDialog
 import androidx.compose.material3.HorizontalDivider
@@ -91,7 +92,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.sp
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.getTextInNode
 import com.openminis.app.ui.theme.ChatColors
@@ -236,8 +236,8 @@ private fun BorderedMarkdownTable(
                             contentAlignment = Alignment.CenterStart,
                         ) {
                             Text(
-                                text = parseInlineMarkdown(cellText, cellStyle.copy(fontSize = 14.sp), inlineCodeText, inlineCodeBg, linkColor),
-                                style = cellStyle.copy(fontSize = 14.sp),
+                                text = parseInlineMarkdown(cellText, cellStyle.copy(fontSize = MinisTypography.bodyLg), inlineCodeText, inlineCodeBg, linkColor),
+                                style = cellStyle.copy(fontSize = MinisTypography.bodyLg),
                             )
                         }
                     }
@@ -402,7 +402,7 @@ internal fun FallbackInfoBlock(block: AssistantBlock, onRevert: (() -> Unit)? = 
                 )
                 Text(
                     text = block.content,
-                    fontSize = 10.sp,
+                    fontSize = MinisTypography.chip,
                     fontWeight = FontWeight.Medium,
                     color = fg,
                     maxLines = 1,
@@ -509,9 +509,9 @@ private fun CompactSummarySheet(
             ) {
                 Text(
                     text = summary,
-                    fontSize = 14.sp,
+                    fontSize = MinisTypography.bodyLg,
                     color = ChatColors.primaryText,
-                    lineHeight = 20.sp,
+                    lineHeight = MinisTypography.lineBodyLg,
                 )
             }
             if (onRevert != null) {
@@ -530,7 +530,7 @@ private fun CompactSummarySheet(
                     Text(
                         text = stringResource(R.string.chat_compact_revert_action),
                         color = MaterialTheme.colorScheme.error,
-                        fontSize = 15.sp,
+                        fontSize = MinisTypography.title,
                         fontWeight = FontWeight.Medium,
                     )
                 }
@@ -756,7 +756,7 @@ internal fun ResumeBanner(onResume: () -> Unit) {
                 } else {
                     stringResource(R.string.resume_banner_title)
                 },
-                fontSize = 11.sp,
+                fontSize = MinisTypography.cap,
                 color = if (showCrashWarning) MaterialTheme.colorScheme.error else ChatColors.secondaryText,
             )
         }
@@ -777,7 +777,7 @@ internal fun ResumeBanner(onResume: () -> Unit) {
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = stringResource(R.string.resume_action),
-                fontSize = 11.sp,
+                fontSize = MinisTypography.cap,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.White,
             )
@@ -874,7 +874,7 @@ internal fun SwipeToSendHint(
                     else R.string.composer_swipe_release_to_send,
                 ),
                 color = chipFg,
-                fontSize = 13.sp,
+                fontSize = MinisTypography.body,
                 fontWeight = FontWeight.SemiBold,
             )
         }

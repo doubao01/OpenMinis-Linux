@@ -63,11 +63,11 @@ object LegacyWorkspaceMigrator {
     }
 
     suspend fun run(context: Context, repo: ChatRepository) {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val prefs = com.openminis.app.config.Prefs.file(PREFS)
         // Two gates, two jobs. The v1 gate is the original one-shot; the v2
         // gate exists because v1's filing rule was wrong and a device that
         // already ran it must be revisited. A fresh install only ever runs v2.
-        if (prefs.getBoolean(KEY_DONE_V2, false)) return
+        if (prefs.bool(KEY_DONE_V2)) return
         val filesDir = context.filesDir
         val globalMemory = File(filesDir, "${SessionWorkspace.GLOBAL_DIR}/memory")
         val sessions = repo.listSessions()
@@ -108,10 +108,11 @@ object LegacyWorkspaceMigrator {
             "legacy migrate done: filed=$filed movedBytes=$movedBytes of ${sessions.size} sessions",
         )
         if (!blocked) {
-            prefs.edit()
-                .putBoolean(KEY_DONE_V2, true)
-                .putBoolean(KEY_DONE, true)
-                .apply()
+            // 两个 gate 一次事务写入，避免中途杀掉时只落一半
+            prefs.write {
+                putBoolean(KEY_DONE_V2, true)
+                putBoolean(KEY_DONE, true)
+            }
         }
     }
 }

@@ -27,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import com.openminis.app.R
 import com.openminis.app.logging.AppLogger
+import com.openminis.app.ui.tokens.MinisTypography
 
 /**
  * One rendered chat row: the alpha/search-focus wrapper Box plus the
@@ -359,6 +360,13 @@ internal fun ChatFlatItemRow(
                                         block = item.block,
                                         isStreaming = item.messageIsStreaming,
                                         isLast = item.isLast,
+                                        // [T-cot-translate-llm] Hand the live
+                                        // provider down so the LLM translate
+                                        // route works. Null (config not loaded,
+                                        // no model picked) degrades to the
+                                        // anonymous Bing route inside the handle.
+                                        llmProvider = viewModel.currentProvider,
+                                        llmModelName = viewModel.currentModel?.displayName ?: "",
                                     )
                                 }
                             }
@@ -493,8 +501,8 @@ private fun MessageUsageFooterLine(stats: MessageUsageStats) {
     val parts = listOfNotNull(tokensPart, cachePart, speedPart)
     Text(
         text = parts.joinToString(" · "),
-        fontSize = 11.sp,
-        lineHeight = 14.sp,
+        fontSize = MinisTypography.cap,
+        lineHeight = MinisTypography.lineCap,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(start = 6.dp, top = 3.dp),
     )
