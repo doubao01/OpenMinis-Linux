@@ -1,5 +1,7 @@
 package com.openminis.app.ui.chat
 
+// [port-upstream-1.16] Ported from OpenMinis 1.16-beta (verbatim).
+
 /**
  * [T-android-settle-programmatic-scroll] Decides whether the post-drag
  * "settle" re-pin (T170, mirrors iOS settleAfterInteraction) may fire.
@@ -50,6 +52,19 @@ object SettleAfterInteractionGate {
         // The discriminator: a scroll that just ended is only "the user's drag
         // ending" if a finger actually lifted recently. The auto-follow glide,
         // pin-to-bottom and the settle itself all end scrolls without one.
-        return msSinceDrag in 0..RECENT_DRAG_MS
+        return isUserInteractionEnd(msSinceDrag)
     }
+
+    /**
+     * Whether a scroll-end that just happened belongs to a real finger lift.
+     *
+     * [com.openminis.app.ui.chat.ChatScreen]'s drag-end checkpoint (the rearm
+     * into Reading mode) collects EVERY `isScrollInProgress` falling edge —
+     * including the auto-follow glide, the pin-to-bottom jump and a queued
+     * settle, all of which a programmatic `scrollToItem` produces without a
+     * finger. Only a `DragInteraction.Stop` writes [msSinceDrag]'s timestamp,
+     * so this window is what distinguishes "the user let go" from "our own
+     * scroll finished".
+     */
+    fun isUserInteractionEnd(msSinceDrag: Long): Boolean = msSinceDrag in 0..RECENT_DRAG_MS
 }
