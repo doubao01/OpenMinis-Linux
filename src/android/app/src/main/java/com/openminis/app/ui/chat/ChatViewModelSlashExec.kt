@@ -25,8 +25,16 @@ fun ChatViewModel.executeSlashCommand(cmd: SlashCommand, currentInput: String = 
     // they're a typing aid. Fill the composer with the literal slash
     // command; the user then taps Send and the model handles the skill via
     // the existing SKILL.md fragment injection in runAgentLoop.
-    if (cmd.isSkill) {
-        AppLogger.info(ChatViewModel.TAG, "[Slash] tap skill id=${cmd.id} title=${cmd.title} → composer fill only")
+    // [T-slash-mcp-fill] MCP rows are composer fillers too: the comment in
+    // chatSlashCommands promises "Tapping fills the composer with the server
+    // name", but the dispatcher had no isMcp branch — tapping one fell
+    // through to the no-dispatch `else` and, on the typed-"/" path, also
+    // wiped whatever the user had typed.
+    if (cmd.isSkill || cmd.isMcp) {
+        AppLogger.info(
+            ChatViewModel.TAG,
+            "[Slash] tap ${if (cmd.isMcp) "mcp" else "skill"} id=${cmd.id} title=${cmd.title} → composer fill only",
+        )
         savedInputBeforeSlash = null
         _showSlashMenu.value = false
         _slashMenuSelectedIndex.value = -1
@@ -52,7 +60,13 @@ fun ChatViewModel.executeSlashCommand(cmd: SlashCommand, currentInput: String = 
     when (cmd.id) {
         "compact" -> compactAll()
         "memory" -> toggleMemoryEnabled()
-        "thinking" -> toggleThinking()
+        // [T-slash-thinking-guard] Reasoning-less models accept the toggle but
+        // nothing changes, so /thinking looked like a dead command.
+        "thinking" -> if (currentModelSupportsReasoning) {
+            toggleThinking()
+        } else {
+            appendSystemInfo(text = "当前模型没有思考档位，/thinking 无效果", iconKind = "info")
+        }
         "goal" -> GoalSheetSignal.open()
         "clear" -> _clearChatConfirmRequested.value = true
         // [T-supervisor-slash-entry] Toggle the armed state; the hint lands

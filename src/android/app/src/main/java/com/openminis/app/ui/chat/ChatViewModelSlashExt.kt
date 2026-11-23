@@ -273,3 +273,30 @@ internal fun ChatViewModel.endSlashSessionForSend() {
 internal fun ChatViewModel.slashMenuSetSelectedIndex(index: Int) {
     _slashMenuSelectedIndex.value = index
 }
+
+/**
+ * [T-slash-skill-passthrough] True when [name] (lowercased, leading slash
+ * already stripped) is an installed skill's handle. Skill rows only fill the
+ * composer, so the send path has to let the text reach runAgentLoop for the
+ * SKILL.md fragment injection — otherwise the literal "/<skill>" was
+ * swallowed by the unknown-command branch and a hand-typed skill could never
+ * run (the /lemon-tools dead end).
+ */
+internal fun ChatViewModel.isKnownSkillSlash(name: String): Boolean {
+    if (name.isBlank()) return false
+    val skills = runCatching { skillRepository?.skills?.value }.getOrNull() ?: return false
+    return skills.any { it.name.equals(name, ignoreCase = true) }
+}
+
+/**
+ * [T-slash-mcp-fill] True when [name] addresses an MCP server, either by the
+ * row's own handle ("/<server-id>") or the explicit "/mcp:<server-id>" form.
+ * Those rows are composer fillers as well: discovery and calls happen
+ * model-side through minis-mcp-cli.
+ */
+internal fun ChatViewModel.isKnownMcpSlash(name: String): Boolean {
+    if (name.isBlank()) return false
+    if (name.startsWith("mcp:")) return true
+    val servers = runCatching { mcpRepository?.servers?.value }.getOrNull() ?: return false
+    return servers.any { it.id.equals(name, ignoreCase = true) }
+}
