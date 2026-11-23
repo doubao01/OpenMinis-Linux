@@ -139,11 +139,12 @@ class MemoryRepository(
         // memory_get full-dump (no keywords): cap at 500 lines — matches iOS
         // `maxTotalLines = 500` in AIChatViewModel+MemoryTools.swift.
         private const val MAX_DUMP_LINES = 500
-        // memory_get keyword search: cap at 60 lines. iOS caps at 60 *entries*
-        // (timestamp-delimited memory_write blocks); Android's keyword search
-        // is line-based with ±2 context windows, so we keep the same algorithm
-        // and align on the 60 magnitude as the line budget.
+        // memory_get keyword search: cap at 60 lines. Hits are now entry-scoped
+        // (timestamp-delimited memory_write blocks) like iOS; the 60-line budget
+        // stays as a hard ceiling so one huge entry cannot flood the result.
         private const val MAX_SEARCH_LINES = 60
+        /** 单次 memory_get 最多返回的记忆条目数（每条命中带时间戳与标题）。 */
+        private const val MAX_SEARCH_HITS = 8
         internal const val MAX_LOOKBACK_DAYS = 30
         // [P5] Verbatim daily window: 7 days (was 3). Days the budget cannot
         // admit drop to a MemoryIndex table-of-contents row instead of
@@ -425,39 +426,27 @@ class MemoryRepository(
                 totalMatchedFiles += 1
                 "[$label$truncated]\n$preview"
             } else {
-                // Keyword search with ±2 context window
-                val lines = content.lines()
-                val matchedRanges = mutableListOf<IntRange>()
-
-                for (i in lines.indices) {
-                    val windowStart = maxOf(0, i - 2)
-                    val windowEnd = minOf(lines.size - 1, i + 2)
-                    val windowText = lines.subList(windowStart, windowEnd + 1)
-                        .joinToString(" ").lowercase()
-
-                    if (keywordList.all { windowText.contains(it) }) {
-                        matchedRanges.add(windowStart..windowEnd)
-                    }
-                }
-
-                if (matchedRanges.isEmpty()) {
-                    null
-                } else {
+                // [T-memory-search-entry-scoped] 条目级检索：关键词必须落在同一条记忆内。
+                // 旧实现用「行 ±2 窗口」，相邻两条记忆会互相污染；单词 `a` 这类单字符
+                // token 又会让 AND 条件恒真。命中块自带时间戳与标题，模型能看清命中的
+                // 是哪条记忆，而不是一段无出处的行窗口。
+                val hits = MemorySearch.search(content, keywordList, maxHits = MAX_SEARCH_HITS)
+                if (hits.isEmpty()) null else {
                     totalMatchedFiles += 1
-                    val merged = mergeRanges(matchedRanges)
                     val fileMatches = mutableListOf<String>()
 
-                    for (range in merged) {
-                        val chunkLines = range.last - range.first + 1
+                    for (hit in hits) {
+                        val rendered = hit.render()
+                        val chunkLines = rendered.lines().size
                         if (totalLines + chunkLines > lineCap) {
                             val remaining = lineCap - totalLines
                             if (remaining > 0) {
-                                fileMatches.add(lines.subList(range.first, range.first + remaining).joinToString("\n"))
+                                fileMatches.add(rendered.lines().take(remaining).joinToString("\n"))
                                 totalLines += remaining
                             }
                             break
                         }
-                        fileMatches.add(lines.subList(range.first, range.last + 1).joinToString("\n"))
+                        fileMatches.add(rendered)
                         totalLines += chunkLines
                     }
 
@@ -737,21 +726,6 @@ class MemoryRepository(
             ?: ""
     }
 
-    private fun mergeRanges(ranges: List<IntRange>): List<IntRange> {
-        if (ranges.isEmpty()) return emptyList()
-        val sorted = ranges.sortedBy { it.first }
-        val result = mutableListOf(sorted[0])
-        for (i in 1 until sorted.size) {
-            val last = result.last()
-            val current = sorted[i]
-            if (current.first <= last.last + 1) {
-                result[result.lastIndex] = last.first..maxOf(last.last, current.last)
-            } else {
-                result.add(current)
-            }
-        }
-        return result
-    }
 }
 
 /**
