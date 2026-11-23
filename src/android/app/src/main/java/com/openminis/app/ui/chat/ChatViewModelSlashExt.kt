@@ -5,6 +5,7 @@ package com.openminis.app.ui.chat
 // dispatcher executeSlashCommand stays in the class (entangled with compact/
 // thinking/memory). 7 slash-state fields flipped private->internal. Verbatim.
 
+import kotlinx.coroutines.launch
 import androidx.lifecycle.viewModelScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Compress
