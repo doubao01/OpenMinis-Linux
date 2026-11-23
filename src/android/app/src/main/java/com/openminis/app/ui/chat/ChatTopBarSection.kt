@@ -446,10 +446,10 @@ internal fun ChatTopBarActions(
                             }
                             // [P0-6] 会话段：本会话的行为开关。
                             MinisMenuSectionHeader(stringResource(R.string.chat_menu_section_session))
-                                                                                    // [T-perm-three-modes] ZCode parity: exactly three session modes, each
+                            // [T-perm-three-modes] ZCode parity: exactly three session modes, each
                             // listed with its one-line meaning. The active one is checked;
-                            //完全访问 first arms an inline risk confirmation instead of switching
-                            // silently on a stray tap.
+                            // full access first arms an inline risk confirmation instead of
+                            // switching silently on a stray tap.
                             var fullAccessArmed by remember { mutableStateOf(false) }
                             val permLabel = stringResource(
                                 when (sessionPerm) {
@@ -497,8 +497,6 @@ internal fun ChatTopBarActions(
                                     )
                                 },
                             )
-                            permissionModes.forEach { mode ->
-                            }
                             if (fullAccessArmed) {
                                 MinisMenuDivider()
                                 DropdownMenuItem(
