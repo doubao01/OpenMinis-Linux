@@ -29,6 +29,9 @@ internal object SessionPermissionPrefs {
 
     fun prime(context: Context) {
         prefs = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        // [T-panel-mode-sync] 冷启动补推一次：面板可能停在别的档（或刚被 boot.sh 拉起，
+        // 默认在变更前确认）。这里是 App 开口的唯一时机，一次 HTTP 即可对齐。
+        PanelModeSync.primeCurrent(current())
     }
 
     /** The mode a chat with no stored choice starts in. Unprimed reads fall back to the safest tier. */
@@ -38,6 +41,9 @@ internal object SessionPermissionPrefs {
     /** Remember the user's choice so the next new chat starts where they left off. */
     fun remember(mode: SessionPermissionMode) {
         prefs?.edit()?.putString(KEY_MODE, mode.toStoredToken())?.apply()
+        // [T-panel-mode-sync] 所有改档路径都汇到这里；顺手推给面板，避免
+        // 「App 完全访问、面板变更前确认」这种同一台机器两套脾气。
+        PanelModeSync.push(mode)
     }
 
     /** Tests: drop the stored choice. */
