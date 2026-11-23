@@ -1,0 +1,42 @@
+name: android-compile
+
+on:
+  push:
+    branches: [feat/session-menu-7]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Point Gradle at the preinstalled SDK
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME:-/usr/local/lib/android/sdk}" >> $GITHUB_ENV
+          echo "sdk.dir=${ANDROID_HOME:-/usr/local/lib/android/sdk}" > src/android/local.properties
+          ls ${ANDROID_HOME:-/usr/local/lib/android/sdk}/platforms | tail -3
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('src/android/**/*.gradle*', 'src/android/gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Compile Kotlin (release variant)
+        working-directory: src/android
+        run: |
+          ./gradlew :app:compileReleaseKotlin --parallel --stacktrace --no-daemon \
+            -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g" \
+            -Pkotlin.daemon.jvmargs=-Xmx4g

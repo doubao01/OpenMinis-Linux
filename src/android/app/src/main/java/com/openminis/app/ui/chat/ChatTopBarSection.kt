@@ -390,6 +390,16 @@ internal fun ChatTopBarActions(
                     }
                     // iOS: "..." circle button → dropdown menu
                     Box {
+                        var showSessionResources by remember { mutableStateOf(false) }
+                        if (showSessionResources) {
+                            SessionResourcesSheet(
+                                viewModel = viewModel,
+                                onOpenSkills = onShowSkillsSheet,
+                                onOpenMcps = onShowMcpsSheet,
+                                onOpenTokenUsage = onShowTokenUsageSheet,
+                                onDismiss = { showSessionResources = false },
+                            )
+                        }
                         IconButton(onClick = { showChatMenu.value = true }) {
                             Icon(Icons.Outlined.MoreHoriz, contentDescription = stringResource(R.string.cd_more))
                         }
@@ -447,49 +457,6 @@ internal fun ChatTopBarActions(
                                 SessionPermissionMode.FULL_ACCESS,
                             )
                             permissionModes.forEach { mode ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            stringResource(
-                                                when (mode) {
-                                                    SessionPermissionMode.ASK_BEFORE_CHANGES -> R.string.chat_menu_perm_ask
-                                                    SessionPermissionMode.AUTONOMOUS -> R.string.chat_menu_perm_safe_auto
-                                                    SessionPermissionMode.FULL_ACCESS -> R.string.chat_menu_perm_yoyo
-                                                },
-                                            ) + " · " + stringResource(
-                                                when (mode) {
-                                                    SessionPermissionMode.ASK_BEFORE_CHANGES -> R.string.perm_mode_desc_ask
-                                                    SessionPermissionMode.AUTONOMOUS -> R.string.perm_mode_desc_auto
-                                                    SessionPermissionMode.FULL_ACCESS -> R.string.perm_mode_desc_full
-                                                },
-                                            ),
-                                        )
-                                    },
-                                    onClick = {
-                                        if (mode == SessionPermissionMode.FULL_ACCESS && !sessionPerm.isFullAccess()) {
-                                            fullAccessArmed = true
-                                        } else {
-                                            showChatMenu.value = false
-                                            fullAccessArmed = false
-                                            viewModel.setSessionPermissionMode(mode)
-                                        }
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            when (mode) {
-                                                SessionPermissionMode.ASK_BEFORE_CHANGES -> Icons.Filled.Shield
-                                                SessionPermissionMode.AUTONOMOUS -> Icons.Filled.Psychology
-                                                SessionPermissionMode.FULL_ACCESS -> Icons.Filled.Bolt
-                                            },
-                                            contentDescription = null,
-                                        )
-                                    },
-                                    trailingIcon = if (mode == sessionPerm) {
-                                        { Icon(Icons.Filled.Check, contentDescription = null) }
-                                    } else {
-                                        null
-                                    },
-                                )
                             }
                             if (fullAccessArmed) {
                                 MinisMenuDivider()
@@ -541,6 +508,13 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                             // the exact state where the banner is on screen.
                             if (restorableCount > 0) {
                                 DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.chat_menu_session_resources)) },
+                                    onClick = {
+                                        showChatMenu.value = false
+                                        showSessionResources = true
+                                    },
+                                )
+                                DropdownMenuItem(
                                     text = { Text(stringResource(R.string.chat_menu_restore_deleted)) },
                                     onClick = {
                                         showChatMenu.value = false
@@ -550,7 +524,6 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                                 )
                             }
                             // [P0-6] 工具段：会话内的扩展面。
-                            MinisMenuSectionHeader(stringResource(R.string.chat_menu_section_tools))
                             // [P2-git-panel] Git panel — desktop-style git UI
                             // over the session workspace.
                             DropdownMenuItem(
@@ -565,29 +538,9 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                             )
                             // Session Skills (iOS parity)
                             if (skillRepository != null) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.session_skills_title)) },
-                                    onClick = {
-                                        showChatMenu.value = false
-                                        onShowSkillsSheet()
-                                    },
-                                    leadingIcon = {
-                                        Icon(m3Icon(Icons.Default.Build), contentDescription = null)
-                                    },
-                                )
                             }
                             // [T-mcp-integration-android] MCPs in Session, next to Skills.
                             if (mcpRepository != null) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.session_mcps_title)) },
-                                    onClick = {
-                                        showChatMenu.value = false
-                                        onShowMcpsSheet()
-                                    },
-                                    leadingIcon = {
-                                        Icon(Icons.Default.Extension, contentDescription = null)
-                                    },
-                                )
                             }
                             // [T-ssh-workspace] (#32) Bind this session to an
                             // SSH host: shell tools then run remotely. The
@@ -611,38 +564,16 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                             // so the entry must stay reachable with memory off
                             // or the user could not edit what still binds.
                             if (memoryRepository != null) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.session_memory_title)) },
-                                    onClick = {
-                                        showChatMenu.value = false
-                                        viewModel.toggleMemorySheet()
-                                    },
-                                    leadingIcon = {
-                                        Icon(m3Icon(Icons.Default.Psychology), contentDescription = null)
-                                    },
-                                )
                             }
                             // [P0-6] 设置段：模型调用与会话开销类开关。增强缓存/
                             // 极速模式保留在此而非移入系统设置页：它们的可见性
                             // 由当前会话的模型/提供方决定（showFastModeToggle、
                             // showEnhancedCacheToggle），设置页没有会话上下文。
-                            MinisMenuSectionHeader(stringResource(R.string.chat_menu_section_settings))
                             // Token Usage (iOS parity). [#25] The context
                             // breakdown (per-block composition of the next
                             // request) now lives INSIDE this sheet's Context
                             // section — one entry point, one sheet, no
                             // duplicated header stats (see TokenUsageSheet).
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.settings_token_usage)) },
-                                onClick = {
-                                    showChatMenu.value = false
-                                    onShowTokenUsageSheet()
-                                },
-                                leadingIcon = {
-                                    val contextUsage by viewModel.contextUsage.collectAsStateWithLifecycle()
-                                    ContextRing(usage = contextUsage)
-                                },
-                            )
                             // Enhanced Cache (iOS parity, commit 57aaf122):
                             // 1-hour Anthropic cache TTL. Only shown for the
                             // official Anthropic API (not relays / other
@@ -652,37 +583,6 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                             val showEnhancedCache by viewModel.showEnhancedCacheToggle.collectAsStateWithLifecycle()
                             val enhancedCacheOn by viewModel.enhancedCacheEnabled.collectAsStateWithLifecycle()
                             if (showEnhancedCache) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.chat_menu_enhanced_cache)) },
-                                    onClick = {
-                                        if (enhancedCacheOn) {
-                                            viewModel.setEnhancedCacheEnabled(false)
-                                        } else if (viewModel.isEnhancedCacheConfirmed()) {
-                                            viewModel.setEnhancedCacheEnabled(true)
-                                        } else {
-                                            showChatMenu.value = false
-                                            onShowEnhancedCacheDialog()
-                                        }
-                                    },
-                                    leadingIcon = {
-                                        Icon(Icons.Default.Bolt, contentDescription = null)
-                                    },
-                                    trailingIcon = {
-                                        SettingsSwitch(
-                                            checked = enhancedCacheOn,
-                                            onCheckedChange = {
-                                                if (enhancedCacheOn) {
-                                                    viewModel.setEnhancedCacheEnabled(false)
-                                                } else if (viewModel.isEnhancedCacheConfirmed()) {
-                                                    viewModel.setEnhancedCacheEnabled(true)
-                                                } else {
-                                                    showChatMenu.value = false
-                                                    onShowEnhancedCacheDialog()
-                                                }
-                                            },
-                                        )
-                                    },
-                                )
                             }
                             // [T-codex-fast-mode] Fast Mode (iOS parity,
                             // fb671083 + 838ba929): shown when the active model
@@ -697,19 +597,6 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                             val showFastMode by viewModel.showFastModeToggle.collectAsStateWithLifecycle()
                             val fastModeOn by viewModel.fastModeEnabled.collectAsStateWithLifecycle()
                             if (showFastMode) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.chat_menu_fast_mode)) },
-                                    onClick = { viewModel.setFastModeEnabled(!fastModeOn) },
-                                    leadingIcon = {
-                                        Icon(Icons.Default.Bolt, contentDescription = null)
-                                    },
-                                    trailingIcon = {
-                                        SettingsSwitch(
-                                            checked = fastModeOn,
-                                            onCheckedChange = { viewModel.setFastModeEnabled(it) },
-                                        )
-                                    },
-                                )
                             }
                             // Auto Compact: app-level persisted toggle mirroring
                             // iOS `autoCompactEnabled`. On → crossing the
@@ -718,19 +605,6 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                             // beside Fast Mode because both are model-invocation
                             // controls the user flips mid-conversation.
                             val autoCompactOn by viewModel.autoCompactEnabled.collectAsStateWithLifecycle()
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.chat_menu_auto_compact)) },
-                                onClick = { viewModel.setAutoCompactEnabled(!autoCompactOn) },
-                                leadingIcon = {
-                                    Icon(Icons.Default.Compress, contentDescription = null)
-                                },
-                                trailingIcon = {
-                                    SettingsSwitch(
-                                        checked = autoCompactOn,
-                                        onCheckedChange = { viewModel.setAutoCompactEnabled(it) },
-                                    )
-                                },
-                            )
                             // T287: debug-only crash trigger so the user can verify
                             // ACRA/native crash log generation (T283). Throws a
                             // RuntimeException from the click handler — the

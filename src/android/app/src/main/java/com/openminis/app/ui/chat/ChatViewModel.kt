@@ -2329,19 +2329,40 @@ class ChatViewModel(
             viewModelScope.launch { executeGoalCommand(body.removeRange(0, 4).trim()) }
             return true
         }
-        val name = body.lowercase()
+        // [T-slash-router] Only the first whitespace-delimited token can be a
+        // command name. "/skill args", MCP rows and filesystem paths must fall
+        // through to the model instead of being answered with "未知命令".
+        val tokens = body.trim().split(Regex("\\s+"), limit = 2)
+        val name = tokens[0].lowercase()
+        val args = tokens.getOrElse(1) { "" }.trim()
         val cmd = availableSlashCommands.firstOrNull { it.title.lowercase() == name }
         if (cmd != null) {
             executeSlashCommand(cmd)
             return true
         }
+        // [T-slash-skill-passthrough] A skill row fills "/<skill-name> " into
+        // the composer (executeSlashCommand → isSkill), so the very next Send
+        // landed here and was swallowed as an unknown command: skills could
+        // only ever be triggered from the / panel, never by hand. Let the text
+        // through so runAgentLoop injects the SKILL.md fragment.
+        if (isKnownSkillSlash(name)) return false
+        // Same for MCP rows ("/<server-id>" / "/mcp:<server-id>") — discovery
+        // and calls happen model-side through minis-mcp-cli.
+        if (isKnownMcpSlash(name)) return false
+        // A path (any further "/" in the body) is content, not a command:
+        // "/data/local/tmp 看一下" used to be eaten by the notice below.
+        if (body.contains('/')) return false
         // [T-android-slash-literal-not-chat] A bare "/" or an unmatched
         // "/xyz" is a slash-panel interaction, not a chat message. Sending
         // it to the model made the assistant answer the literal string.
         // Swallow it with a local notice instead; the composer's slash
         // panel stays open so the user can pick a real command.
         appendSystemInfo(
-            text = "未知命令: $trimmed（可用命令见 / 面板）",
+            text = if (args.isEmpty()) {
+                "未知命令: $trimmed（可用命令见 / 面板）"
+            } else {
+                "未知命令: /$name（可用命令见 / 面板）"
+            },
             iconKind = "info",
         )
         return true
