@@ -54,12 +54,13 @@ class McpToolDispatcherExtendedTest {
     // ─── listTools surface ────────────────────────────────────────────────
 
     @Test
-    fun `listTools exposes all sixteen tools`() {
+    fun `listTools exposes all twenty-one tools`() {
         val tools = dispatcher().listTools()
         // [T-lemon-integration] 14 built-ins + lemon_list / lemon_call. The
         // cargo catalog lives in assets and is reachable through those two,
         // so the surface grew by two, not by 358.
-        assertEquals(16, tools.length())
+        // [T-lemon-pilot-native] +5: pilot_* 是内核 builtin，不在资产目录里。
+        assertEquals(21, tools.length())
         val names = (0 until tools.length()).map { tools.getJSONObject(it).getString("name") }
         assertEquals(
             listOf(
@@ -69,6 +70,7 @@ class McpToolDispatcherExtendedTest {
                 "schedule_task_update", "schedule_task_delete",
                 "alarm_reminder_create", "context_apps_query",
                 "lemon_list", "lemon_call",
+                "pilot_perceive", "pilot_tap", "pilot_run", "pilot_skills", "pilot_audit",
             ),
             names,
         )

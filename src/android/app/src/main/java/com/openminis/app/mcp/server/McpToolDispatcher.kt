@@ -81,6 +81,10 @@ class McpToolDispatcher(
         // through this same gate — no second permission model, no second
         // process. Two entries, 358 reachable tools.
         addAll(lemonTools(deps))
+        // [T-lemon-pilot-native] pilot_* 是内核 builtin（没有插件壳），所以不在
+        // assets/lemon/catalog.json 里。补上这五个后，in-app 的机器可用工具
+        // 与独立面板活体（363）对齐，不再需要开第二个进程补位。
+        addAll(pilotTools(deps))
         // Approval tools appear only when a runtime exists: advertising a tool
         // whose handler has no store behind it is the defect the announced-tool
         // gate exists for.

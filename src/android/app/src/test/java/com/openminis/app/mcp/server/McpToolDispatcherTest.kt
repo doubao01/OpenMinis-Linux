@@ -69,11 +69,13 @@ class McpToolDispatcherTest {
     // ─── listTools ────────────────────────────────────────────────────────
 
     @Test
-    fun `listTools exposes exactly the sixteen tools with schemas`() {
+    fun `listTools exposes exactly the twenty-one tools with schemas`() {
         val tools = dispatcher(FakeGate()).listTools()
         // [T-lemon-integration] +2: lemon_list / lemon_call front the bundled
         // 358-tool catalog without putting 358 entries in tools/list.
-        assertEquals(16, tools.length())
+        // [T-lemon-pilot-native] +5: pilot_* 是内核 builtin（没有插件壳），
+        // 目录资产盖不住它们，所以作为独立 spec 注册。
+        assertEquals(21, tools.length())
         val names = (0 until tools.length()).map { tools.getJSONObject(it).getString("name") }
         assertEquals(
             listOf(
@@ -83,6 +85,7 @@ class McpToolDispatcherTest {
                 "schedule_task_update", "schedule_task_delete",
                 "alarm_reminder_create", "context_apps_query",
                 "lemon_list", "lemon_call",
+                "pilot_perceive", "pilot_tap", "pilot_run", "pilot_skills", "pilot_audit",
             ),
             names,
         )
