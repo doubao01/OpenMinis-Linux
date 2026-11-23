@@ -54,6 +54,12 @@ data class ScheduledRun(
 enum class ScheduledRepeatMode { ONCE, DAILY, WEEKDAYS, CUSTOM, INTERVAL, CRON }
 
 /**
+ * 触发方式。[SCHEDULE] 按闹钟时间触发（默认）；[AFTER_TASK] 不装闹钟，
+ * 由上游任务成功跑完后经 [ScheduledChain] 拉起，用来做「跑完再跑下一步」的链式编排。
+ */
+enum class ScheduledTriggerKind { SCHEDULE, AFTER_TASK }
+
+/**
  * What the task does when it fires. Mirrors the iOS App Intent set.
  *  - [NewSession]: run [ScheduledTask.prompt] in a brand-new chat.
  *  - [AppendToSession]: append the prompt to an existing chat (follow-up).
@@ -162,6 +168,11 @@ data class ScheduledTask(
     // fire time (see [resolvedNewSessionFolderId]); a dissolved group
     // degrades to unfiled instead of filing into a ghost row.
     val newSessionFolderId: String? = null,
+
+    /** 触发方式：默认按时间；AFTER_TASK 由上游任务完成时拉起。 */
+    val triggerKind: ScheduledTriggerKind = ScheduledTriggerKind.SCHEDULE,
+    /** triggerKind=AFTER_TASK 时的上游任务 id；null 表示未绑定，永不自动触发。 */
+    val afterTaskId: String? = null,
 ) {
 
     /**
@@ -303,6 +314,8 @@ data class ScheduledTask(
         if (runNowSlotMs != null) put("runNowSlotMs", runNowSlotMs)
         if (newSessionPermissionMode != null) put("newSessionPermissionMode", newSessionPermissionMode)
         if (newSessionFolderId != null) put("newSessionFolderId", newSessionFolderId)
+        if (triggerKind != ScheduledTriggerKind.SCHEDULE) put("triggerKind", triggerKind.name)
+        if (afterTaskId != null) put("afterTaskId", afterTaskId)
     }
 
     companion object {
@@ -347,6 +360,10 @@ data class ScheduledTask(
                 if (o.has("newSessionPermissionMode")) o.optString("newSessionPermissionMode", null) else null,
             newSessionFolderId =
                 if (o.has("newSessionFolderId")) o.optString("newSessionFolderId", null) else null,
+            triggerKind = ScheduledTriggerKind.values().firstOrNull {
+                it.name == o.optString("triggerKind", "")
+            } ?: ScheduledTriggerKind.SCHEDULE,
+            afterTaskId = if (o.has("afterTaskId")) o.optString("afterTaskId", null) else null,
         )
     }
 }

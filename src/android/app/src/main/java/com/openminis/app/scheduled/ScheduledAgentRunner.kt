@@ -86,6 +86,8 @@ object ScheduledAgentRunner {
         context: Context,
         task: ScheduledTask,
         waitForCompletion: Boolean = true,
+        /** 链式触发的当前层级：上游任务为 0，它拉起的下游为 1，最多 ScheduledChain.MAX_DEPTH 层。 */
+        chainDepth: Int = 0,
     ): String? {
         // [T-android-scheduled-lateinit-crash-156] The MinisApp
         // half-initialization guard lives in the template now
@@ -123,6 +125,8 @@ object ScheduledAgentRunner {
                 val ok = result.status != "Error" && result.status != "Timeout"
                 ScheduledTaskManager(app).markFired(task.id, sessionId, preview, ok = ok)
                 postCompletionNotification(app, task, sessionId, preview)
+                // 链式编排：只在真正成功时拉起下游，失败的上游不带动别人的账。
+                if (ok) fireDependents(app, task.id, chainDepth)
             },
         )
         } finally {
@@ -144,6 +148,29 @@ object ScheduledAgentRunner {
      * the transport. Always dispatched with wait=true (the template decides
      * inline-vs-bgScope).
      */
+    /**
+     * 上游任务成功后拉起挂在它下面的 AFTER_TASK 任务。
+     *
+     * 深度闸门在 [ScheduledChain.selectDependents] 里：A→B→A 这种环走三层就停，
+     * 不会变成无限自激。下游一律 waitForCompletion=false 异步跑，避免一条链把
+     * 前台调度线程占满；每条的完成又会回到这里，把链继续往下带。
+     */
+    private suspend fun fireDependents(app: MinisApp, completedTaskId: String, depth: Int) {
+        val dependents = ScheduledChain.selectDependents(
+            tasks = ScheduledTaskManager(app).list(),
+            completedTaskId = completedTaskId,
+            depth = depth,
+        )
+        if (dependents.isEmpty()) return
+        AppLogger.info(
+            TAG,
+            "chain: ${dependents.size} dependent task(s) after $completedTaskId (depth=$depth)",
+        )
+        for (dependent in dependents) {
+            run(app, dependent, waitForCompletion = false, chainDepth = depth + 1)
+        }
+    }
+
     private suspend fun dispatchForTask(
         app: MinisApp,
         task: ScheduledTask,

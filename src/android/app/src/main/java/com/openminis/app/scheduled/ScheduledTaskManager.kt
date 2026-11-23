@@ -90,6 +90,8 @@ class ScheduledTaskManager(private val context: Context) {
         var count = 0
         for (t in tasks) {
             if (!t.enabled) continue
+            // AFTER_TASK 任务不按时间触发：它由上游完成事件拉起，装闹钟会变成每日空跑。
+            if (t.triggerKind != ScheduledTriggerKind.SCHEDULE) continue
             registerAlarm(t)
             count++
         }
@@ -228,6 +230,8 @@ class ScheduledTaskManager(private val context: Context) {
     }
 
     private fun registerAlarm(task: ScheduledTask) {
+        // 兜底：链式任务在任何路径上都不该拿到闹钟。
+        if (task.triggerKind != ScheduledTriggerKind.SCHEDULE) return
         val triggerAt = task.nextTriggerMs() ?: run {
             AppLogger.warning(TAG, "task ${task.id} has no next trigger — skipping register")
             return

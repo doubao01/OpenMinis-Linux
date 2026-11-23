@@ -4,7 +4,10 @@ import android.content.Context
 import com.openminis.app.data.model.AgentToolDefinition
 import com.openminis.app.data.model.AgentToolParam
 import com.openminis.app.sandbox.ExecutionCoordinator
+import com.openminis.app.scheduled.ScheduledRepeatMode
 import com.openminis.app.scheduled.ScheduledTargetMode
+import com.openminis.app.scheduled.ScheduledTask
+import com.openminis.app.scheduled.ScheduledTriggerKind
 import com.openminis.app.scheduled.ScheduledTaskCodec
 import com.openminis.app.scheduled.ScheduledTaskManager
 import org.json.JSONArray
@@ -51,10 +54,16 @@ object CronJobTool {
                 "For create: any duration like '90s', '7m', '45m', '3h', '1d', '1h30m', or 'every 15m' / 'every 1h30m'.",
             ),
             "prompt" to AgentToolParam("string", "Agent prompt to run when the task fires."),
+            "after_task" to AgentToolParam(
+                "string",
+                "For create: id (or unique prefix) of an upstream scheduled task. When set, this task " +
+                    "does NOT run on a timer — it runs once, right after that upstream task finishes successfully. " +
+                    "Use it to chain steps (research -> collate -> send).",
+            ),
             "id" to AgentToolParam("string", "Task id or a unique id prefix for remove (from list)."),
         ),
         required = listOf("tool_title", "action"),
-        propertyOrdering = listOf("tool_title", "action", "name", "schedule", "prompt", "id"),
+        propertyOrdering = listOf("tool_title", "action", "name", "schedule", "prompt", "after_task", "id"),
     )
 
     fun execute(argsJson: String, sessionId: String, context: Context): ToolExecutionResult {
@@ -103,6 +112,39 @@ object CronJobTool {
         val schedule = args.optString("schedule").trim()
         val prompt = args.optString("prompt").trim()
         if (prompt.isEmpty()) return ToolExecutionResult("Error: prompt is required for create", false)
+
+        // 链式任务：不给 schedule，只在指定上游成功后跑一次。
+        val afterTaskRaw = args.optString("after_task").trim()
+        if (afterTaskRaw.isNotEmpty()) {
+            val upstreamId = manager.resolveId(afterTaskRaw)
+            val upstream = upstreamId?.let { manager.get(it) }
+                ?: return ToolExecutionResult(
+                    "Error: after_task '$afterTaskRaw' does not match any scheduled task",
+                    false,
+                )
+            if (upstream.id == afterTaskRaw) {
+                return ToolExecutionResult("Error: a task cannot chain to itself", false)
+            }
+            val chained = ScheduledTask(
+                label = name.ifBlank { "after ${upstream.label}" },
+                timeOfDayHour = 9,
+                timeOfDayMinute = 0,
+                repeatMode = ScheduledRepeatMode.ONCE,
+                prompt = prompt,
+                targetMode = if (ownerSessionId.isBlank()) {
+                    ScheduledTargetMode.NewSession
+                } else {
+                    ScheduledTargetMode.AppendToSession(ownerSessionId)
+                },
+                triggerKind = ScheduledTriggerKind.AFTER_TASK,
+                afterTaskId = upstream.id,
+            )
+            val savedChained = manager.create(chained)
+            return ToolExecutionResult(
+                ScheduledTaskCodec.createResult(savedChained, chained, "after ${upstream.id}").toString(),
+                true,
+            )
+        }
         // [P2-schedule-codec] Parse→fireAt→construct is the shared codec; this
         // surface only adapts its inputs (attribution to the calling chat).
         // Blank owner (no chat context, e.g. a debug harness) keeps the
