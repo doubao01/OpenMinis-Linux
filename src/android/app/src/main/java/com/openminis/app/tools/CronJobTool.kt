@@ -141,7 +141,7 @@ object CronJobTool {
             )
             val savedChained = manager.create(chained)
             return ToolExecutionResult(
-                ScheduledTaskCodec.createResult(savedChained, chained, "after ${upstream.id}").toString(),
+                ScheduledTaskCodec.createResult(savedChained, chained, "after_task:${upstream.id}").toString(),
                 true,
             )
         }

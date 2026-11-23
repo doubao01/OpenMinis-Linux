@@ -96,7 +96,13 @@ object ScheduledTaskCodec {
             put("repeat", t.repeatMode.name)
             if (t.intervalMinutes > 0) put("intervalMinutes", t.intervalMinutes)
             if (t.fireAtMs != null) put("fireAtMs", t.fireAtMs)
-            put("nextTriggerMs", t.nextTriggerMs() ?: JSONObject.NULL)
+            if (t.triggerKind != ScheduledTriggerKind.SCHEDULE) {
+                put("trigger", t.triggerKind.name)
+                t.afterTaskId?.let { put("afterTaskId", it) }
+                put("nextTriggerMs", JSONObject.NULL) // 链式任务没有时间点
+            } else {
+                put("nextTriggerMs", t.nextTriggerMs() ?: JSONObject.NULL)
+            }
             put("prompt", t.prompt.take(200))
             if (includeTargetSession) {
                 t.targetMode.sessionIdOrNull?.let { put("target_session", it) }
