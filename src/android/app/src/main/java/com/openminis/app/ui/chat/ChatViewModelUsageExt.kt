@@ -34,6 +34,14 @@ internal data class MessageUsageStats(
     val cacheReadTokens: Int,
     val cacheCreationTokens: Int,
     val streamDurationMs: Long? = null,
+    /**
+     * [T-message-usage-footer-time] Wall-clock time of the message this stats
+     * belongs to (ms epoch), injected by [usageByUiMessageId] from
+     * [ChatMessage.createdAt] — NOT part of the persisted usage JSON
+     * ([fromJson] always yields null). Null when no DB row backs the bubble;
+     * the three-tier time tier in the usage footer formats it.
+     */
+    val createdAtMs: Long? = null,
 ) {
     val promptTotalTokens: Int get() = inputTokens + cacheReadTokens + cacheCreationTokens
 
@@ -93,14 +101,27 @@ internal data class MessageUsageStats(
 // callers — the footer path pre-parses rows (usageByUiMessageId) and merges
 // via mergeMessageUsageStats; the raw-row variant existed only for its test.
 
-/** Sum pre-parsed rows (see [usageByUiMessageId]); null entries skipped. Pure. */
+/**
+ * Sum pre-parsed rows (see [usageByUiMessageId]); null entries skipped.
+ *
+ * [T-usage-tok-s-merge] A merged bubble's rows come from different persist
+ * paths — the turn-persist path stamps a stream window, the others don't.
+ * The binary [MessageUsageStats.plus] keeps its all-or-nothing window gate,
+ * but THIS merge — the one the footer actually uses — aggregates the windows
+ * that ARE present, so one un-windowed row no longer drops tok/s for the
+ * whole bubble. The speed then reads slightly fast (un-windowed rows still
+ * contribute tokens to the numerator), which beats a footer that loses its
+ * speed segment on every long multi-tool-turn reply. Pure.
+ */
 internal fun mergeMessageUsageStats(stats: List<MessageUsageStats?>): MessageUsageStats? {
     var merged: MessageUsageStats? = null
+    var windowedMs = 0L
     for (parsed in stats) {
         if (parsed == null) continue
         merged = merged?.plus(parsed) ?: parsed
+        parsed.streamDurationMs?.let { windowedMs += it }
     }
-    return merged
+    return merged?.copy(streamDurationMs = windowedMs.takeIf { it > 0L })
 }
 
 /**
@@ -148,7 +169,10 @@ internal fun usageByUiMessageId(
         if (message.role != "assistant" || message.isStreaming) continue
         if (message.sourceDbIds.isEmpty()) continue
         val merged = mergeMessageUsageStats(message.sourceDbIds.map { usageByDbId[it] }) ?: continue
-        if (merged.hasData) out[message.id] = merged
+        // [T-message-usage-footer-time] Stamp the bubble's wall-clock time for
+        // the footer's three-tier time tier — merged stats carry no time of
+        // their own (the persisted usage JSON has no timestamp).
+        if (merged.hasData) out[message.id] = merged.copy(createdAtMs = message.createdAt)
     }
     return out
 }

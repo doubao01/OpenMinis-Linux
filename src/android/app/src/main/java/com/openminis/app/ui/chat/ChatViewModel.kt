@@ -613,30 +613,6 @@ class ChatViewModel(
     internal val _isLoadingHistory = MutableStateFlow(false)
     val isLoadingHistory: StateFlow<Boolean> = _isLoadingHistory.asStateFlow()
 
-    internal fun notePersistedUiRow(uiMessageId: String?, dbMessageId: String) {
-        if (uiMessageId != null) {
-            _messages.value = _messages.value.map { message ->
-                if (message.id == uiMessageId && dbMessageId !in message.sourceDbIds) {
-                    message.copy(sourceDbIds = message.sourceDbIds + dbMessageId)
-                } else message
-            }
-        }
-        viewModelScope.launch {
-            val sort = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                chatRepository.dao.sortOrderOf(dbMessageId)
-            }
-            val newest = timeline.newestSortOrder
-            // count == 1 is this row alone. Anything larger is a gap under it.
-            // Jumping the cursor over that gap would hide the missing rows.
-            val skipped = newest != null && withContext(kotlinx.coroutines.Dispatchers.IO) {
-                chatRepository.dao.countMessagesAfterSort(sessionId, newest) > 1
-            }
-            if (!skipped && sort != null && (newest == null || sort > newest)) {
-                timeline.extendNewest(sort)
-            }
-            refreshHistoryEdges()
-        }
-    }
 
     // [T-android-split-chat-historypage] loadOlderMessages / loadOlderPage /
     // ensureSessionTailLoaded / drainMissingTail moved verbatim to
@@ -2372,7 +2348,7 @@ class ChatViewModel(
         ))
     }
 
-    /** Replace an assistant bubble's visible text with a translation. Tool cards stay. */
+    /** Replace the visible reply with its translation. */
     fun replaceAssistantOutput(messageId: String, translated: String) {
         val text = translated.trim()
         if (text.isEmpty()) return
@@ -2380,15 +2356,11 @@ class ChatViewModel(
         val idx = cur.indexOfFirst { it.id == messageId }
         if (idx < 0) return
         val msg = cur[idx]
-        val lastTextId = msg.toolBlocks.lastOrNull { it.kind == "text" }?.id
-        val newBlocks = if (lastTextId == null) {
-            msg.toolBlocks + AssistantBlock(id = "tr-${msg.id}", kind = "text", content = text)
-        } else {
-            msg.toolBlocks.map { block ->
-                if (block.kind != "text") block
-                else if (block.id == lastTextId) block.copy(content = text)
-                else block.copy(content = "")
-            }
+        val lastReply = msg.toolBlocks.indexOfLast { it.isReplyText && it.content.isNotBlank() }
+        if (lastReply < 0) return
+        val newBlocks = msg.toolBlocks.mapIndexed { index, block ->
+            if (!block.isReplyText || block.content.isBlank()) block
+            else block.copy(content = if (index == lastReply) text else "")
         }
         val updated = msg.copy(content = text, toolBlocks = newBlocks)
         _messages.value = cur.toMutableList().also { it[idx] = updated }
@@ -2408,7 +2380,7 @@ class ChatViewModel(
         }
     }
 
-    /** Replace one assistant text block. Other segments and tool cards stay. */
+    /** Replace one reply paragraph with its translation. */
     fun replaceAssistantTextBlock(messageId: String, blockId: String, translated: String) {
         val text = translated.trim()
         if (text.isEmpty()) return
@@ -2416,17 +2388,16 @@ class ChatViewModel(
         val idx = cur.indexOfFirst { it.id == messageId }
         if (idx < 0) return
         val msg = cur[idx]
-        val old = msg.toolBlocks.find { it.id == blockId }?.content
-        val newBlocks = msg.toolBlocks.map { block ->
-            if (block.id == blockId && block.kind == "text") block.copy(content = text) else block
-        }
-        val joined = newBlocks.filter { it.kind == "text" }.joinToString("\n\n") { it.content }.ifBlank { text }
-        val updated = msg.copy(content = joined, toolBlocks = newBlocks)
-        _messages.value = cur.toMutableList().also { it[idx] = updated }
-        val dbIds = msg.sourceDbIds
-        if (dbIds.isEmpty() || old == null) return
+        val old = msg.toolBlocks.find { it.id == blockId && it.isReplyText }?.content ?: return
         val occurrence = AssistantReplyText.textOccurrence(msg.toolBlocks, blockId, old)
         if (occurrence < 0) return
+        val newBlocks = msg.toolBlocks.map { block ->
+            if (block.id == blockId && block.isReplyText) block.copy(content = text) else block
+        }
+        val updated = msg.copy(content = AssistantReplyText.joined(newBlocks), toolBlocks = newBlocks)
+        _messages.value = cur.toMutableList().also { it[idx] = updated }
+        val dbIds = msg.sourceDbIds
+        if (dbIds.isEmpty()) return
         viewModelScope.launch {
             runCatching {
                 val rows = dbIds.mapNotNull { id ->
@@ -3565,7 +3536,7 @@ class ChatViewModel(
                             // so it doesn't keep text the renderer just dropped.
                             // The chat list renders ordering from toolBlocks, but
                             // `content` feeds previews / copy, so keep it in sync.
-                            val keptText = keptBlocks.filter { it.isText }
+                            val keptText = keptBlocks.filter { it.isReplyText }
                                 .joinToString("") { it.content }
                             val trimmed = cur[ai].copy(
                                 content = keptText,

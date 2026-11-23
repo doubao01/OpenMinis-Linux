@@ -617,6 +617,7 @@
     <string name="appearance_context_glow_subtitle">Krawędź pola wprowadzania świeci obracającym się blaskiem, gdy kontekst zbliża się do limitu</string>
     <string name="chat_usage_footer_tokens">↑ %1$s ↓ %2$s</string>
     <string name="chat_usage_footer_cache">cache %1$d%%</string>
+    <string name="chat_usage_footer_speed">%1$d tok/s</string>
     <string name="appearance_section_grouping">Grupowanie</string>
     <string name="appearance_auto_grouping">Automatyczne grupowanie</string>
     <string name="appearance_auto_grouping_subtitle">Umieszczaj nowe czaty w pasującej grupie</string>
@@ -3095,6 +3096,7 @@
     <string name="quota_unsupported_no_api">Ten dostawca nie oferuje odczytu salda ani limitu.</string>
     <string name="quota_unsupported_passive">Ten dostawca zgłasza limit tylko przy odpowiedziach; pokazywanie go nie jest jeszcze obsługiwane.</string>
     <string name="quota_unsupported_probe_failed">Ten endpoint nie odpowiedział na zapytanie o saldo. Minis sprawdzi jutro, albo stuknij odśwież, aby sprawdzić teraz.</string>
+    <string name="quota_unsupported_insecure">Sprawdzanie salda jest wyłączone dla tego punktu końcowego, ponieważ używa nieszyfrowanego http. Czat nadal działa.</string>
     <string name="quota_unsupported_type">Sprawdzanie salda nie jest jeszcze obsługiwane dla tego dostawcy.</string>
     <string name="quota_unsupported_unknown_endpoint">Sprawdzanie salda jest niedostępne dla tego endpointu.</string>
     <string name="quota_updated">Zaktualizowano</string>

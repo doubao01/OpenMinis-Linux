@@ -215,15 +215,16 @@ internal fun ChatViewModel.toChatMessages(
                             if (it != raw) it.trim() else it
                         }
                         if (t.isEmpty()) continue
-                        text += t
-                        // For assistant messages, also push the text as a block so
-                        // the renderer can preserve the original text↔tool ordering.
-                        // For user messages we keep using the `text` field only.
+                        val processText = entity.role == "assistant" &&
+                            com.openminis.app.data.AssistantTextPartJson.isProcessText(obj)
+                        if (!processText) text += t
+                        // Keep assistant progress in chronological order without adding it to the reply.
                         if (entity.role == "assistant") {
                             blocks.add(AssistantBlock(
                                 id = "text_restored_${entity.id}_${textBlockCounter++}",
                                 kind = "text",
                                 content = t,
+                                isProcessText = processText,
                             ))
                         }
                     }
@@ -340,6 +341,10 @@ internal fun ChatViewModel.toChatMessages(
             attachmentUris = restoredAttachmentUris,
             toolBlocks = blocks,
             sourceDbIds = listOf(entity.id),
+            // [T-message-usage-footer-time] Wall-clock display time for the
+            // usage footer's three-tier time tier (today HH:mm / this year
+            // M/d HH:mm / older yyyy/M/d HH:mm). entity.createdAt is NOT NULL.
+            createdAt = entity.createdAt,
             speakerName = speakerName,
             speakerVendor = speakerVendor,
             // [T-error-persist-android] Restore the persisted terminal error
@@ -393,6 +398,10 @@ internal fun ChatViewModel.toChatMessages(
                     // to the LAST assistant row of the turn, so the later row
                     // (`msg`) wins; fall back to `prev` if only it carried one.
                     error = msg.error ?: prev.error,
+                    // [T-message-usage-footer-time] Same last-row-wins rule as
+                    // the error sticker: the merged bubble displays the time
+                    // of its newest source row.
+                    createdAt = msg.createdAt ?: prev.createdAt,
                 )
             } else {
                 merged.add(msg)
@@ -444,12 +453,10 @@ internal fun mapStoredLLMMessage(
                     // messages byte-identical so `.content` consumers
                     // (summary, title fallback, edit) see the same string
                     // as a fresh turn and don't get the XML twice.
-                    if (value.contains("<user-attached-files>")) {
-                        contentParts.add(AgentContentPart.Text(value))
-                    } else {
-                        textContent += value
-                        contentParts.add(AgentContentPart.Text(value))
-                    }
+                    if (!value.contains("<user-attached-files>")) textContent += value
+                    contentParts.add(AgentContentPart.Text(
+                        value, r == LLMMessage.Role.ASSISTANT && com.openminis.app.data.AssistantTextPartJson.isProcessText(obj),
+                    ))
                 }
                 "toolUse" -> {
                     contentParts.add(readTranscriptToolUse(obj.getJSONObject("value")))

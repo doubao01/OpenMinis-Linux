@@ -35,16 +35,19 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.openminis.app.R
 import com.openminis.app.ui.theme.m3Icon
+import com.openminis.app.ui.tokens.Minis
+import com.openminis.app.ui.tokens.MinisTypography
 import kotlinx.coroutines.delay
 
 /**
@@ -148,6 +153,7 @@ internal fun ProcessSummaryBar(
     startedAtMs: Long = 0L,
     onToggle: () -> Unit,
     onOpenStep: (String) -> Unit = {},
+    singleToolContent: (@Composable (ProcessStepRef) -> Unit)? = null,
 ) {
     // [P-process-card] Outlined capsule (collapsed) that grows into a card
     // listing every step (expanded). Replaces the centred hairline divider:
@@ -175,12 +181,13 @@ internal fun ProcessSummaryBar(
     } else {
         formatProcessDuration(totalMs)
     }
-    val header = processCardHeader(
+    val aiProcess = stringResource(R.string.process_card_ai_process)
+    val header = if (thinkingCount == 0 && toolCount == 0) aiProcess else processCardHeader(
         thinkingCount, toolCount, running, expanded, activity, activityTitle, duration,
         labels = ProcessCardHeaderLabels(
             thinking = stringResource(R.string.process_card_thinking),
             tools = stringResource(R.string.process_card_tools),
-            aiProcess = stringResource(R.string.process_card_ai_process),
+            aiProcess = aiProcess,
             thinkingNow = stringResource(R.string.process_card_thinking_now),
             callingTool = stringResource(R.string.subagent_status_calling_tool),
         ),
@@ -244,15 +251,9 @@ internal fun ProcessSummaryBar(
                 thickness = 0.5.dp,
                 color = thinkingBlue.copy(alpha = 0.15f),
             )
-            // [P-process-card] Compact step rows, NOT the unfolded blocks:
-            // the full ThinkingBlock / ToolCallPill each carry their own
-            // bubble background and 36dp pill height, so an expanded card
-            // was a stack of mismatched bubbles (user: "长短不一、背景颜色
-            // 不统一、卡片过大"). Inside the card every step is one tight
-            // row — icon (from the SAME toolIconFor/toolAccentColor mapping
-            // the unfolded pills use, never invented), title, duration,
-            // 查看 for tools, expand chevron for thinking — separated by
-            // hairlines, no per-row background. The card is the only bubble.
+            // Keep the compact rows for existing multi-step runs. When progress
+            // folds a formerly inline tool, reuse its pill so the same actions
+            // are available inside the expanded card.
             steps.forEachIndexed { idx, step ->
                 if (idx > 0) {
                     HorizontalDivider(
@@ -260,10 +261,40 @@ internal fun ProcessSummaryBar(
                         color = thinkingBlue.copy(alpha = 0.10f),
                     )
                 }
-                ProcessStepRow(step = step, onOpen = { onOpenStep(step.id) })
+                key(step.messageId, step.id) {
+                    when {
+                        step.block.isProcessText -> ProcessTextRow(text = step.block.content)
+                        step.kind == "tool_use" && singleToolContent != null -> singleToolContent(step)
+                        else -> ProcessStepRow(step = step, onOpen = { onOpenStep(step.id) })
+                    }
+                }
             }
         }
     }
+}
+
+/**
+ * [T-midturn-prose-inline] Mid-turn assistant prose renders as ordinary
+ * markdown text, in place — NOT as a collapsed "AI process" disclosure.
+ *
+ * The folding was the wrong fix for fragmentation: it hid the words instead of
+ * removing the reason the model produced them. Prose the model wrote while
+ * working is real content the user wants to read, so it is shown with the same
+ * body typography as a reply (the reply/process split still decides what Copy
+ * Markdown and the final answer contain, and the history still stores the
+ * original bytes). The same row renders inside a card and in the unfolded transcript.
+ */
+@Composable
+internal fun ProcessTextRow(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        fontSize = MinisTypography.body,
+        lineHeight = MinisTypography.lineBody,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = Minis.dimens.spaceLg.dp, vertical = Minis.dimens.spaceXs.dp),
+    )
 }
 
 /**
