@@ -34,6 +34,6 @@ jobs:
             ~/.gradle/wrapper
           key: gradle-${{ runner.os }}-${{ hashFiles('src/android/**/*.gradle*', 'src/android/gradle/wrapper/gradle-wrapper.properties') }}
 
-      - name: Compile Kotlin (debug)
+      - name: Compile Kotlin (release variant)
         working-directory: src/android
-        run: ./gradlew :app:compileDebugKotlin --stacktrace --no-daemon
+        run: ./gradlew :app:compileReleaseKotlin --parallel --stacktrace --no-daemon
