@@ -615,6 +615,7 @@
     <string name="appearance_context_glow_subtitle">Tepi kotak input berpendar berputar apabila konteks hampir had</string>
     <string name="chat_usage_footer_tokens">↑ %1$s ↓ %2$s</string>
     <string name="chat_usage_footer_cache">cache %1$d%%</string>
+    <string name="chat_usage_footer_speed">%1$d tok/s</string>
     <string name="appearance_section_grouping">Pengumpulan</string>
     <string name="appearance_auto_grouping">Pengumpulan Automatik</string>
     <string name="appearance_auto_grouping_subtitle">Masukkan sembang baharu ke kumpulan yang sepadan</string>
@@ -3088,6 +3089,7 @@
     <string name="quota_unsupported_no_api">Pembekal ini tidak menawarkan semakan baki atau kuota.</string>
     <string name="quota_unsupported_passive">Pembekal ini hanya melaporkan kuota bersama balasan; paparannya belum disokong.</string>
     <string name="quota_unsupported_probe_failed">Hujung ini tidak menjawab semakan baki. Minis akan semak esok, atau ketuk segar semula untuk semak sekarang.</string>
+    <string name="quota_unsupported_insecure">Semakan baki dimatikan untuk titik akhir ini kerana menggunakan http tanpa penyulitan. Sembang masih berfungsi.</string>
     <string name="quota_unsupported_type">Semakan baki belum disokong untuk pembekal ini.</string>
     <string name="quota_unsupported_unknown_endpoint">Semakan baki tidak tersedia untuk hujung ini.</string>
     <string name="quota_updated">Dikemas kini</string>

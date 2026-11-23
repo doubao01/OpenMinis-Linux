@@ -54,7 +54,12 @@ internal fun completedToolTurnParts(
     // Keep the complete turn text in that case, as in the live transcript.
     val renderedText = renderedParts.filterIsInstance<AgentContentPart.Text>().joinToString("") { it.text }
     return buildList {
-        if (renderedText != text && text.isNotEmpty()) add(AgentContentPart.Text(text))
+        // [T-midturn-prose-is-reply] The fallback copy of the turn text is PROSE.
+        // It used to hardcode isProcessText = true, which re-folded the reply
+        // into the process card on the PERSIST path — a reopened session showed
+        // the words back inside the card even though the live transcript had
+        // them inline.
+        if (renderedText != text && text.isNotEmpty()) add(AgentContentPart.Text(text, isProcessText = false))
         for (part in renderedParts) {
             when (part) {
                 is AgentContentPart.Text -> if (renderedText == text) add(part)
@@ -88,7 +93,6 @@ internal suspend fun ChatViewModel.persistToolTurnPairForRun(
     blockMeta: Map<String, AssistantBlock>,
     lastUsage: LLMUsage?,
     turnReasoningContent: String?,
-    assistantText: String,
     resultParts: List<AgentContentPart>,
     targetSessionId: String,
     expectedEpoch: Long,
@@ -120,7 +124,7 @@ internal suspend fun ChatViewModel.persistToolTurnPairForRun(
         }
         if (persisted.isEmpty()) return@withContext null
         val (assistant, result) = persisted
-        run.markAssistantTurnPersisted(assistantText)
+        run.markAssistantTurnPersisted()
         val currentToolId = run.currentToolSnapshot()?.callId
         if (resultParts.any { it is AgentContentPart.ToolResult && it.id == currentToolId }) run.setCurrentTool(null, null)
         withContext(Dispatchers.Main.immediate) {

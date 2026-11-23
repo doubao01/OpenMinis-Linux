@@ -616,6 +616,7 @@
     <string name="appearance_context_glow_subtitle">Marginea câmpului de introducere strălucește rotativ când contextul se apropie de limită</string>
     <string name="chat_usage_footer_tokens">↑ %1$s ↓ %2$s</string>
     <string name="chat_usage_footer_cache">cache %1$d%%</string>
+    <string name="chat_usage_footer_speed">%1$d tok/s</string>
     <string name="appearance_section_grouping">Grupare</string>
     <string name="appearance_auto_grouping">Grupare automată</string>
     <string name="appearance_auto_grouping_subtitle">Pune conversațiile noi într-un grup potrivit</string>
@@ -3092,6 +3093,7 @@
     <string name="quota_unsupported_no_api">Acest furnizor nu oferă interogarea soldului sau a cotei.</string>
     <string name="quota_unsupported_passive">Acest furnizor raportează cota doar împreună cu răspunsurile; afișarea nu este încă acceptată.</string>
     <string name="quota_unsupported_probe_failed">Acest endpoint nu a răspuns la interogarea soldului. Minis verifică mâine, sau atinge reîmprospătează pentru a verifica acum.</string>
+    <string name="quota_unsupported_insecure">Verificarea soldului este dezactivată pentru acest endpoint deoarece folosește http necriptat. Chatul funcționează în continuare.</string>
     <string name="quota_unsupported_type">Interogarea soldului nu este încă acceptată pentru acest furnizor.</string>
     <string name="quota_unsupported_unknown_endpoint">Interogarea soldului nu e disponibilă pentru acest endpoint.</string>
     <string name="quota_updated">Actualizat</string>
