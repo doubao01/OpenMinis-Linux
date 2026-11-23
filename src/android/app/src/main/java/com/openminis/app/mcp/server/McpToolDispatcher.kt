@@ -14,6 +14,7 @@ import com.openminis.app.mcp.server.tools.deviceTools
 import com.openminis.app.mcp.server.tools.fileTools
 import com.openminis.app.mcp.server.tools.scheduleTools
 import com.openminis.app.mcp.server.tools.lemonTools
+import com.openminis.app.mcp.server.tools.pilotTools
 import com.openminis.app.mcp.server.tools.shellTools
 import com.openminis.app.mcp.server.tools.uiTools
 import com.openminis.app.security.PermissionMode
