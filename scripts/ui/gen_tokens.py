@@ -668,6 +668,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--ui', required=True)
     ap.add_argument('--out', default='gen')
+    ap.add_argument('--emit-json', metavar='PATH', default=None,
+                    help='把扫描事实写成 JSON（默认不落盘）')
     a = ap.parse_args()
 
     files, colors, dps, sps = scan(a.ui)
@@ -678,7 +680,11 @@ def main():
 
     named = sum(c for h, c in colors.items() if h in IOS_NAMES or h in NEUTRAL_NAMES)
     total = sum(colors.values())
-    json.dump({
+    # [T-token-data-out-of-tree] 扫描事实默认不落盘：它没有消费者
+    # （check_ui_tokens 只比对 MinisTokens.kt），却因为每次合并都要
+    # "取一侧再重生成"而在两天里冲突了 4 次。需要时用 --emit-json 显式生成。
+    if a.emit_json:
+        json.dump({
         'files': files,
         'colors': dict(colors.most_common()),
         'dp': dict(dps.most_common()),
@@ -687,8 +693,8 @@ def main():
         'named_pct': round(named * 100 / total) if total else 0,
         'brand_light': len(brand['light']),
         'brand_dark': len(brand['dark']),
-    }, open(os.path.join(a.out, 'token_data.json'), 'w', encoding='utf-8'),
-        ensure_ascii=False, indent=1)
+        }, open(a.emit_json, 'w', encoding='utf-8'),
+            ensure_ascii=False, indent=1)
 
     pct = round(named * 100 / total) if total else 0
     print('ui 文件      : %d' % files)
@@ -697,7 +703,7 @@ def main():
     print('品牌色       : 浅色 %d / 深色 %d' % (len(brand['light']), len(brand['dark'])))
     print('dp           : %d 处 / %3d 个不同值' % (sum(dps.values()), len(dps)))
     print('sp           : %d 处 / %d 个不同值' % (sum(sps.values()), len(sps)))
-    print('输出 -> %s/MinisTokens.kt + token_data.json' % a.out)
+    print('输出 -> %s/MinisTokens.kt%s' % (a.out, ('（+ %s）' % a.emit_json) if a.emit_json else ''))
 
 
 if __name__ == '__main__':

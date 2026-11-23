@@ -127,7 +127,9 @@ sp           :    0 处 /  0 个不同值
 
 令牌层文件：
 - `MinisTokens.kt` — 生成的常量
-- `token_data.json` — 生成的数据源
+- `token_data.json` — 扫描事实，**不进版本库**（`gen_tokens.py --emit-json <path>` 按需生成）。
+  它没有消费者：`check_ui_tokens` 只比对 `MinisTokens.kt`。留在树里只会让每次合并多一处
+  "取一侧再重生成"的冲突（两天内 4 次）。
 - `ComposeAdapters.kt` — `TextUnit` / `Dp` 桥接
 
 ### 2.2 目标：dp 角色化
