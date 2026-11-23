@@ -1611,6 +1611,7 @@
     </plurals>
     <string name="chat_menu_section_quick">Quick</string>
     <string name="chat_menu_section_session">Session</string>
+    <string name="chat_menu_session_resources">Session resources</string>
     <string name="chat_menu_section_tools">Tools</string>
     <string name="chat_menu_section_settings">Settings</string>
     <string name="chat_menu_open_terminal">Open Terminal</string>

@@ -1477,6 +1477,7 @@
     </plurals>
     <string name="chat_menu_section_quick">快捷</string>
     <string name="chat_menu_section_session">会话</string>
+    <string name="chat_menu_session_resources">会话资源</string>
     <string name="chat_menu_section_tools">工具</string>
     <string name="chat_menu_section_settings">设置</string>
     <string name="chat_menu_open_terminal">打开终端</string>
