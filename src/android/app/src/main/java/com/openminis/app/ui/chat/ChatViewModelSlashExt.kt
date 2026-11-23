@@ -343,11 +343,10 @@ internal fun ChatViewModel.tryExecuteInputAsSlashCommandImpl(text: String): Bool
         // Swallow it with a local notice instead; the composer's slash
         // panel stays open so the user can pick a real command.
         appendSystemInfo(
-            text = if (args.isEmpty()) {
-                "未知命令: $trimmed（可用命令见 / 面板）"
-            } else {
-                "未知命令: /$name（可用命令见 / 面板）"
-            },
+            text = context.getString(
+                R.string.slash_unknown_command,
+                if (args.isEmpty()) trimmed else "/$name",
+            ),
             iconKind = "info",
         )
         return true

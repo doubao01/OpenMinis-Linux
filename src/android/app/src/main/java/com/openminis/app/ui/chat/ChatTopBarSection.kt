@@ -297,7 +297,7 @@ internal fun ChatTopBarTitle(
                                                     .background(Color(0xFFFF9500), CircleShape),
                                             ) {
                                                 Icon(
-                                                    Icons.Default.Bolt,
+                                                    m3Icon(Icons.Default.Bolt),
                                                     contentDescription = null,
                                                     tint = Color.White,
                                                     modifier = Modifier.size(9.dp),
@@ -401,7 +401,7 @@ internal fun ChatTopBarActions(
                             )
                         }
                         IconButton(onClick = { showChatMenu.value = true }) {
-                            Icon(Icons.Outlined.MoreHoriz, contentDescription = stringResource(R.string.cd_more))
+                            Icon(m3Icon(Icons.Outlined.MoreHoriz), contentDescription = stringResource(R.string.cd_more))
                         }
                         MinisMenu(
                             expanded = showChatMenu.value,
@@ -451,10 +451,51 @@ internal fun ChatTopBarActions(
                             //完全访问 first arms an inline risk confirmation instead of switching
                             // silently on a stray tap.
                             var fullAccessArmed by remember { mutableStateOf(false) }
-                            val permissionModes = listOf(
-                                SessionPermissionMode.ASK_BEFORE_CHANGES,
-                                SessionPermissionMode.AUTONOMOUS,
-                                SessionPermissionMode.FULL_ACCESS,
+                            val permLabel = stringResource(
+                                when (sessionPerm) {
+                                    SessionPermissionMode.ASK_BEFORE_CHANGES -> R.string.chat_menu_perm_ask
+                                    SessionPermissionMode.AUTONOMOUS -> R.string.chat_menu_perm_safe_auto
+                                    SessionPermissionMode.FULL_ACCESS -> R.string.chat_menu_perm_yoyo
+                                },
+                            )
+                            val permDesc = stringResource(
+                                when (sessionPerm) {
+                                    SessionPermissionMode.ASK_BEFORE_CHANGES -> R.string.perm_mode_desc_ask
+                                    SessionPermissionMode.AUTONOMOUS -> R.string.perm_mode_desc_auto
+                                    SessionPermissionMode.FULL_ACCESS -> R.string.perm_mode_desc_full
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(permLabel + " · " + permDesc) },
+                                onClick = {
+                                    val next = sessionPerm.next()
+                                    if (next == SessionPermissionMode.FULL_ACCESS) {
+                                        fullAccessArmed = true
+                                    } else {
+                                        fullAccessArmed = false
+                                        showChatMenu.value = false
+                                        viewModel.setSessionPermissionMode(next)
+                                    }
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        m3Icon(
+                                            when (sessionPerm) {
+                                                SessionPermissionMode.ASK_BEFORE_CHANGES -> Icons.Filled.Shield
+                                                SessionPermissionMode.AUTONOMOUS -> Icons.Filled.Psychology
+                                                SessionPermissionMode.FULL_ACCESS -> Icons.Filled.Bolt
+                                            },
+                                        ),
+                                        contentDescription = null,
+                                    )
+                                },
+                                trailingIcon = {
+                                    // Tap advances to the next tier, wrapping.
+                                    Icon(
+                                        m3Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight),
+                                        contentDescription = null,
+                                    )
+                                },
                             )
                             permissionModes.forEach { mode ->
                             }
@@ -469,7 +510,7 @@ internal fun ChatTopBarActions(
                                         )
                                     },
                                     onClick = {},
-                                    leadingIcon = { Icon(Icons.Filled.Bolt, contentDescription = null) },
+                                    leadingIcon = { Icon(m3Icon(Icons.Filled.Bolt), contentDescription = null) },
                                 )
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.perm_full_access_confirm)) },
@@ -478,7 +519,7 @@ internal fun ChatTopBarActions(
                                         showChatMenu.value = false
                                         viewModel.setSessionPermissionMode(SessionPermissionMode.FULL_ACCESS)
                                     },
-                                    leadingIcon = { Icon(Icons.Filled.Check, contentDescription = null) },
+                                    leadingIcon = { Icon(m3Icon(Icons.Filled.Check), contentDescription = null) },
                                 )
                                 DropdownMenuItem(
                                     text = { Text(stringResource(R.string.common_cancel)) },
@@ -489,7 +530,7 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.chat_menu_group_chat)) },
                                 onClick = { viewModel.setGroupChatEnabled(!groupChatOn) },
-                                leadingIcon = { Icon(Icons.Default.Forum, contentDescription = null) },
+                                leadingIcon = { Icon(m3Icon(Icons.Default.Forum), contentDescription = null) },
                                 trailingIcon = {
                                     // The row already toggles. A live switch here
                                     // also consumes the tap and flips the flag
@@ -520,7 +561,7 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                                         showChatMenu.value = false
                                         onShowRestoreDialog()
                                     },
-                                    leadingIcon = { Icon(Icons.Default.Restore, contentDescription = null) },
+                                    leadingIcon = { Icon(m3Icon(Icons.Default.Restore), contentDescription = null) },
                                 )
                             }
                             // [P0-6] 工具段：会话内的扩展面。
@@ -533,7 +574,7 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                                     onOpenGitPanel()
                                 },
                                 leadingIcon = {
-                                    Icon(Icons.Default.MergeType, contentDescription = null)
+                                    Icon(m3Icon(Icons.Default.MergeType), contentDescription = null)
                                 },
                             )
                             // Session Skills (iOS parity)
@@ -627,7 +668,7 @@ val groupChatOn by viewModel.groupChatEnabled.collectAsStateWithLifecycle()
                                     },
                                     leadingIcon = {
                                         Icon(
-                                            Icons.Default.BugReport,
+                                            m3Icon(Icons.Default.BugReport),
                                             contentDescription = null,
                                             tint = MaterialTheme.colorScheme.error,
                                         )

@@ -65,7 +65,10 @@ fun ChatViewModel.executeSlashCommand(cmd: SlashCommand, currentInput: String = 
         "thinking" -> if (currentModelSupportsReasoning) {
             toggleThinking()
         } else {
-            appendSystemInfo(text = "当前模型没有思考档位，/thinking 无效果", iconKind = "info")
+            appendSystemInfo(
+                text = context.getString(R.string.slash_thinking_unsupported_detail),
+                iconKind = "info",
+            )
         }
         "goal" -> GoalSheetSignal.open()
         "clear" -> _clearChatConfirmRequested.value = true

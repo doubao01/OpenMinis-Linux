@@ -45,18 +45,19 @@ import org.json.JSONObject
 internal fun pilotTools(deps: McpToolDeps): List<McpToolSpec> = listOf(
     McpToolSpec(
         name = "pilot_perceive",
-        description = "[LemonPilot 原生] 语义感知：把当前界面的控件树解析成语义元素表" +
-            "（text/id/bounds/clickable），按关键词过滤。等价于面板的 pilot_perceive。",
+        description = "[LemonPilot native] Semantic perception: parse the current screen's view tree into " +
+            "a semantic element list (text/id/bounds/clickable), filtered by keyword. " +
+            "Same contract as the panel's pilot_perceive.",
         schema = JSONObject().apply {
             put("type", "object")
             put("properties", JSONObject().apply {
                 put("keyword", JSONObject().apply {
                     put("type", "string")
-                    put("description", "过滤关键词（匹配 text/desc 或 id，空=全部）")
+                    put("description", "Keyword filter (matches text/desc or id; empty = all)")
                 })
                 put("limit", JSONObject().apply {
                     put("type", "integer")
-                    put("description", "最大条数，默认 40，上限 80")
+                    put("description", "Max entries (default 40, cap 80)")
                 })
             })
         },
@@ -64,22 +65,22 @@ internal fun pilotTools(deps: McpToolDeps): List<McpToolSpec> = listOf(
     ),
     McpToolSpec(
         name = "pilot_tap",
-        description = "[LemonPilot 原生] 语义点击：按 text 或 resource-id 定位控件并点其中心，" +
-            "免坐标硬编码。等价于面板的 pilot_tap。",
+        description = "[LemonPilot native] Semantic tap: locate a control by text or resource-id and tap " +
+            "its center, so callers never hard-code coordinates.",
         schema = JSONObject().apply {
             put("type", "object")
             put("properties", JSONObject().apply {
                 put("text", JSONObject().apply {
                     put("type", "string")
-                    put("description", "控件文本/描述子串")
+                    put("description", "Control text or content-description substring")
                 })
                 put("id", JSONObject().apply {
                     put("type", "string")
-                    put("description", "resource-id 子串（text 为空时使用）")
+                    put("description", "resource-id substring (used when text is empty)")
                 })
                 put("index", JSONObject().apply {
                     put("type", "integer")
-                    put("description", "第几个匹配，默认 0")
+                    put("description", "Index among matches (default 0)")
                 })
             })
         },
@@ -87,27 +88,27 @@ internal fun pilotTools(deps: McpToolDeps): List<McpToolSpec> = listOf(
     ),
     McpToolSpec(
         name = "pilot_run",
-        description = "[LemonPilot 原生] 任务执行：回放已结晶技能（skill=名字），或执行 JSON 步骤序列" +
-            "（open_app/stop_app/tap_text/tap_id/tap_xy/swipe/key/text/wait/assert_text）。" +
-            "成功后可 save_as 结晶为技能名，下次回放零 Token。",
+        description = "[LemonPilot native] Run a task: replay a crystallized skill (skill=name) or execute a " +
+            "JSON step array (open_app/stop_app/tap_text/tap_id/tap_xy/swipe/key/text/wait/assert_text). " +
+            "Pass save_as to crystallize the steps into a skill for zero-token replay.",
         schema = JSONObject().apply {
             put("type", "object")
             put("properties", JSONObject().apply {
                 put("skill", JSONObject().apply {
                     put("type", "string")
-                    put("description", "要回放的技能名（与 steps 二选一）")
+                    put("description", "Skill name to replay (mutually exclusive with steps)")
                 })
                 put("steps", JSONObject().apply {
                     put("type", "string")
-                    put("description", "JSON 步骤数组字符串")
+                    put("description", "JSON array of steps, as a string")
                 })
                 put("save_as", JSONObject().apply {
                     put("type", "string")
-                    put("description", "成功后把本次步骤结晶为该技能名")
+                    put("description", "Crystallize the steps under this name on success")
                 })
                 put("confirm", JSONObject().apply {
                     put("type", "string")
-                    put("description", "1=允许 open_app/stop_app 这类跨应用敏感动作")
+                    put("description", "1 = allow cross-app actions such as open_app / stop_app")
                 })
             })
         },
@@ -115,8 +116,8 @@ internal fun pilotTools(deps: McpToolDeps): List<McpToolSpec> = listOf(
     ),
     McpToolSpec(
         name = "pilot_skills",
-        description = "[LemonPilot 原生] 技能库：list 列出、show 看单条步骤、del 删除。" +
-            "与 App 的录制/回放共用同一份 a11y_skills.json。",
+        description = "[LemonPilot native] Skill library: list, show one skill's steps, or delete. " +
+            "Shares the same a11y_skills.json the app's recorder and replayer use.",
         schema = JSONObject().apply {
             put("type", "object")
             put("properties", JSONObject().apply {
@@ -126,7 +127,7 @@ internal fun pilotTools(deps: McpToolDeps): List<McpToolSpec> = listOf(
                 })
                 put("name", JSONObject().apply {
                     put("type", "string")
-                    put("description", "技能名（show/del 必填）")
+                    put("description", "Skill name (required for show / del)")
                 })
             })
             put("required", JSONArray().put("action"))
@@ -135,14 +136,14 @@ internal fun pilotTools(deps: McpToolDeps): List<McpToolSpec> = listOf(
     ),
     McpToolSpec(
         name = "pilot_audit",
-        description = "[LemonPilot 原生] 审计：读 App 的配置/门审计（最近 N 条），" +
-            "若本机同时跑着独立面板，再附面板审计尾部，便于对照。",
+        description = "[LemonPilot native] Audit: read the app's config/gate audit trail (last N entries); " +
+            "when a standalone panel is also running, append its tail for cross-checking.",
         schema = JSONObject().apply {
             put("type", "object")
             put("properties", JSONObject().apply {
                 put("lines", JSONObject().apply {
                     put("type", "integer")
-                    put("description", "条数，默认 20，上限 100")
+                    put("description", "Number of entries (default 20, cap 100)")
                 })
             })
         },
@@ -234,14 +235,14 @@ private fun pilotPerceive(deps: McpToolDeps, arguments: JSONObject): McpServerCo
         }
         if (seen.size >= limit) break
     }
-    if (seen.isEmpty() && lastError != null) return pilotFail(lastError, "ui find 失败")
+    if (seen.isEmpty() && lastError != null) return pilotFail(lastError, "ui find failed")
     val body = if (seen.isEmpty()) {
-        "（没有匹配的语义元素：关键词=${keyword.ifBlank { "<全部>" }}）"
+        "(no matching semantic elements; keyword=${keyword.ifBlank { "<all>" }})"
     } else {
         seen.keys.joinToString("\n")
     }
     return McpServerCore.CallResult(
-        content = JSONArray().put(McpToolShared.text("语义元素 ${seen.size} 条：\n$body")),
+        content = JSONArray().put(McpToolShared.text("Semantic elements: ${seen.size}\n$body")),
     )
 }
 
@@ -249,24 +250,24 @@ private fun pilotTap(deps: McpToolDeps, arguments: JSONObject): McpServerCore.Ca
     val text = arguments.optString("text").trim()
     val id = arguments.optString("id").trim()
     val index = arguments.optInt("index", 0).coerceAtLeast(0)
-    if (text.isEmpty() && id.isEmpty()) return McpToolShared.error("需要 text 或 id")
+    if (text.isEmpty() && id.isEmpty()) return McpToolShared.error("text or id is required")
     val cmd = if (text.isNotEmpty()) {
         "android-a11y-cli tap text ${McpToolShared.shellEscape(text)} --contains --index $index"
     } else {
         "android-a11y-cli tap id ${McpToolShared.shellEscape(id)}"
     }
-    val envelope = pilotCli(cmd) ?: return McpToolShared.error("tap 没有返回可解析的结果")
+    val envelope = pilotCli(cmd) ?: return McpToolShared.error("tap returned no parseable result")
     if (!envelope.optBoolean("ok")) {
         // 面板的行为：按 text 找不到时，把同一个串当 id 再试一次。
         if (text.isNotEmpty()) {
             val retry = pilotCli("android-a11y-cli tap id ${McpToolShared.shellEscape(text)}")
             if (retry != null && retry.optBoolean("ok")) {
                 return McpServerCore.CallResult(
-                    content = JSONArray().put(McpToolShared.text("按 id 命中并点击：$text")),
+                    content = JSONArray().put(McpToolShared.text("Matched by id and tapped: $text")),
                 )
             }
         }
-        return pilotFail(envelope, "tap 失败")
+        return pilotFail(envelope, "tap failed")
     }
     val data = envelope.optJSONObject("data")
     val where = listOfNotNull(
@@ -276,7 +277,7 @@ private fun pilotTap(deps: McpToolDeps, arguments: JSONObject): McpServerCore.Ca
     ).joinToString(" ")
     return McpServerCore.CallResult(
         content = JSONArray().put(
-            McpToolShared.text("已点击：${text.ifBlank { id }}${if (where.isBlank()) "" else "（$where）"}"),
+            McpToolShared.text("Tapped: ${text.ifBlank { id }}${if (where.isBlank()) "" else " ($where)"}"),
         ),
     )
 }
@@ -292,29 +293,29 @@ private fun stepCommand(step: JSONObject, allowCrossApp: Boolean): StepPlan? {
     return when (op) {
         "open_app" -> {
             val pkg = esc("pkg").ifBlank { esc("package") }
-            if (!allowCrossApp) return StepPlan("", "open_app $pkg", "open_app 需要 confirm=1")
-            StepPlan("monkey -p $pkg -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1", "打开 $pkg")
+            if (!allowCrossApp) return StepPlan("", "open_app $pkg", "open_app requires confirm=1")
+            StepPlan("monkey -p $pkg -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1", "open $pkg")
         }
         "stop_app" -> {
             val pkg = esc("pkg").ifBlank { esc("package") }
-            if (!allowCrossApp) return StepPlan("", "stop_app $pkg", "stop_app 需要 confirm=1")
-            StepPlan("am force-stop $pkg", "停止 $pkg")
+            if (!allowCrossApp) return StepPlan("", "stop_app $pkg", "stop_app requires confirm=1")
+            StepPlan("am force-stop $pkg", "stop $pkg")
         }
         "tap_text" -> StepPlan(
             "android-a11y-cli tap text ${esc("text")} --contains --index ${int("index")}",
-            "点「${v("text")}」",
+            "tap \"${v("text")}\"",
         )
-        "tap_id" -> StepPlan("android-a11y-cli tap id ${esc("id")}", "点 id=${v("id")}")
-        "tap_xy" -> StepPlan("android-a11y-cli tap xy ${int("x")} ${int("y")}", "点 (${int("x")},${int("y")})")
+        "tap_id" -> StepPlan("android-a11y-cli tap id ${esc("id")}", "tap id=${v("id")}")
+        "tap_xy" -> StepPlan("android-a11y-cli tap xy ${int("x")} ${int("y")}", "tap (${int("x")},${int("y")})")
         "swipe" -> StepPlan(
             "android-a11y-cli gesture swipe ${int("x1")} ${int("y1")} ${int("x2")} ${int("y2")} ${int("ms", 300)}",
-            "滑动",
+            "swipe",
         )
-        "key" -> StepPlan("android-a11y-cli input key ${esc("key")}", "按键 ${v("key")}")
-        "text" -> StepPlan("android-a11y-cli input text ${esc("text")}", "输入")
+        "key" -> StepPlan("android-a11y-cli input key ${esc("key")}", "key ${v("key")}")
+        "text" -> StepPlan("android-a11y-cli input text ${esc("text")}", "type text")
         "wait" -> {
             val ms = int("ms", 500).coerceAtLeast(50)
-            StepPlan("sleep ${ms / 1000.0}", "等待 ${ms}ms")
+            StepPlan("sleep ${ms / 1000.0}", "wait ${ms}ms")
         }
         "assert_text" -> null   // 断言在调用侧校验，不发命令
         else -> null
@@ -325,11 +326,11 @@ private fun pilotRun(deps: McpToolDeps, arguments: JSONObject): McpServerCore.Ca
     val skillName = arguments.optString("skill").trim()
     val saveAs = arguments.optString("save_as").trim()
     val allowCrossApp = arguments.optString("confirm").trim() == "1"
-    val context = deps.context ?: return McpToolShared.error("需要 Android context（单元测试环境不可用）")
+    val context = deps.context ?: return McpToolShared.error("Android context required (unavailable in JVM tests)")
     val steps: JSONArray = when {
         skillName.isNotEmpty() -> {
             val store = A11ySkillStore.forContext(context)
-            val skill = store.byName(skillName) ?: return McpToolShared.error("技能不存在：$skillName")
+            val skill = store.byName(skillName) ?: return McpToolShared.error("No such skill: $skillName")
             val arr = JSONArray()
             for (step in skill.steps) {
                 val text = step.text ?: step.contentDescription
@@ -356,9 +357,9 @@ private fun pilotRun(deps: McpToolDeps, arguments: JSONObject): McpServerCore.Ca
             arr
         }
         arguments.has("steps") -> runCatching { JSONArray(arguments.optString("steps")) }.getOrElse {
-            return McpToolShared.error("steps 不是合法 JSON 数组")
+            return McpToolShared.error("steps is not a valid JSON array")
         }
-        else -> return McpToolShared.error("需要 skill 或 steps")
+        else -> return McpToolShared.error("skill or steps is required")
     }
     val log = StringBuilder()
     for (i in 0 until steps.length()) {
@@ -366,7 +367,7 @@ private fun pilotRun(deps: McpToolDeps, arguments: JSONObject): McpServerCore.Ca
         val plan = stepCommand(step, allowCrossApp) ?: continue
         plan.error?.let { reason ->
             return McpServerCore.CallResult(
-                content = JSONArray().put(McpToolShared.text("步骤 ${i + 1} 被拦下：$reason\n$log")),
+                content = JSONArray().put(McpToolShared.text("Step ${i + 1} blocked: $reason\n$log")),
                 isError = true,
             )
         }
@@ -377,7 +378,7 @@ private fun pilotRun(deps: McpToolDeps, arguments: JSONObject): McpServerCore.Ca
             .append('\n')
         if (failed) {
             return McpServerCore.CallResult(
-                content = JSONArray().put(McpToolShared.text("步骤 ${i + 1} 失败，已中止：\n$log")),
+                content = JSONArray().put(McpToolShared.text("Step ${i + 1} failed; aborted:\n$log")),
                 isError = true,
             )
         }
@@ -399,46 +400,46 @@ private fun pilotRun(deps: McpToolDeps, arguments: JSONObject): McpServerCore.Ca
                 ),
             )
         }
-        store.save(saveAs, "pilot_run 结晶", converted, null)
-        log.append("已结晶为技能：$saveAs\n")
+        store.save(saveAs, "pilot_run crystallized", converted, null)
+        log.append("Crystallized as skill: $saveAs\n")
     }
     return McpServerCore.CallResult(
-        content = JSONArray().put(McpToolShared.text("执行完成 ${steps.length()} 步\n$log")),
+        content = JSONArray().put(McpToolShared.text("Done: ${steps.length()} step(s)\n$log")),
     )
 }
 
 private fun pilotSkills(deps: McpToolDeps, arguments: JSONObject): McpServerCore.CallResult {
     val action = arguments.optString("action").trim().lowercase()
     val name = arguments.optString("name").trim()
-    val context = deps.context ?: return McpToolShared.error("需要 Android context（单元测试环境不可用）")
+    val context = deps.context ?: return McpToolShared.error("Android context required (unavailable in JVM tests)")
     val store = A11ySkillStore.forContext(context)
     return when (action) {
         "list" -> {
             val all = store.all()
             val lines = all.joinToString("\n") {
-                "${it.name}  ${it.steps.size} 步  pkg=${it.packageName ?: "-"}  失败连击=${it.failStreak}"
+                "${it.name}  ${it.steps.size} step(s)  pkg=${it.packageName ?: "-"}  failStreak=${it.failStreak}"
             }
             McpServerCore.CallResult(
-                content = JSONArray().put(McpToolShared.text("技能 ${all.size} 条：\n${lines.ifBlank { "（空）" }}")),
+                content = JSONArray().put(McpToolShared.text("Skills: ${all.size}\n${lines.ifBlank { "(empty)" }}")),
             )
         }
         "show" -> {
-            val skill = store.byName(name) ?: return McpToolShared.error("技能不存在：$name")
+            val skill = store.byName(name) ?: return McpToolShared.error("No such skill: $name")
             val lines = skill.steps.mapIndexed { i, s ->
                 "${i + 1}. text=${s.text ?: "-"} id=${s.viewId ?: "-"} xy=${s.resolvedXy ?: s.xy ?: "-"}"
             }.joinToString("\n")
             McpServerCore.CallResult(
-                content = JSONArray().put(McpToolShared.text("${skill.name}（${skill.steps.size} 步）\n$lines")),
+                content = JSONArray().put(McpToolShared.text("${skill.name} (${skill.steps.size} step(s))\n$lines")),
             )
         }
         "del" -> {
-            val skill = store.byName(name) ?: return McpToolShared.error("技能不存在：$name")
+            val skill = store.byName(name) ?: return McpToolShared.error("No such skill: $name")
             val removed = store.delete(skill.id)
             McpServerCore.CallResult(
-                content = JSONArray().put(McpToolShared.text(if (removed) "已删除：$name" else "删除失败：$name")),
+                content = JSONArray().put(McpToolShared.text(if (removed) "Deleted: $name" else "Delete failed: $name")),
             )
         }
-        else -> McpToolShared.error("action 只能是 list / show / del")
+        else -> McpToolShared.error("action must be list / show / del")
     }
 }
 
@@ -455,7 +456,7 @@ private fun pilotAudit(deps: McpToolDeps, arguments: JSONObject): McpServerCore.
                 val e = entries.optJSONObject(i) ?: return@mapNotNull null
                 "${e.optString("ts", e.optString("timestamp"))}  ${e.optString("toolName", e.optString("field"))}  ${e.optString("decision", e.optString("action"))}"
             }
-            if (lines.isNotEmpty()) sections.add("App 审计：\n" + lines.joinToString("\n"))
+            if (lines.isNotEmpty()) sections.add("App audit:\n" + lines.joinToString("\n"))
         }
     }
 
@@ -465,9 +466,9 @@ private fun pilotAudit(deps: McpToolDeps, arguments: JSONObject): McpServerCore.
             "tail -n $limit /var/minis/workspace/lemon-panel/stage/audit.jsonl 2>/dev/null || true",
             10,
         ).output.trim()
-        if (tail.isNotBlank()) sections.add("面板审计：\n$tail")
+        if (tail.isNotBlank()) sections.add("Panel audit:\n$tail")
     }
 
-    val body = sections.joinToString("\n\n").ifBlank { "（没有审计记录）" }
+    val body = sections.joinToString("\n\n").ifBlank { "(no audit entries)" }
     return McpServerCore.CallResult(content = JSONArray().put(McpToolShared.text(body)))
 }

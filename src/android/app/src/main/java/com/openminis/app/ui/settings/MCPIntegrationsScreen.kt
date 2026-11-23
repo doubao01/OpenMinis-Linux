@@ -143,7 +143,7 @@ fun MCPIntegrationsScreen(
                         R.string.mcp_status_stopped, builtInPort,
                     )
                 },
-                icon = Icons.Outlined.Dns,
+                icon = m3Icon(Icons.Outlined.Dns),
                 checked = mcpConfig.enabled,
                 onCheckedChange = { checked ->
                     if (checked) {
@@ -169,14 +169,14 @@ fun MCPIntegrationsScreen(
             SettingsRow(
                 title = stringResource(R.string.mcp_builtin_port),
                 subtitle = stringResource(R.string.mcp_builtin_port_sub, builtInPort),
-                icon = Icons.Outlined.Terminal,
+                icon = m3Icon(Icons.Outlined.Terminal),
                 onClick = { showPortDialog = true },
             )
             SettingsRow(
                 title = stringResource(R.string.mcp_builtin_token),
                 subtitle = mcpConfig.token?.let { stringResource(R.string.mcp_builtin_token_configured, it.take(4) + "****" + it.takeLast(4)) }
                     ?: stringResource(R.string.mcp_builtin_token_missing),
-                icon = Icons.Outlined.Key,
+                icon = m3Icon(Icons.Outlined.Key),
                 onClick = { showTokenDialog = true },
             )
             SettingsRow(
@@ -185,13 +185,13 @@ fun MCPIntegrationsScreen(
                     stringResource(R.string.mcp_builtin_shell_strict)
                 else
                     stringResource(R.string.mcp_builtin_shell_auto),
-                icon = Icons.Outlined.Info,
+                icon = m3Icon(Icons.Outlined.Info),
                 onClick = { showShellPolicyDialog = true },
             )
             SettingsRow(
                 title = stringResource(R.string.mcp_builtin_pc_connect),
                 subtitle = stringResource(R.string.mcp_builtin_pc_connect_sub, builtInPort),
-                icon = Icons.Outlined.Language,
+                icon = m3Icon(Icons.Outlined.Language),
                 showChevron = false,
             )
             com.openminis.app.ui.lemon.LemonPanelLauncherRow(

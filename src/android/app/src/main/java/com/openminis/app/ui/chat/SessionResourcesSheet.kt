@@ -20,8 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.openminis.app.R
+import com.openminis.app.ui.tokens.RawSpace
 import com.openminis.app.security.SessionPermissionMode
 
 /**
@@ -47,53 +50,58 @@ fun SessionResourcesSheet(
             Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 24.dp),
+                .padding(bottom = RawSpace.xxl3.dp),
         ) {
             Text(
-                text = "会话资源",
+                text = stringResource(R.string.session_res_title),
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 8.dp),
+                modifier = Modifier.padding(start = RawSpace.xxl3.dp, end = RawSpace.xxl3.dp, bottom = RawSpace.md.dp),
             )
             Text(
-                text = "只作用于当前会话",
+                text = stringResource(R.string.session_res_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 12.dp),
+                modifier = Modifier.padding(start = RawSpace.xxl3.dp, end = RawSpace.xxl3.dp, bottom = RawSpace.lg.dp),
             )
 
-            ResourceRow("技能", "当前会话可用的技能包") {
+            ResourceRow(stringResource(R.string.session_res_skills), stringResource(R.string.session_res_skills_sub)) {
                 onDismiss(); onOpenSkills()
             }
-            ResourceRow("MCP", "已接入的 MCP 服务器与工具") {
+            ResourceRow(stringResource(R.string.session_res_mcp), stringResource(R.string.session_res_mcp_sub)) {
                 onDismiss(); onOpenMcps()
             }
-            ResourceRow("记忆", "本会话写入的日记与召回") {
+            ResourceRow(stringResource(R.string.session_res_memory), stringResource(R.string.session_res_memory_sub)) {
                 onDismiss(); viewModel.toggleMemorySheet()
             }
-            ResourceRow("Token 用量", "本会话的输入/输出与缓存命中") {
+            ResourceRow(stringResource(R.string.session_res_tokens), stringResource(R.string.session_res_tokens_sub)) {
                 onDismiss(); onOpenTokenUsage()
             }
-            ResourceRow("小柠檬工具台", "363 个系统工具 · 面板") {
+            ResourceRow(stringResource(R.string.session_res_lemon), stringResource(R.string.session_res_lemon_sub)) {
                 onDismiss()
                 viewModel.openBrowserSheetForUrl("http://127.0.0.1:8795/")
             }
 
-            Spacer(Modifier.height(8.dp))
-            HorizontalDivider(Modifier.padding(horizontal = 24.dp))
+            Spacer(Modifier.height(RawSpace.md.dp))
+            HorizontalDivider(Modifier.padding(horizontal = RawSpace.xxl3.dp))
             Text(
-                text = "实验性",
+                text = stringResource(R.string.session_res_experimental),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 24.dp, top = 16.dp, bottom = 4.dp),
+                modifier = Modifier.padding(start = RawSpace.xxl3.dp, top = RawSpace.xl.dp, bottom = RawSpace.xs.dp),
             )
 
             ResourceRow(
-                title = "权限模式：" + when (permMode) {
-                    SessionPermissionMode.ASK_BEFORE_CHANGES -> "逐次审批"
-                    SessionPermissionMode.AUTONOMOUS -> "部分授权"
-                    else -> "全授权"
-                },
-                desc = "点按切换：审批 → 部分授权 → 全授权",
+                title = stringResource(
+                    R.string.session_res_perm_title,
+                    stringResource(
+                        when (permMode) {
+                            SessionPermissionMode.ASK_BEFORE_CHANGES -> R.string.session_res_perm_ask
+                            SessionPermissionMode.AUTONOMOUS -> R.string.session_res_perm_auto
+                            else -> R.string.session_res_perm_full
+                        },
+                    ),
+                ),
+                desc = stringResource(R.string.session_res_perm_hint),
             ) {
                 viewModel.setSessionPermissionMode(
                     when (permMode) {
@@ -104,8 +112,8 @@ fun SessionResourcesSheet(
                 )
             }
             SwitchRow(
-                title = "增强缓存",
-                desc = "仅对 Anthropic 供应商生效，按会话前缀缓存",
+                title = stringResource(R.string.session_res_cache_title),
+                desc = stringResource(R.string.session_res_cache_sub),
                 checked = cacheOn,
                 onChange = { on ->
                     if (on) viewModel.confirmAndEnableEnhancedCache()
@@ -113,23 +121,23 @@ fun SessionResourcesSheet(
                 },
             )
             SwitchRow(
-                title = "高速模式",
-                desc = "仅对支持 priority processing 的供应商生效（OpenAI / xAI）",
+                title = stringResource(R.string.session_res_fast_title),
+                desc = stringResource(R.string.session_res_fast_sub),
                 checked = fastMode,
                 onChange = { viewModel.setFastModeEnabled(it) },
             )
             SwitchRow(
-                title = "自动压缩",
-                desc = "上下文接近上限时自动折叠早期消息",
+                title = stringResource(R.string.session_res_compact_title),
+                desc = stringResource(R.string.session_res_compact_sub),
                 checked = autoCompact,
                 onChange = { viewModel.setAutoCompactEnabled(it) },
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(RawSpace.md.dp))
             TextButton(
                 onClick = { onDismiss() },
-                modifier = Modifier.padding(start = 12.dp),
-            ) { Text("关闭") }
+                modifier = Modifier.padding(start = RawSpace.lg.dp),
+            ) { Text(stringResource(R.string.session_res_close)) }
         }
     }
 }
@@ -139,10 +147,10 @@ private fun ResourceRow(title: String, desc: String, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp)
-            .padding(vertical = 2.dp),
+            .padding(horizontal = RawSpace.lg.dp)
+            .padding(vertical = RawSpace.xxs.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(RawSpace.lg.dp),
     ) {
         TextButton(onClick = onClick, modifier = Modifier.weight(1f)) {
             Column(Modifier.fillMaxWidth()) {
@@ -162,7 +170,7 @@ private fun SwitchRow(title: String, desc: String, checked: Boolean, onChange: (
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 8.dp),
+            .padding(horizontal = RawSpace.xxl3.dp, vertical = RawSpace.md.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
