@@ -36,4 +36,7 @@ jobs:
 
       - name: Compile Kotlin (release variant)
         working-directory: src/android
-        run: ./gradlew :app:compileReleaseKotlin --parallel --stacktrace --no-daemon
+        run: |
+          ./gradlew :app:compileReleaseKotlin --parallel --stacktrace --no-daemon \
+            -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g" \
+            -Pkotlin.daemon.jvmargs=-Xmx4g
