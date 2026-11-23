@@ -22,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.openminis.app.security.PermissionMode
+import com.openminis.app.security.SessionPermissionMode
 
 /**
  * 会话资源：把原来菜单里的 4 个入口（技能 / MCP / 记忆 / 工具台）
@@ -89,17 +89,17 @@ fun SessionResourcesSheet(
 
             ResourceRow(
                 title = "权限模式：" + when (permMode) {
-                    PermissionMode.ASK -> "逐次审批"
-                    PermissionMode.SAFE_AUTO -> "部分授权"
+                    SessionPermissionMode.ASK_BEFORE_CHANGES -> "逐次审批"
+                    SessionPermissionMode.AUTONOMOUS -> "部分授权"
                     else -> "全授权"
                 },
                 desc = "点按切换：审批 → 部分授权 → 全授权",
             ) {
                 viewModel.setSessionPermissionMode(
                     when (permMode) {
-                        PermissionMode.ASK -> PermissionMode.SAFE_AUTO
-                        PermissionMode.SAFE_AUTO -> PermissionMode.ALLOW_ALL
-                        else -> PermissionMode.ASK
+                        SessionPermissionMode.ASK_BEFORE_CHANGES -> SessionPermissionMode.AUTONOMOUS
+                        SessionPermissionMode.AUTONOMOUS -> SessionPermissionMode.FULL_ACCESS
+                        else -> SessionPermissionMode.ASK_BEFORE_CHANGES
                     },
                 )
             }
