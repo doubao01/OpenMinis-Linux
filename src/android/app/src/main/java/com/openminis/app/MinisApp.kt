@@ -160,6 +160,9 @@ class MinisApp : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
 
+        // 崩溃报告要读的资源水位目录（每轮流式结束写一次，见 StreamPerfMonitor）。
+        com.openminis.app.diagnostics.StreamPerfMonitor.attachFilesDir(filesDir)
+
         // [T-acra-prefs-order] Bind the typed-prefs source BEFORE this early return:
         // the :acra reporter process leaves here without ever reaching the main
         // install point below, and any prefs read in that process used to throw

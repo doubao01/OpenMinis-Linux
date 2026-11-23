@@ -3539,9 +3539,18 @@
     {
       "name": "TAG",
       "a": "LaunchBeacon",
-      "b": "StreamPerf",
+      "b": "JitterProbe",
       "files": [
         "diagnostics/LaunchCycleBeacon.kt",
+        "diagnostics/StreamJitterProbe.kt"
+      ]
+    },
+    {
+      "name": "TAG",
+      "a": "JitterProbe",
+      "b": "StreamPerf",
+      "files": [
+        "diagnostics/StreamJitterProbe.kt",
         "diagnostics/StreamPerfMonitor.kt"
       ]
     },
@@ -4209,6 +4218,15 @@
       "files": [
         "offload/ScheduledNotificationStore.kt",
         "plugins/LocalToolPluginStore.kt"
+      ]
+    },
+    {
+      "name": "PREFIX",
+      "a": "mn-",
+      "b": "online_",
+      "files": [
+        "diagnostics/ResourceWatermark.kt",
+        "plugins/OnlineApiTool.kt"
       ]
     },
     {
@@ -6803,6 +6821,6 @@
     "orphan_keys": 35,
     "usage_sites": 184,
     "usage_files": 111,
-    "constant_conflicts": 525
+    "constant_conflicts": 527
   }
 }

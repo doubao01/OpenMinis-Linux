@@ -32,7 +32,7 @@ class CrashFileSender : ReportSender {
 
     override fun send(context: Context, errorContent: CrashReportData) {
         try {
-            val body = buildReport(errorContent)
+            val body = buildReport(errorContent, context)
             val name = "crash-${IsoTime.formatFileStamp()}.log"
             val primary = File(context.filesDir, "logs")
             if (CrashReportWriter.write(primary, name, body) != null) return
@@ -43,8 +43,19 @@ class CrashFileSender : ReportSender {
         }
     }
 
-    private fun buildReport(errorContent: CrashReportData): String = buildString {
+    private fun buildReport(errorContent: CrashReportData, context: Context): String = buildString {
         appendLine("=== Minis Java/Kotlin Crash ===")
+        // 崩溃前的最后一次资源水位：Java 崩溃也能看到「线程/maps/fd 已经涨到多少」，
+        // 这是死前状态唯一的现场证据（native tombstone 由另一条链负责）。
+        runCatching {
+            com.openminis.app.diagnostics.ResourceWatermark
+                .readWatermark(context.filesDir, android.os.Process.myPid())
+                ?.let { (text, modifiedMs) ->
+                    appendLine("--- resource watermark (last sample) ---")
+                    appendLine("sampledAt=${IsoTime.formatFileStamp(modifiedMs)}")
+                    appendLine(text.trimEnd())
+                }
+        }
         appendLine("Time: ${IsoTime.formatFileStamp()}")
         appendLine(
             "Version: ${errorContent.getString(ReportField.APP_VERSION_NAME)} " +

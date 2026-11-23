@@ -29,6 +29,38 @@ object StreamPerfMonitor {
 
     private const val TAG = "StreamPerf"
 
+    /**
+     * 资源水位落盘目录。由 MinisApp 启动时 [attachFilesDir] 接上；没接上就跳过，
+     * 崩溃报告里退化成「没有水位」而不是写到一个猜出来的路径。
+     */
+    @Volatile
+    private var filesDir: java.io.File? = null
+
+    /** 只在 Application.onCreate 调一次。 */
+    fun attachFilesDir(dir: java.io.File) {
+        filesDir = dir
+    }
+
+    /**
+     * 每轮流式结束落一次资源水位（线程数 / maps / fd），供崩溃报告读取。
+     * 采样读的是 /proc/self，代价微秒级；任何异常都吞掉——监控不能自己变成崩溃源。
+     */
+    private fun writeResourceWatermark() {
+        val dir = filesDir ?: return
+        try {
+            val pid = android.os.Process.myPid()
+            ResourceWatermark.pruneWatermarks(dir, pid)
+            val sample = ResourceWatermark.sample()
+            ResourceWatermark.writeWatermark(
+                dir,
+                pid,
+                "sampled=${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())} " +
+                    sample.fields() + "\n",
+            )
+        } catch (_: Throwable) {
+        }
+    }
+
     private var active = false
     private var sessionId: String = ""
     private var turnStartNs = 0L
@@ -77,6 +109,16 @@ object StreamPerfMonitor {
         if (frozenReused) frozenHitTicks++
         lastFrozenRows = frozenRows
         lastLiveRows = liveRows
+        // 时间线标记（debug-only）：与 dumpsys gfxinfo 的 CLOCK_MONOTONIC 对齐，
+        // 用来判定哪些掉帧紧跟在 flatten 之后。挂在 tick 上而不是调用点，避免
+        // ChatScreen 再长一行（架构门禁按文件行数设了天花板）。
+        StreamJitterProbe.flatten(
+            ms = flattenNanos / 1_000_000,
+            frozenReused = frozenReused,
+            frozen = frozenRows,
+            live = liveRows,
+            streamEmpty = liveRows == 0,
+        )
     }
 
     /** End the turn and emit the one-line summary. No-op when not active. */
@@ -95,5 +137,6 @@ object StreamPerfMonitor {
                 "gcCount=+$gcCountDelta gcFreedMB=+${String.format(java.util.Locale.US, "%.1f", gcFreedDeltaMb)} " +
                 "turnS=${turnMs / 1000}",
         )
+        writeResourceWatermark()
     }
 }
