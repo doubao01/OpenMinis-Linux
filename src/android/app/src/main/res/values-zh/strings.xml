@@ -2465,6 +2465,8 @@
     <string name="mcp_builtin_shell_auto">auto：放行除高危外全部命令</string>
     <string name="mcp_builtin_pc_connect">PC 端连接</string>
     <string name="mcp_builtin_pc_connect_sub">先执行 adb reverse tcp:%1$d tcp:%1$d，然后在 MCP 客户端添加 http://127.0.0.1:%1$d/mcp（Streamable HTTP，需 Bearer token）</string>
+    <string name="mcp_lemon_panel">打开工具目录</string>
+    <string name="mcp_lemon_panel_sub">端口 %1$d 的内置工具目录（系统、文件、应用、网络、内核、调试），所有调用经过本服务与安全门</string>
     <string name="mcp_builtin_port_edit">修改端口</string>
     <string name="mcp_builtin_port_edit_sub">1024–65535。修改后需重新启动 Server 生效。</string>
     <string name="mcp_builtin_token_dialog_title">访问令牌</string>
