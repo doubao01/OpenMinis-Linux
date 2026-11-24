@@ -3435,4 +3435,6 @@
     <string name="session_res_compact_title">Automatyczna kompakcja</string>
     <string name="session_res_compact_sub">Zwijaj wczesne wiadomości, gdy kontekst zbliża się do limitu</string>
     <string name="session_res_close">Zamknij</string>
+    <string name="mcp_lemon_panel">Panel katalogu narzędzi</string>
+    <string name="mcp_lemon_panel_sub">%1$d narzędzi urządzenia (system, pliki, aplikacje, sieć, jądro, debug) działa przez ten serwer i bramę bezpieczeństwa</string>
 </resources>

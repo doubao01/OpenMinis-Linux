@@ -3432,4 +3432,6 @@
     <string name="session_res_compact_title">Compactare automată</string>
     <string name="session_res_compact_sub">Pliază mesajele vechi când contextul se apropie de limită</string>
     <string name="session_res_close">Închide</string>
+    <string name="mcp_lemon_panel">Panou catalog de instrumente</string>
+    <string name="mcp_lemon_panel_sub">%1$d instrumente ale dispozitivului (sistem, fișiere, aplicații, rețea, kernel, depanare) rulează prin acest server și poarta de securitate</string>
 </resources>

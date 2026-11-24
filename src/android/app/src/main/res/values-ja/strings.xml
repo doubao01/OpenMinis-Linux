@@ -3427,4 +3427,6 @@
     <string name="session_res_compact_title">自動圧縮</string>
     <string name="session_res_compact_sub">コンテキストが上限に近づくと古いメッセージを折りたたみます</string>
     <string name="session_res_close">閉じる</string>
+    <string name="mcp_lemon_panel">ツールカタログパネル</string>
+    <string name="mcp_lemon_panel_sub">%1$d 個のデバイスツール（システム・ファイル・アプリ・ネットワーク・カーネル・デバッグ）がこのサーバーとセキュリティゲートを経由して実行されます</string>
 </resources>

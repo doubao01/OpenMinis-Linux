@@ -3425,4 +3425,6 @@
     <string name="session_res_compact_title">自動壓縮</string>
     <string name="session_res_compact_sub">上下文接近上限時自動摺疊早期訊息</string>
     <string name="session_res_close">關閉</string>
+    <string name="mcp_lemon_panel">工具目錄面板</string>
+    <string name="mcp_lemon_panel_sub">%1$d 個裝置工具（系統、檔案、應用程式、網路、核心、偵錯）經由本伺服器與安全閘門執行</string>
 </resources>

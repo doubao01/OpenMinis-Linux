@@ -3428,4 +3428,6 @@
     <string name="session_res_compact_title">Compactage automatique</string>
     <string name="session_res_compact_sub">Replie les premiers messages quand le contexte approche la limite</string>
     <string name="session_res_close">Fermer</string>
+    <string name="mcp_lemon_panel">Panneau du catalogue d\'outils</string>
+    <string name="mcp_lemon_panel_sub">%1$d outils sur l\'appareil (système, fichiers, applis, réseau, noyau, débogage) passent par ce serveur et le portail de sécurité</string>
 </resources>

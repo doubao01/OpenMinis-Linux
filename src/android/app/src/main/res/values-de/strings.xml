@@ -3272,4 +3272,6 @@
     <string name="session_res_compact_title">Automatisch verdichten</string>
     <string name="session_res_compact_sub">Frühe Nachrichten zusammenklappen, wenn der Kontext das Limit erreicht</string>
     <string name="session_res_close">Schließen</string>
+    <string name="mcp_lemon_panel">Werkzeugkatalog-Leiste</string>
+    <string name="mcp_lemon_panel_sub">%1$d Gerätewerkzeuge (System, Dateien, Apps, Netzwerk, Kernel, Debug) laufen über diesen Server und die Sicherheitsfreigabe</string>
 </resources>

@@ -3428,4 +3428,6 @@
     <string name="session_res_compact_title">Padat automatik</string>
     <string name="session_res_compact_sub">Lipat mesej awal apabila konteks menghampiri had</string>
     <string name="session_res_close">Tutup</string>
+    <string name="mcp_lemon_panel">Panel katalog alat</string>
+    <string name="mcp_lemon_panel_sub">%1$d alat peranti (sistem, fail, aplikasi, rangkaian, kernel, debug) berjalan melalui pelayan dan gerbang keselamatan ini</string>
 </resources>

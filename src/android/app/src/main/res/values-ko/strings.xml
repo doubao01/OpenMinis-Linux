@@ -3427,4 +3427,6 @@
     <string name="session_res_compact_title">자동 압축</string>
     <string name="session_res_compact_sub">컨텍스트가 한계에 가까워지면 이전 메시지를 접습니다</string>
     <string name="session_res_close">닫기</string>
+    <string name="mcp_lemon_panel">도구 카탈로그 패널</string>
+    <string name="mcp_lemon_panel_sub">%1$d개의 기기 도구(시스템, 파일, 앱, 네트워크, 커널, 디버그)가 이 서버와 보안 게이트를 통해 실행됩니다</string>
 </resources>

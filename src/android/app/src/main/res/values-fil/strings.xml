@@ -3428,4 +3428,6 @@
     <string name="session_res_compact_title">Awtomatikong compaction</string>
     <string name="session_res_compact_sub">Tiklupin ang mga lumang mensahe kapag malapit na sa limit ang konteksto</string>
     <string name="session_res_close">Isara</string>
+    <string name="mcp_lemon_panel">Panel ng katalogo ng tool</string>
+    <string name="mcp_lemon_panel_sub">%1$d tool ng device (system, file, app, network, kernel, debug) ay tumatakbo sa server at security gate na ito</string>
 </resources>

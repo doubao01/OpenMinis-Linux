@@ -3428,4 +3428,6 @@
     <string name="session_res_compact_title">บีบอัดอัตโนมัติ</string>
     <string name="session_res_compact_sub">พับข้อความเก่าเมื่อบริบทใกล้ขีดจำกัด</string>
     <string name="session_res_close">ปิด</string>
+    <string name="mcp_lemon_panel">แผงแคตตาล็อกเครื่องมือ</string>
+    <string name="mcp_lemon_panel_sub">เครื่องมืออุปกรณ์ %1$d รายการ (ระบบ ไฟล์ แอป เครือข่าย เคอร์เนล ดีบัก) ทำงานผ่านเซิร์ฟเวอร์และประตูความปลอดภัยนี้</string>
 </resources>

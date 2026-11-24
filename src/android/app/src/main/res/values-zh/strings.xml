@@ -3061,4 +3061,6 @@
     <string name="session_res_compact_title">自动压缩</string>
     <string name="session_res_compact_sub">上下文接近上限时自动折叠早期消息</string>
     <string name="session_res_close">关闭</string>
+    <string name="mcp_lemon_panel">工具目录面板</string>
+    <string name="mcp_lemon_panel_sub">%1$d 个设备工具（系统、文件、应用、网络、内核、调试）经由本服务器与安全门执行</string>
 </resources>

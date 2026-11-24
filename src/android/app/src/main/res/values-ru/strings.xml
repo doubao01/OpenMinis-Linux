@@ -3436,4 +3436,6 @@
     <string name="session_res_compact_title">Автосжатие</string>
     <string name="session_res_compact_sub">Сворачивать ранние сообщения при приближении к лимиту контекста</string>
     <string name="session_res_close">Закрыть</string>
+    <string name="mcp_lemon_panel">Панель каталога инструментов</string>
+    <string name="mcp_lemon_panel_sub">%1$d инструментов устройства (система, файлы, приложения, сеть, ядро, отладка) работают через этот сервер и шлюз безопасности</string>
 </resources>
