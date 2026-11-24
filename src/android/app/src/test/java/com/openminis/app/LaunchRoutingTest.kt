@@ -20,8 +20,8 @@ class LaunchRoutingTest {
     @Test
     fun recreationSkipsChatRestore() {
         val saved = Bundle().apply {
-            putBoolean(KEY_ACTIVITY_RECREATION, true)
-            putString(KEY_CURRENT_CHAT_SESSION_ID, "chat-1")
+            putBoolean(BUNDLE_ACTIVITY_RECREATION, true)
+            putString(BUNDLE_CURRENT_CHAT_SESSION_ID, "chat-1")
         }
         val restore = readActivityRestore(saved, forceHome = false)
         assertTrue(restore.isRecreation)
@@ -31,8 +31,8 @@ class LaunchRoutingTest {
     @Test
     fun processDeathStillRestoresChat() {
         val saved = Bundle().apply {
-            putBoolean(KEY_ACTIVITY_RECREATION, false)
-            putString(KEY_CURRENT_CHAT_SESSION_ID, "chat-1")
+            putBoolean(BUNDLE_ACTIVITY_RECREATION, false)
+            putString(BUNDLE_CURRENT_CHAT_SESSION_ID, "chat-1")
         }
         val restore = readActivityRestore(saved, forceHome = false)
         assertFalse(restore.isRecreation)
@@ -42,7 +42,7 @@ class LaunchRoutingTest {
     @Test
     fun forceHomeWinsOverChatRestore() {
         val saved = Bundle().apply {
-            putString(KEY_CURRENT_CHAT_SESSION_ID, "chat-1")
+            putString(BUNDLE_CURRENT_CHAT_SESSION_ID, "chat-1")
         }
         val restore = readActivityRestore(saved, forceHome = true)
         assertNull(restore.chatSessionId)

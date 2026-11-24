@@ -5,8 +5,8 @@ import android.os.Bundle
 import com.openminis.app.deeplink.DeepLinkAction
 import com.openminis.app.deeplink.DeepLinkHandler
 
-internal const val KEY_CURRENT_CHAT_SESSION_ID = "minis.current_chat_session_id"
-internal const val KEY_ACTIVITY_RECREATION = "minis.activity_recreation"
+internal const val BUNDLE_CURRENT_CHAT_SESSION_ID = "minis.current_chat_session_id"
+internal const val BUNDLE_ACTIVITY_RECREATION = "minis.activity_recreation"
 
 internal data class ActivityRestore(
     val isRecreation: Boolean,
@@ -20,11 +20,11 @@ internal data class ActivityRestore(
  * language in Settings jumps back into the last conversation.
  */
 internal fun readActivityRestore(savedInstanceState: Bundle?, forceHome: Boolean): ActivityRestore {
-    val isRecreation = savedInstanceState?.getBoolean(KEY_ACTIVITY_RECREATION, false) == true
+    val isRecreation = savedInstanceState?.getBoolean(BUNDLE_ACTIVITY_RECREATION, false) == true
     val chatSessionId = if (isRecreation) {
         null
     } else {
-        savedInstanceState?.getString(KEY_CURRENT_CHAT_SESSION_ID)
+        savedInstanceState?.getString(BUNDLE_CURRENT_CHAT_SESSION_ID)
             ?.takeUnless { forceHome }
     }
     return ActivityRestore(isRecreation, chatSessionId)

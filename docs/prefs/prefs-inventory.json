@@ -114,7 +114,6 @@
         "KEY_AUTO_FOCUS_AFTER_REPLY": "chat.autoFocusAfterReply",
         "KEY_AUTO_GROUPING": "autoGroupingEnabled",
         "KEY_COMPOSER_CONTEXT_GLOW": "chat.composerContextGlow",
-        "KEY_CURRENT_CHAT_SESSION_ID": "minis.current_chat_session_id",
         "KEY_DYNAMIC_COLOR": "chat.dynamicColor",
         "KEY_FOLD_AI_PROCESS": "chat.foldAiProcess",
         "KEY_FONT_APP_BASE": "font_app_base",
@@ -6817,7 +6816,7 @@
   "totals": {
     "prefs_files": 105,
     "prefs_encrypted": 10,
-    "key_constants_attributed": 206,
+    "key_constants_attributed": 205,
     "orphan_keys": 35,
     "usage_sites": 184,
     "usage_files": 111,

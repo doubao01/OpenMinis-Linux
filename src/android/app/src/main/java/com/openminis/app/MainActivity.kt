@@ -641,9 +641,9 @@ class MainActivity : ComponentActivity() {
      */
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY_ACTIVITY_RECREATION, isChangingConfigurations)
+        outState.putBoolean(BUNDLE_ACTIVITY_RECREATION, isChangingConfigurations)
         currentChatSessionId?.let {
-            outState.putString(KEY_CURRENT_CHAT_SESSION_ID, it)
+            outState.putString(BUNDLE_CURRENT_CHAT_SESSION_ID, it)
         }
     }
 
