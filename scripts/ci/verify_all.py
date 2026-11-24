@@ -70,6 +70,10 @@ def _py(script: str, *args: str) -> list[str]:
 GATES: list[Gate] = [
     # ── 结构 / 架构 ──────────────────────────────────────────────────────────
     Gate("architecture-policy", _py("check_architecture_policy.py")),
+    # [T-feature-anchors] 关键入口的引用数下限。补的是「代码能编译但功能整块丢失」
+    # 这一类合并事故 —— 两天里发生过一次（会话资源面板入口），CI 全程绿。
+    # 静态分析试过三次全被误报否掉（302 / 6695 / 202 处），锚点表是唯一零误报的形态。
+    Gate("feature-anchors", _py("check_feature_anchors.py")),
     Gate("composition-locals", _py("check_composition_locals.py")),
     # [T-submodule-mapping] A gitlink without a .gitmodules entry breaks
     # `git submodule status` / `update --init` for every checkout.

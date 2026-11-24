@@ -1,0 +1,93 @@
+{
+  "_comment": [
+    "功能锚点表 —— 每个关键入口「全仓至少要出现几次」。",
+    "",
+    "为什么需要它：两天里 CI 红了 6 次，其中 2 次是同类事故 —— 解合并冲突时只取了",
+    "一侧的一部分，代码能编译通过但整块功能没了：",
+    "  1. ChatTopBarSection 删了 `val permissionModes` 却留下 `permissionModes.forEach {}` 空壳",
+    "     （编译不过，被 CI 抓住）",
+    "  2. feat/lemon-inapp 分支上 `showSessionResources` / `SessionResourcesSheet` 引用为 0，",
+    "     会话资源面板入口整段丢失，**CI 一直是绿的**，没人发现",
+    "",
+    "为什么不用静态分析：试过三次，误报分别是 302 / 6695 / 202 处 —— Kotlin 的局部声明",
+    "形态（解构、lambda 参数、作用域函数、by 委托、remember）无法用正则可靠还原，同包",
+    "可见性又让「未 import」不等于「不可见」。会误报的守卫最终会被 baseline 绕过。",
+    "",
+    "锚点表不推断，只比对人工认定的下限，所以零误报。代价是需要人挑锚点。",
+    "",
+    "min 只降不升。功能性删除（重构替代、入口迁移）必须同步下调并在 commit message",
+    "说明原因，命令：python3 scripts/ci/check_feature_anchors.py --update-anchors"
+  ],
+  "anchors": [
+    {
+      "symbol": "showSessionResources",
+      "min": 4,
+      "why": "会话资源面板的开关状态；丢失 = 入口消失（真实发生过的 bug）"
+    },
+    {
+      "symbol": "SessionResourcesSheet",
+      "min": 2,
+      "why": "会话资源面板本体；分支合并时曾整段丢失"
+    },
+    {
+      "symbol": "lemonTools",
+      "min": 7,
+      "why": "小柠檬目录工具注册函数；删除 = 358 个工具全部失联"
+    },
+    {
+      "symbol": "pilotTools",
+      "min": 3,
+      "why": "LemonPilot 五个原生工具；跨包顶层函数，曾因漏 import 编译失败"
+    },
+    {
+      "symbol": "lemon_list",
+      "min": 10,
+      "why": "目录检索工具名；MCP tools/list 直接暴露给 agent，改名即断客户端"
+    },
+    {
+      "symbol": "lemon_call",
+      "min": 13,
+      "why": "目录执行工具名；同上，且是唯一执行入口"
+    },
+    {
+      "symbol": "pilot_perceive",
+      "min": 6,
+      "why": "语义感知工具名；面板与原生两条路都引用"
+    },
+    {
+      "symbol": "LemonPanelScreen",
+      "min": 2,
+      "why": "面板 WebView 容器；丢失 = 设置里的入口点不开东西"
+    },
+    {
+      "symbol": "LemonPanelLauncherRow",
+      "min": 2,
+      "why": "设置页启动行；被抽出以避免主文件超行数上限"
+    },
+    {
+      "symbol": "mcpNavDestinations",
+      "min": 2,
+      "why": "MCP 三个导航目的地的聚合入口；抽取时最容易只搬一半"
+    },
+    {
+      "symbol": "McpServerCore",
+      "min": 8,
+      "why": "MCP 协议核心；跨包引用最多，曾因漏 import 编译失败"
+    },
+    {
+      "symbol": "SecurityGate",
+      "min": 10,
+      "why": "唯一的三档权限判定点；任何绕过它直接起进程的改动都该被看见"
+    },
+    {
+      "symbol": "SessionPermissionMode",
+      "min": 10,
+      "why": "会话权限三档枚举；面板、门、设置页三处共用"
+    },
+    {
+      "symbol": "gen_catalog",
+      "min": 2,
+      "why": "目录生成器；删了就没法从插件壳重出 catalog.json"
+    }
+  ]
+}
