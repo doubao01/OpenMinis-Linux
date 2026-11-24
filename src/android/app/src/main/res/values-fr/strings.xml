@@ -3430,4 +3430,6 @@
     <string name="session_res_close">Fermer</string>
     <string name="mcp_lemon_panel">Panneau du catalogue d\'outils</string>
     <string name="mcp_lemon_panel_sub">%1$d outils sur l\'appareil (système, fichiers, applis, réseau, noyau, débogage) passent par ce serveur et le portail de sécurité</string>
+    <string name="slash_thinking_unsupported_detail">Ce modele n\'a pas de niveaux de reflexion ; /thinking n\'a aucun effet</string>
+    <string name="slash_unknown_command">Commande inconnue : %1$s (voir le panneau / pour les commandes disponibles)</string>
 </resources>

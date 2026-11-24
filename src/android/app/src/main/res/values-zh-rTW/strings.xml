@@ -3427,4 +3427,6 @@
     <string name="session_res_close">關閉</string>
     <string name="mcp_lemon_panel">工具目錄面板</string>
     <string name="mcp_lemon_panel_sub">%1$d 個裝置工具（系統、檔案、應用程式、網路、核心、偵錯）經由本伺服器與安全閘門執行</string>
+    <string name="slash_thinking_unsupported_detail">目前模型沒有思考檔位，/thinking 無效果</string>
+    <string name="slash_unknown_command">未知指令：%1$s（可用指令見 / 面板）</string>
 </resources>

@@ -3063,4 +3063,6 @@
     <string name="session_res_close">关闭</string>
     <string name="mcp_lemon_panel">工具目录面板</string>
     <string name="mcp_lemon_panel_sub">%1$d 个设备工具（系统、文件、应用、网络、内核、调试）经由本服务器与安全门执行</string>
+    <string name="slash_thinking_unsupported_detail">当前模型没有思考档位，/thinking 无效果</string>
+    <string name="slash_unknown_command">未知命令：%1$s（可用命令见 / 面板）</string>
 </resources>

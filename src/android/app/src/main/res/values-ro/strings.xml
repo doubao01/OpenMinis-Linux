@@ -3434,4 +3434,6 @@
     <string name="session_res_close">Închide</string>
     <string name="mcp_lemon_panel">Panou catalog de instrumente</string>
     <string name="mcp_lemon_panel_sub">%1$d instrumente ale dispozitivului (sistem, fișiere, aplicații, rețea, kernel, depanare) rulează prin acest server și poarta de securitate</string>
+    <string name="slash_thinking_unsupported_detail">Acest model nu are niveluri de gandire; /thinking nu are efect</string>
+    <string name="slash_unknown_command">Comanda necunoscuta: %1$s (vezi panoul / pentru comenzile disponibile)</string>
 </resources>

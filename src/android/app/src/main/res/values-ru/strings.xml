@@ -3438,4 +3438,6 @@
     <string name="session_res_close">Закрыть</string>
     <string name="mcp_lemon_panel">Панель каталога инструментов</string>
     <string name="mcp_lemon_panel_sub">%1$d инструментов устройства (система, файлы, приложения, сеть, ядро, отладка) работают через этот сервер и шлюз безопасности</string>
+    <string name="slash_thinking_unsupported_detail">У этой модели нет уровней рассуждения; /thinking не действует</string>
+    <string name="slash_unknown_command">Неизвестная команда: %1$s (доступные команды — в панели /)</string>
 </resources>

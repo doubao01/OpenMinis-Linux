@@ -3429,4 +3429,6 @@
     <string name="session_res_close">閉じる</string>
     <string name="mcp_lemon_panel">ツールカタログパネル</string>
     <string name="mcp_lemon_panel_sub">%1$d 個のデバイスツール（システム・ファイル・アプリ・ネットワーク・カーネル・デバッグ）がこのサーバーとセキュリティゲートを経由して実行されます</string>
+    <string name="slash_thinking_unsupported_detail">このモデルには思考レベルがないため、/thinking は効果がありません</string>
+    <string name="slash_unknown_command">不明なコマンド: %1$s（使用可能なコマンドは / パネルを参照）</string>
 </resources>

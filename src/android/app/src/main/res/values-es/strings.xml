@@ -3274,4 +3274,6 @@
     <string name="session_res_close">Cerrar</string>
     <string name="mcp_lemon_panel">Panel del catálogo de herramientas</string>
     <string name="mcp_lemon_panel_sub">%1$d herramientas del dispositivo (sistema, archivos, apps, red, kernel, depuración) se ejecutan a través de este servidor y la puerta de seguridad</string>
+    <string name="slash_thinking_unsupported_detail">Este modelo no tiene niveles de razonamiento; /thinking no tiene efecto</string>
+    <string name="slash_unknown_command">Comando desconocido: %1$s (consulta el panel / para ver los comandos)</string>
 </resources>

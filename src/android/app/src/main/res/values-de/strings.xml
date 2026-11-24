@@ -3274,4 +3274,6 @@
     <string name="session_res_close">Schließen</string>
     <string name="mcp_lemon_panel">Werkzeugkatalog-Leiste</string>
     <string name="mcp_lemon_panel_sub">%1$d Gerätewerkzeuge (System, Dateien, Apps, Netzwerk, Kernel, Debug) laufen über diesen Server und die Sicherheitsfreigabe</string>
+    <string name="slash_thinking_unsupported_detail">Dieses Modell hat keine Denkstufen; /thinking hat keine Wirkung</string>
+    <string name="slash_unknown_command">Unbekannter Befehl: %1$s (verfuegbare Befehle im /-Panel)</string>
 </resources>

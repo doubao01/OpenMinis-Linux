@@ -3430,4 +3430,6 @@
     <string name="session_res_close">ปิด</string>
     <string name="mcp_lemon_panel">แผงแคตตาล็อกเครื่องมือ</string>
     <string name="mcp_lemon_panel_sub">เครื่องมืออุปกรณ์ %1$d รายการ (ระบบ ไฟล์ แอป เครือข่าย เคอร์เนล ดีบัก) ทำงานผ่านเซิร์ฟเวอร์และประตูความปลอดภัยนี้</string>
+    <string name="slash_thinking_unsupported_detail">โมเดลนี้ไม่มีระดับการคิด /thinking จึงไม่มีผล</string>
+    <string name="slash_unknown_command">ไม่รู้จักคำสั่ง: %1$s (ดูคำสั่งที่ใช้ได้ในแผง /)</string>
 </resources>

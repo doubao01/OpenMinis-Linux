@@ -3430,4 +3430,6 @@
     <string name="session_res_close">Fechar</string>
     <string name="mcp_lemon_panel">Painel do catálogo de ferramentas</string>
     <string name="mcp_lemon_panel_sub">%1$d ferramentas do dispositivo (sistema, arquivos, apps, rede, kernel, depuração) passam por este servidor e portão de segurança</string>
+    <string name="slash_thinking_unsupported_detail">Este modelo nao tem niveis de raciocinio; /thinking nao tem efeito</string>
+    <string name="slash_unknown_command">Comando desconhecido: %1$s (veja o painel / para comandos disponiveis)</string>
 </resources>

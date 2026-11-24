@@ -3430,4 +3430,6 @@
     <string name="session_res_close">Kapat</string>
     <string name="mcp_lemon_panel">Araç kataloğu paneli</string>
     <string name="mcp_lemon_panel_sub">%1$d cihaz aracı (sistem, dosya, uygulama, ağ, çekirdek, hata ayıklama) bu sunucu ve güvenlik geçidinden çalışır</string>
+    <string name="slash_thinking_unsupported_detail">Bu modelde dusunme seviyesi yok; /thinking etkisizdir</string>
+    <string name="slash_unknown_command">Bilinmeyen komut: %1$s (kullanilabilir komutlar icin / panelini acin)</string>
 </resources>

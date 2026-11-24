@@ -3435,4 +3435,6 @@
     <string name="session_res_close">Tutup</string>
     <string name="mcp_lemon_panel">Panel katalog alat</string>
     <string name="mcp_lemon_panel_sub">%1$d alat perangkat (sistem, berkas, aplikasi, jaringan, kernel, debug) berjalan melalui server dan gerbang keamanan ini</string>
+    <string name="slash_thinking_unsupported_detail">Model ini tidak memiliki tingkat penalaran; /thinking tidak berpengaruh</string>
+    <string name="slash_unknown_command">Perintah tidak dikenal: %1$s (lihat panel / untuk perintah yang tersedia)</string>
 </resources>

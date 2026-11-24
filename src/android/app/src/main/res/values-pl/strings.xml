@@ -3437,4 +3437,6 @@
     <string name="session_res_close">Zamknij</string>
     <string name="mcp_lemon_panel">Panel katalogu narzędzi</string>
     <string name="mcp_lemon_panel_sub">%1$d narzędzi urządzenia (system, pliki, aplikacje, sieć, jądro, debug) działa przez ten serwer i bramę bezpieczeństwa</string>
+    <string name="slash_thinking_unsupported_detail">Ten model nie ma poziomow myslenia; /thinking nie dziala</string>
+    <string name="slash_unknown_command">Nieznane polecenie: %1$s (dostepne polecenia w panelu /)</string>
 </resources>
