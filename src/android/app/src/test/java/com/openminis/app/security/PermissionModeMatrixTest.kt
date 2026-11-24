@@ -31,7 +31,18 @@ class PermissionModeMatrixTest {
     private fun read() = gate.classify("file_read", """{"path":"/var/minis/workspace/a.txt"}""")
     private fun write() = gate.classify("file_write", """{"path":"/var/minis/workspace/a.txt","content":"x"}""")
     private fun shellSafe() = gate.classify("shell_exec", """{"command":"echo hi"}""")
-    private fun shellDangerous() = gate.classify("shell_exec", """{"command":"rm -rf /var/minis/workspace/x"}""")
+    /**
+     * 必须挑一个**真的**判成 DANGEROUS 的命令。
+     *
+     * 我用 `rm -rf /var/minis/workspace/x` 试过 —— 它是 **NORMAL**，不是 DANGEROUS。
+     * 这是设计意图不是漏洞：workspace 内的文件可 checkpoint 还原，
+     * `classifySegment` 的 DANGEROUS 只覆盖不可逆的几条（`/data/data/`、
+     * build.prop、`iptables -F`、`pm uninstall --user 0`、`/etc/hosts`、
+     * `setenforce 0`、含 shell 展开）。
+     *
+     * 所以这里用 `iptables -F`：清防火墙规则，不在任何 recoverable 路径下。
+     */
+    private fun shellDangerous() = gate.classify("shell_exec", """{"command":"iptables -F"}""")
     private fun shellFatal() = gate.classify("shell_exec", """{"command":"rm -rf /"}""")
     private fun coordinator() = gate.classify("agent_plan", """{"op":"list"}""")
 
@@ -46,6 +57,18 @@ class PermissionModeMatrixTest {
                 d is Decision.Allow,
             )
         }
+    }
+
+    @Test
+    fun workspaceRmIsNormalNotDangerous() {
+        // 反向确认上面那条注释：workspace 内的删除被判 NORMAL，因为可还原。
+        // 若有人把这条改成 DANGEROUS，GUARDED 模式会对每次工作区清理弹窗 ——
+        // 那不是安全，是骚扰。
+        val cmd = gate.classify("shell_exec", """{"command":"rm -rf /var/minis/workspace/x"}""")
+        assertTrue(
+            "workspace 内删除应可自动放行（可 checkpoint 还原）",
+            gate.decide(cmd, PermissionMode.GUARDED) is Decision.Allow,
+        )
     }
 
     @Test
