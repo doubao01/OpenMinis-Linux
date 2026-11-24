@@ -49,10 +49,18 @@ class LaunchRoutingTest {
     }
 
     @Test
-    fun recreationDoesNotRedispatchTheLaunchIntent() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("minis://action/new_chat"))
+    fun recreationDoesNotSynthesizeAChatRestore() {
         assertEquals(
             DeepLinkAction.Unknown,
+            resolveLaunchDeepLink(null, restoredChatSessionId = "chat-1", isActivityRecreation = true),
+        )
+    }
+
+    @Test
+    fun recreationKeepsAnExplicitDeepLinkForTheGraphStart() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("minis://action/new_chat"))
+        assertEquals(
+            DeepLinkAction.NewChat,
             resolveLaunchDeepLink(intent, restoredChatSessionId = "chat-1", isActivityRecreation = true),
         )
     }
@@ -71,6 +79,25 @@ class LaunchRoutingTest {
         assertEquals(
             DeepLinkAction.OpenSession("chat-1"),
             resolveLaunchDeepLink(null, restoredChatSessionId = "chat-1", isActivityRecreation = false),
+        )
+    }
+
+    @Test
+    fun appNavigationReceivesTheRecreationFlag() {
+        val main = ProductionSources.read("MainActivity.kt")
+        assertTrue(main.contains("skipInitialRouting = isActivityRecreation"))
+
+        val nav = ProductionSources.read("ui/navigation/AppNavigation.kt")
+        assertTrue(nav.contains("skipInitialRouting: Boolean = false"))
+        assertTrue(
+            nav.substringAfter("LaunchedEffect(initialDeepLink) {")
+                .substringBefore("when (initialDeepLink)")
+                .contains("if (skipInitialRouting) return@LaunchedEffect"),
+        )
+        assertTrue(
+            nav.substringAfter("LaunchedEffect(Unit) {")
+                .substringBefore("val hasDeepLink")
+                .contains("if (skipInitialRouting) return@LaunchedEffect"),
         )
     }
 }

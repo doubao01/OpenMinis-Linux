@@ -31,24 +31,25 @@ internal fun readActivityRestore(savedInstanceState: Bundle?, forceHome: Boolean
 }
 
 /**
- * Resolve the cold-start deep link. On a configuration change the original
- * Intent is still attached; re-dispatching it would mount its destination on
- * top of the restored NavController stack, so it is deliberately ignored.
+ * Resolve the cold-start deep link. An explicit Intent deep link is kept on a
+ * configuration change because it also defines the NavHost start destination;
+ * the caller skips its dispatch effect so it cannot mount a second copy. A
+ * saved chat id, by contrast, must not be turned into a deep link on
+ * recreation — that is what replaced Settings with the last conversation.
+ * Every action returned here still needs a branch in AppNavigation's
+ * cold-start `when` and in MainActivity.handleDeepLink.
  */
 internal fun resolveLaunchDeepLink(
     intent: Intent?,
     restoredChatSessionId: String?,
     isActivityRecreation: Boolean,
 ): DeepLinkAction {
-    if (isActivityRecreation) return DeepLinkAction.Unknown
     val explicitDeepLink = when {
         intent?.action == Intent.ACTION_ASSIST ||
             intent?.action == Intent.ACTION_VOICE_COMMAND -> DeepLinkAction.NewChat
         else -> DeepLinkHandler.parse(intent?.data)
     }
-    return if (explicitDeepLink !is DeepLinkAction.Unknown) {
-        explicitDeepLink
-    } else {
-        restoredChatSessionId?.let { DeepLinkAction.OpenSession(it) } ?: DeepLinkAction.Unknown
-    }
+    if (explicitDeepLink !is DeepLinkAction.Unknown) return explicitDeepLink
+    if (isActivityRecreation) return DeepLinkAction.Unknown
+    return restoredChatSessionId?.let { DeepLinkAction.OpenSession(it) } ?: DeepLinkAction.Unknown
 }
