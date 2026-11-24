@@ -78,6 +78,7 @@ fun AppNavigation(
     memoryRepository: MemoryRepository? = null,
     navController: NavHostController = rememberNavController(),
     initialDeepLink: DeepLinkAction? = null,
+    skipInitialRouting: Boolean = false,
 ) {
     val context = LocalContext.current
 
@@ -96,6 +97,7 @@ fun AppNavigation(
     // needs a branch in BOTH `when`s — OpenAlarmList / OpenDevSuiteInstall /
     // OpenShare were missing here and dead-ended on cold start.
     LaunchedEffect(initialDeepLink) {
+        if (skipInitialRouting) return@LaunchedEffect
         when (initialDeepLink) {
             is DeepLinkAction.OpenTerminal -> {
                 navController.safeNavigate(Routes.terminal(initialDeepLink.initCommand))
@@ -180,6 +182,7 @@ fun AppNavigation(
     // settle into RESUMED before navigating; for mode 3 (Home) we don't
     // need to navigate at all so we can skip the wait entirely.
     LaunchedEffect(Unit) {
+        if (skipInitialRouting) return@LaunchedEffect
         val hasDeepLink = initialDeepLink != null && initialDeepLink !is DeepLinkAction.Unknown
         if (hasDeepLink) return@LaunchedEffect
         val hasPendingShare =
