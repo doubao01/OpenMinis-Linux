@@ -3035,7 +3035,6 @@
  <string name="subagent_tool_browser">浏览器</string>
  <string name="subagent_tool_memory">记忆</string>
  <string name="subagent_tool_spawn">子代理</string>
-    <string name="chat_menu_session_resources">会话资源</string>
     <string name="session_res_title">会话资源</string>
     <string name="session_res_subtitle">只作用于当前会话</string>
     <string name="session_res_skills">技能</string>

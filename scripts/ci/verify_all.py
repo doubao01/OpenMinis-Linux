@@ -79,6 +79,13 @@ GATES: list[Gate] = [
     # low —— 编译通过、其他门禁全绿（它是 JSON 资产，没有类型约束）。
     # 这是唯一一条「改数据就能绕过安全判断」的路径，所以要能由源重算。
     Gate("lemon-catalog", _py("check_lemon_catalog.py")),
+    # [T-dup-strings] 同一资源名在 values*/*.xml 里定义两次 → mergeReleaseResources
+    # 直接 FAILED（Android 资源合并器的致命错误）。2026-11-24 真发生过：
+    # cherry-pick 一个 l10n 提交，`chat_menu_session_resources` 在 values-zh
+    # 已存在，两条文本完全相同所以**没有冲突标记**，人看不出来；
+    # 而 check_string_refs 只验引用能解析、check_new_untranslated 只数键在不在，
+    # 都放它过去了 —— 只有 APK 构建阶段的资源合并器能发现。
+    Gate("duplicate-strings", _py("check_duplicate_strings.py")),
     Gate("composition-locals", _py("check_composition_locals.py")),
     # [T-submodule-mapping] A gitlink without a .gitmodules entry breaks
     # `git submodule status` / `update --init` for every checkout.
