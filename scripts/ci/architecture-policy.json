@@ -108,7 +108,7 @@
     "src/android/app/src/main/java"
   ],
   "baseline": {
-    "src/android/app/src/main/java/com/openminis/app/MainActivity.kt": 847,
+    "src/android/app/src/main/java/com/openminis/app/MainActivity.kt": 835,
     "src/android/app/src/main/java/com/openminis/app/agent/PersonaPromptLibrary.kt": 834,
     "src/android/app/src/main/java/com/openminis/app/backup/BackupImporter.kt": 1124,
     "src/android/app/src/main/java/com/openminis/app/browser/BrowserTabPool.kt": 1385,
@@ -148,7 +148,7 @@
     "src/android/app/src/main/java/com/openminis/app/ui/chat/StreamingMarkdownText.kt": 1398,
     "src/android/app/src/main/java/com/openminis/app/ui/chat/voice/InlineVoiceInputPanel.kt": 910,
     "src/android/app/src/main/java/com/openminis/app/ui/markdown/MarkdownText.kt": 831,
-    "src/android/app/src/main/java/com/openminis/app/ui/navigation/AppNavigation.kt": 984,
+    "src/android/app/src/main/java/com/openminis/app/ui/navigation/AppNavigation.kt": 981,
     "src/android/app/src/main/java/com/openminis/app/ui/navigation/ChatSplitScaffold.kt": 952,
     "src/android/app/src/main/java/com/openminis/app/ui/sandbox/FilePreviewScreen.kt": 1250,
     "src/android/app/src/main/java/com/openminis/app/ui/sandbox/MirrorSettingsScreen.kt": 861,

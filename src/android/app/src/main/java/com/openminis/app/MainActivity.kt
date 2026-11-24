@@ -53,9 +53,6 @@ import com.openminis.app.ui.settings.fontScaleForLevel
 import com.openminis.app.ui.settings.keepScreenAwakeEnabled
 import com.openminis.app.ui.theme.MinisTheme
 
-private const val KEY_CURRENT_CHAT_SESSION_ID = "minis.current_chat_session_id"
-private const val KEY_ACTIVITY_RECREATION = "minis.activity_recreation"
-
 class MainActivity : ComponentActivity() {
 
     private var navController: NavHostController? = null
@@ -321,22 +318,12 @@ class MainActivity : ComponentActivity() {
         // own launch-mode resolution; gating restoredChatSessionId here
         // covers the path where saved-state would override the
         // launch-mode dispatch entirely.
-        // A configuration change (locale, font scale, …) recreates the
-        // Activity too, but it must not be treated as process death: the
-        // NavController restores the visible screen, while the restore below
-        // would replace it with the last chat. Keep the two paths separate so
-        // changing the language in Settings no longer kicks the user back into
-        // a conversation. [T-android-config-change-chat-restore]
-        val isActivityRecreation = savedInstanceState
-            ?.getBoolean(KEY_ACTIVITY_RECREATION, false) == true
-        restoredChatSessionId = if (isActivityRecreation) {
-            null
-        } else {
-            savedInstanceState?.getString(KEY_CURRENT_CHAT_SESSION_ID)
-                ?.takeUnless {
-                    com.openminis.app.crash.CrashFrequencyDetector.shouldForceHomeOnLaunch(this)
-                }
-        }
+        val restore = readActivityRestore(
+            savedInstanceState,
+            forceHome = com.openminis.app.crash.CrashFrequencyDetector.shouldForceHomeOnLaunch(this),
+        )
+        val isActivityRecreation = restore.isRecreation
+        restoredChatSessionId = restore.chatSessionId
 
         permissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
@@ -529,26 +516,7 @@ class MainActivity : ComponentActivity() {
         // while inside a chat, synthesise an OpenSession deep-link so
         // the navigation stack lands on that chat instead of the
         // sessions list. T166.
-        // [T-deeplink-coldstart] This parse IS the cold-start deep-link dispatch
-        // (handleDeepLink runs only for onNewIntent); every DeepLinkAction needs
-        // a branch in BOTH this path's AppNavigation `when` and handleDeepLink.
-        val explicitDeepLink = when {
-            intent?.action == Intent.ACTION_ASSIST || intent?.action == Intent.ACTION_VOICE_COMMAND ->
-                DeepLinkAction.NewChat
-            else -> DeepLinkHandler.parse(intent?.data)
-        }
-        val launchDeepLink = if (isActivityRecreation) {
-            // The Intent that started this Activity is still attached after a
-            // configuration change. Re-dispatching it would mount the original
-            // deep-link destination on top of the restored NavController stack.
-            null
-        } else if (explicitDeepLink !is DeepLinkAction.Unknown) {
-            explicitDeepLink
-        } else {
-            restoredChatSessionId
-                ?.let { DeepLinkAction.OpenSession(it) }
-                ?: DeepLinkAction.Unknown
-        }
+        val launchDeepLink = resolveLaunchDeepLink(intent, restoredChatSessionId, isActivityRecreation)
 
         setContent {
             // [T-db-startup-integrity-gate] If the startup gate quarantined a

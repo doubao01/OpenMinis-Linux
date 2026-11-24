@@ -171,16 +171,10 @@ fun AppNavigation(
         }
     }
 
-    // Resolve launch session preference once into a deferred navigation target.
-    // T314: this LaunchedEffect fires the same frame the NavHost mounts, so
-    // the SESSION_LIST start-destination's NavBackStackEntry is still in
-    // STARTED state when we'd otherwise call navigate(). safeNavigate() —
-    // designed to defang the back-then-tap race — early-returns whenever
-    // the current entry isn't RESUMED, which silently dropped every
-    // launch-session navigation and left the user on the home screen
-    // regardless of mode 1 / 2 / 0. Wait for the start destination to
-    // settle into RESUMED before navigating; for mode 3 (Home) we don't
-    // need to navigate at all so we can skip the wait entirely.
+    // Resolve the launch-session preference once into a deferred target.
+    // T314: this effect runs before the start destination is RESUMED;
+    // safeNavigate() would early-return and silently drop the navigation.
+    // Wait for RESUMED before navigating; mode 3 (Home) has no target.
     LaunchedEffect(Unit) {
         if (skipInitialRouting) return@LaunchedEffect
         val hasDeepLink = initialDeepLink != null && initialDeepLink !is DeepLinkAction.Unknown
