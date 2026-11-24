@@ -74,6 +74,11 @@ GATES: list[Gate] = [
     # 这一类合并事故 —— 两天里发生过一次（会话资源面板入口），CI 全程绿。
     # 静态分析试过三次全被误报否掉（302 / 6695 / 202 处），锚点表是唯一零误报的形态。
     Gate("feature-anchors", _py("check_feature_anchors.py")),
+    # [T-lemon-catalog-guard] catalog.json 决定运行时能做什么：domain 决定分组，
+    # risk 决定三档权限里哪些工具会被拦。手改一个字符就能把 fs_rm 从 high 改成
+    # low —— 编译通过、其他门禁全绿（它是 JSON 资产，没有类型约束）。
+    # 这是唯一一条「改数据就能绕过安全判断」的路径，所以要能由源重算。
+    Gate("lemon-catalog", _py("check_lemon_catalog.py")),
     Gate("composition-locals", _py("check_composition_locals.py")),
     # [T-submodule-mapping] A gitlink without a .gitmodules entry breaks
     # `git submodule status` / `update --init` for every checkout.
