@@ -156,7 +156,7 @@
     "src/android/app/src/main/java/com/openminis/app/ui/sessions/SessionListViewModel.kt": 1165,
     "src/android/app/src/main/java/com/openminis/app/ui/settings/AddProviderScreen.kt": 890,
     "src/android/app/src/main/java/com/openminis/app/ui/settings/AppearanceScreen.kt": 830,
-    "src/android/app/src/main/java/com/openminis/app/ui/settings/MCPIntegrationsScreen.kt": 1084,
+    "src/android/app/src/main/java/com/openminis/app/ui/settings/MCPIntegrationsScreen.kt": 1082,
     "src/android/app/src/main/java/com/openminis/app/ui/settings/ProviderDetailScreen.kt": 1022,
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SkillsManagementScreen.kt": 1116,
     "src/android/app/src/main/java/com/openminis/app/ui/settings/SoulSettingsScreen.kt": 866,

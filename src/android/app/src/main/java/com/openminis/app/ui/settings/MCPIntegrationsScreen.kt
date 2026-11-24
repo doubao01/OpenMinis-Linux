@@ -166,6 +166,13 @@ fun MCPIntegrationsScreen(
                     }
                 },
             )
+            com.openminis.app.ui.lemon.LemonPanelLauncherRow(
+                port = builtInPort,
+                onEnsureServer = {
+                    com.openminis.app.ui.lemon.ensureBuiltInMcpServer(context, mcpStore)
+                },
+                onOpen = onOpenLemonPanel,
+            )
             SettingsRow(
                 title = stringResource(R.string.mcp_builtin_port),
                 subtitle = stringResource(R.string.mcp_builtin_port_sub, builtInPort),
@@ -193,15 +200,6 @@ fun MCPIntegrationsScreen(
                 subtitle = stringResource(R.string.mcp_builtin_pc_connect_sub, builtInPort),
                 icon = m3Icon(Icons.Outlined.Language),
                 showChevron = false,
-            )
-            com.openminis.app.ui.lemon.LemonPanelLauncherRow(
-                port = builtInPort,
-                enabled = mcpConfig.enabled,
-                onEnableServer = {
-                    mcpStore?.setEnabled(true)
-                    McpServerManager.start()
-                },
-                onOpen = onOpenLemonPanel,
             )
         }
         // [T-mcp-approval-ui] Decision inbox for waiting clients; silent when idle.

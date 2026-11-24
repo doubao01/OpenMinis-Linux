@@ -111,15 +111,18 @@
 // 默认端口来自 McpHttpServer.DEFAULT_PORT = 8765，可用 ?port= 覆盖。
 const PORT = new URLSearchParams(location.search).get('port') || '8765';
 const ENDPOINT = 'http://127.0.0.1:' + PORT + '/mcp';
+const TOKEN = new URLSearchParams(location.search).get('token') || '';
 let TOOLS = [], COUNTS = [], DOM = '', NID = 1;
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 async function rpc(method, params) {
+  const headers = {'Content-Type': 'application/json'};
+  if (TOKEN) headers['Authorization'] = 'Bearer ' + TOKEN;
   const r = await fetch(ENDPOINT, {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+    headers,
     body: JSON.stringify({jsonrpc: '2.0', id: NID++, method, params: params || {}})
   });
   const j = await r.json();
@@ -140,7 +143,7 @@ async function loadCatalog() {
     render();
   } catch (e) {
     $('list').className = 'empty';
-    $('list').textContent = '连不上内嵌 MCP 服务（' + ENDPOINT + '）。请到 设置 → MCP 打开服务后重试。';
+    $('list').textContent = '连不上或鉴权失败（' + ENDPOINT + '）。请确认 设置 → MCP 中服务已启动，然后重新打开面板。';
     $('meta').textContent = '未连接';
   }
 }

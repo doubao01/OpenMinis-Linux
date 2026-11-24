@@ -27,11 +27,14 @@ import com.openminis.app.ui.theme.m3Icon
 /**
  * [T-lemon-integration] The bundled tool catalog panel.
  *
- * Loads `assets/lemon/panel.html?port=<live port>` in a WebView. The page ships
- * inside the APK, so it needs no network: it talks to the app's own built-in
- * MCP server on loopback (`127.0.0.1:<port>/mcp`), the same server any external
- * client would use. That keeps ONE execution path — the page's "run" button and
- * an MCP client's `tools/call` both land in
+ * Loads `assets/lemon/panel.html?port=<live port>&token=<loopback token>` in a
+ * WebView. The page ships inside the APK, so it needs no network: it talks to
+ * the app's own built-in MCP server on loopback (`127.0.0.1:<port>/mcp`), the
+ * same server any external client would use. The token is the generated
+ * loopback Bearer token; without it every call is 401 because the panel is
+ * served from `file://` and does not share the app's process state. That keeps
+ * ONE execution path — the page's "run" button and an MCP client's
+ * `tools/call` both land in
  * [com.openminis.app.mcp.server.McpToolDispatcher] behind the same
  * [com.openminis.app.security.SecurityGate].
  *
@@ -45,7 +48,10 @@ fun LemonPanelScreen(
     port: Int,
     onBack: () -> Unit,
 ) {
-    val url = remember(port) { "file:///android_asset/lemon/panel.html?port=$port" }
+    val token = remember(port) {
+        com.openminis.app.mcp.server.McpServerManager.configStore()?.currentToken()
+    }
+    val url = remember(port, token) { lemonPanelUrl(port, token) }
 
     Scaffold(
         topBar = {
@@ -91,5 +97,18 @@ fun LemonPanelScreen(
                 },
             )
         }
+    }
+}
+
+/**
+ * The generated token is 48 lowercase hex characters, so it needs no URL
+ * escaping. Keeping the builder pure makes the panel's auth contract testable.
+ */
+internal fun lemonPanelUrl(port: Int, token: String?): String = buildString {
+    append("file:///android_asset/lemon/panel.html?port=")
+    append(port)
+    if (!token.isNullOrBlank()) {
+        append("&token=")
+        append(token)
     }
 }
