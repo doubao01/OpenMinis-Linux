@@ -121,6 +121,17 @@ jobs:
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
         run: ./gradlew :app:testReleaseUnitTest --parallel --stacktrace
 
+      # [T-androidtest-blind-spot] 19 个 androidTest 文件从来没被编译过 ——
+      # 没有 emulator 就跑不了 connectedAndroidTest，但**至少能编译**：
+      # `compileReleaseAndroidTestKotlin` 只做类型检查，不需要设备。
+      # 不加这一步，删掉一个被测类、改掉一个签名，这 19 个文件会静默腐烂，
+      # 等哪天真机上跑才炸（其中 8 个是数据库迁移测试，最该早发现）。
+      - name: Compile androidTest sources (no device needed)
+        working-directory: src/android
+        env:
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        run: ./gradlew :app:compileReleaseAndroidTestKotlin --parallel --stacktrace
+
       # [T-schema-drift] Hand-written migration DDL must agree with the
       # exported Room schema: an index created by a migration but undeclared
       # on the entity crashes RoomOpenHelper.onUpgrade — after the migration

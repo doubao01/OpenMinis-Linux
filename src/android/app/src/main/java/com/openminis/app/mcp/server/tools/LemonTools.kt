@@ -270,7 +270,7 @@ private fun lemonCall(deps: McpToolDeps, arguments: JSONObject): McpServerCore.C
  * execution. Missing required parameters fail loudly instead of silently
  * expanding to an empty string.
  */
-private fun buildCommand(tool: LemonCatalog.Tool, argv: JSONObject): String {
+internal fun buildCommand(tool: LemonCatalog.Tool, argv: JSONObject): String {
     val required = tool.required.split('|').map { it.trim() }.filter { it.isNotEmpty() }
     val missing = required.filter { argv.optString(it, "").isEmpty() }
     if (missing.isNotEmpty()) {
