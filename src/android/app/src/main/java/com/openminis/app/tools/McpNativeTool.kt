@@ -27,7 +27,7 @@ object McpNativeTool {
     fun definition(): AgentToolDefinition = AgentToolDefinition(
         name = NAME,
         description = "Call MCP (Model Context Protocol) servers natively — faster than minis-mcp-cli via shell. " +
-            "Actions: 'servers' lists configured servers; 'tools' lists one server's tools; " +
+            "Actions: 'servers' lists available servers, including enabled built-in phone tools; 'tools' lists one server's tools; " +
             "'call' invokes a tool with a JSON arguments object; 'resources'/'read_resource' list and read " +
             "server resources; 'prompts'/'get_prompt' list and fetch prompt templates. " +
             "resources/prompts need a server that implements them — an unsupported server answers with a clean not-supported message.",

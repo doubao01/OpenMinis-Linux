@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import com.openminis.app.R
 import com.openminis.app.data.repository.MCPRepository
 import com.openminis.app.data.repository.MCPToolPolicy
+import com.openminis.app.mcp.client.BuiltinMcpServer
+import com.openminis.app.mcp.client.McpNativeBridge
 import com.openminis.app.sandbox.ExecutionCoordinator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -153,13 +155,14 @@ fun MCPToolsScreen(
     onBack: () -> Unit,
     onManage: () -> Unit,
 ) {
-    val servers by mcpRepository.servers.collectAsStateWithLifecycle()
+    val servers = rememberAvailableMcpServers(mcpRepository)
     val server = servers.find { it.id == serverId }
+    val policyId = server?.let { BuiltinMcpServer.policyId(it) } ?: serverId
     val context = LocalContext.current
     var busy by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var tools by remember { mutableStateOf<List<McpToolRow>>(emptyList()) }
-    var disabled by remember(serverId) { mutableStateOf(MCPToolPolicy.disabled(context, serverId)) }
+    var disabled by remember(policyId) { mutableStateOf(MCPToolPolicy.disabled(context, policyId)) }
     var confirmDelete by remember { mutableStateOf(false) }
     // [T-mcp-tools-refresh] The load is re-runnable: the refresh action passes
     // --refresh (the CLI evicts the daemon's live session first, so the list
@@ -178,17 +181,27 @@ fun MCPToolsScreen(
         error = null
         val quoted = "'" + current.id.replace("'", "'\\''") + "'"
         val refresh = if (refreshTick > 0) " --refresh" else ""
-        val result = withContext(Dispatchers.IO) {
-            ExecutionCoordinator.execute(
-                sessionId = "mcp-tools-ui",
-                command = "minis-mcp-cli tools $quoted$refresh",
-                timeout = 25_000L,
-            )
+        val output = withContext(Dispatchers.IO) {
+            if (current.isBuiltin) {
+                runCatching {
+                    if (refreshTick > 0) McpNativeBridge.invalidate(current.id)
+                    JSONObject().put(
+                        "tools",
+                        McpNativeBridge.listToolDescriptors(context, mcpRepository, "mcp-tools-ui", current.id),
+                    ).toString()
+                }.getOrElse { it.message ?: "MCP tool discovery failed" }
+            } else {
+                ExecutionCoordinator.execute(
+                    sessionId = "mcp-tools-ui",
+                    command = "minis-mcp-cli tools $quoted$refresh",
+                    timeout = 25_000L,
+                ).output
+            }
         }
-        tools = parseMcpTools(result.output)
-        disabled = MCPToolPolicy.disabled(context, current.id)
+        tools = parseMcpTools(output)
+        disabled = MCPToolPolicy.disabled(context, BuiltinMcpServer.policyId(current))
         if (tools.isEmpty()) {
-            error = result.output.ifBlank { "exit ${result.exitCode}" }
+            error = output.ifBlank { "MCP server returned no tools" }
         }
         busy = false
     }
@@ -258,8 +271,8 @@ fun MCPToolsScreen(
                     Switch(
                         checked = on,
                         onCheckedChange = { enabled ->
-                            MCPToolPolicy.setEnabled(context, serverId, tool.name, enabled)
-                            disabled = MCPToolPolicy.disabled(context, serverId)
+                            MCPToolPolicy.setEnabled(context, policyId, tool.name, enabled)
+                            disabled = MCPToolPolicy.disabled(context, policyId)
                         },
                     )
                 }
@@ -269,10 +282,12 @@ fun MCPToolsScreen(
         // [T-mcp-fix-delete-entry] The old "manage" button just popped back
         // (the edit sheet had lost its entry point, so delete was
         // unreachable). This screen now carries the delete itself.
-        TextButton(
-            onClick = { confirmDelete = true },
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-        ) { Text(stringResource(R.string.mcp_delete_server), color = MaterialTheme.colorScheme.error) }
+        if (server?.isBuiltin != true) {
+            TextButton(
+                onClick = { confirmDelete = true },
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            ) { Text(stringResource(R.string.mcp_delete_server), color = MaterialTheme.colorScheme.error) }
+        }
     }
 
     if (confirmDelete) {

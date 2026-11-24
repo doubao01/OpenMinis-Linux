@@ -37,6 +37,7 @@ import com.openminis.app.R
 import com.openminis.app.data.repository.MCPRepository
 import com.openminis.app.ui.settings.SettingsRow
 import com.openminis.app.ui.settings.SettingsSection
+import com.openminis.app.ui.settings.rememberAvailableMcpServers
 import com.openminis.app.ui.theme.m3Icon
 import com.openminis.app.ui.tokens.MinisType
 import com.openminis.app.ui.tokens.MinisTypography
@@ -62,7 +63,7 @@ fun SessionMcpsSheet(
     mcpRepository: MCPRepository,
     onDismiss: () -> Unit,
 ) {
-    val servers by mcpRepository.servers.collectAsStateWithLifecycle()
+    val servers = rememberAvailableMcpServers(mcpRepository)
 
     // [T-mcp-review-fixes-android] Key the seed on `servers` so the override map
     // re-derives when the live server list arrives. A keyless remember{} seeds

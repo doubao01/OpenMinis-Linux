@@ -121,7 +121,7 @@ object McpNativeBridge {
     /** Text overview of configured servers for `mcp(action="servers")`. */
     fun serversOverview(repo: MCPRepository, sessionId: String): String {
         val overrides = repo.effectiveEnabledMap(sessionId)
-        val all = repo.servers.value
+        val all = repo.availableServers()
         if (all.isEmpty()) {
             return "No MCP servers configured. Add one in Settings → MCP."
         }
@@ -144,18 +144,19 @@ object McpNativeBridge {
     fun listTools(context: Context, repo: MCPRepository, sessionId: String, server: String): String {
         val (client, cfg) = clientFor(context, repo, sessionId, server)
         val tools = client.listTools()
-        val disabled = MCPToolPolicy.disabled(context, cfg.id)
-        val filtered = if (disabled.isEmpty()) tools else org.json.JSONArray().apply {
-            for (i in 0 until tools.length()) {
-                val t = tools.optJSONObject(i) ?: continue
-                if (t.optString("name") !in disabled) put(t)
-            }
-        }
+        val disabled = MCPToolPolicy.disabled(context, BuiltinMcpServer.policyId(cfg))
+        val visible = BuiltinMcpServer.filterTools(cfg, tools)
+        val filtered = BuiltinMcpServer.filterTools(cfg, visible, disabled)
         val header = "MCP server '${cfg.id}' (${cfg.transportSummary}):\n"
         val body = McpJsonRpc.formatToolList(filtered)
-        val hidden = tools.length() - filtered.length()
+        val hidden = visible.length() - filtered.length()
         val tail = if (hidden > 0) "\n($hidden tool(s) disabled in Settings → MCP)" else ""
         return header + body + tail
+    }
+
+    fun listToolDescriptors(context: Context, repo: MCPRepository, sessionId: String, server: String): org.json.JSONArray {
+        val (client, cfg) = clientFor(context, repo, sessionId, server)
+        return BuiltinMcpServer.filterTools(cfg, client.listTools())
     }
 
     /**
@@ -202,8 +203,10 @@ object McpNativeBridge {
         tool: String,
         arguments: JSONObject,
     ): McpJsonRpc.CallOutcome {
+        requireBuiltinToolAccess(resolveConfig(repo, sessionId, server), tool)
         val (client, cfg) = clientFor(context, repo, sessionId, server)
-        if (MCPToolPolicy.isDisabled(context, cfg.id, tool)) {
+        requireBuiltinToolAccess(cfg, tool)
+        if (MCPToolPolicy.isDisabled(context, BuiltinMcpServer.policyId(cfg), tool)) {
             throw McpError(
                 "TOOL_DISABLED",
                 "MCP tool \"$tool\" on ${cfg.id} is disabled in Settings → MCP.",
@@ -219,6 +222,12 @@ object McpNativeBridge {
                 saveOutput = mcpOutputSaver(context, sessionId, cfg.id, tool),
             ),
         )
+    }
+
+    private fun requireBuiltinToolAccess(cfg: MCPServerConfig, tool: String) {
+        if (!BuiltinMcpServer.allowsTool(cfg, tool)) {
+            throw McpError("TOOL_DISABLED", "Built-in catalog access exposes only lemon_list and lemon_call, not '$tool'.")
+        }
     }
 
     /** The shared writer returns null if the full text is not readable in this session. */
@@ -254,11 +263,12 @@ object McpNativeBridge {
         server: String,
     ): MCPServerConfig {
         val overrides = repo.effectiveEnabledMap(sessionId)
-        val cfg = repo.servers.value.firstOrNull { it.id == server }
+        val available = repo.availableServers()
+        val cfg = available.firstOrNull { it.id == server }
             ?: throw McpError(
                 "NOT_FOUND",
                 "No MCP server named '$server'. Configured: " +
-                    repo.servers.value.joinToString(", ") { it.id }.ifEmpty { "(none)" },
+                    available.joinToString(", ") { it.id }.ifEmpty { "(none)" },
             )
         val enabled = overrides[cfg.id] ?: cfg.enabled
         if (!enabled) {
@@ -275,6 +285,7 @@ object McpNativeBridge {
         cfg.isStdio.toString(), cfg.url, cfg.command, cfg.args.toString(),
         cfg.env.toSortedMap().toString(), cfg.headers.toSortedMap().toString(),
         cfg.oauth?.clientId, cfg.oauth?.mode, cfg.startupTimeoutSeconds,
+        cfg.isBuiltin,
     ).joinToString("|")
 
     /**

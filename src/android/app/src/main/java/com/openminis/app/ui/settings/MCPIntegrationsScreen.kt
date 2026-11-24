@@ -70,7 +70,7 @@ fun MCPIntegrationsScreen(
     // [T-mcp-env-var-picker-android] App env vars for the STDIO env "insert app var" picker; null hides the affordance.
     envVarRepository: com.openminis.app.data.repository.EnvVarRepository? = null,
 ) {
-    val servers by mcpRepository.servers.collectAsStateWithLifecycle()
+    val servers = rememberAvailableMcpServers(mcpRepository)
 
     // [T-android-mcp-list-reload-on-appear] Re-read servers.json on entry so CLI-added servers show without restart.
     LaunchedEffect(Unit) {
@@ -84,7 +84,7 @@ fun MCPIntegrationsScreen(
 
     // ─── 内置 MCP Server（实验）─────────────────────────────────────────────
     // Config store is created in init(); null-safe reads fall back to defaults pre-init.
-    val mcpStore = remember { McpServerManager.configStore() }
+    val mcpStore = McpServerManager.configStore()
     val mcpConfig = mcpStore?.config?.collectAsStateWithLifecycle()?.value
         ?: McpServerConfigStore.Config()
     val mcpState by McpServerManager.state.collectAsStateWithLifecycle()
@@ -146,23 +146,16 @@ fun MCPIntegrationsScreen(
                 icon = m3Icon(Icons.Outlined.Dns),
                 checked = mcpConfig.enabled,
                 onCheckedChange = { checked ->
-                    if (checked) {
-                        mcpStore?.setEnabled(true)
-                        if (!McpServerManager.start()) {
-                            mcpStore?.setEnabled(false)
-                            android.widget.Toast.makeText(
-                                context,
-                                context.getString(
-                                    R.string.mcp_start_failed_toast,
-                                    McpServerManager.state.value.error
-                                        ?: context.getString(R.string.mcp_error_unknown),
-                                ),
-                                android.widget.Toast.LENGTH_SHORT,
-                            ).show()
-                        }
-                    } else {
-                        mcpStore?.setEnabled(false)
-                        McpServerManager.stop()
+                    if (!McpServerManager.setEnabled(checked)) {
+                        android.widget.Toast.makeText(
+                            context,
+                            context.getString(
+                                R.string.mcp_start_failed_toast,
+                                McpServerManager.state.value.error
+                                    ?: context.getString(R.string.mcp_error_unknown),
+                            ),
+                            android.widget.Toast.LENGTH_SHORT,
+                        ).show()
                     }
                 },
             )

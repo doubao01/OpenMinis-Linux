@@ -212,6 +212,19 @@ object McpServerManager {
 
     fun currentPort(): Int = configStore?.config?.value?.port ?: McpHttpServer.DEFAULT_PORT
 
+    @Synchronized
+    fun setEnabled(enabled: Boolean): Boolean {
+        val store = configStore ?: return false
+        store.setEnabled(enabled)
+        if (!enabled) {
+            stop()
+            return true
+        }
+        val started = _state.value.status == Status.RUNNING || start()
+        if (!started) store.setEnabled(false)
+        return started
+    }
+
     /**
      * Approval runtime for the in-process approvals UI. Null before the first
      * [init]; the manager itself is created on first [start] and survives

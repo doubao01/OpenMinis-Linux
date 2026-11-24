@@ -133,7 +133,7 @@ internal fun MCPMergedServerList(
                 // tools screen, which left the edit sheet — and with it the
                 // delete button — with zero entry points: editServer was never
                 // set anywhere.
-                onClick = { onEditServer(server) },
+                onClick = { if (server.isBuiltin) onOpenTools(server) else onEditServer(server) },
                 trailing = {
                     ServerTrailing(
                         server = server,

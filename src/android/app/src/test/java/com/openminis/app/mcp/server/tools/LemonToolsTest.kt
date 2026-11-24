@@ -54,6 +54,53 @@ class LemonToolsTest {
         assertTrue(res.isError)
     }
 
+    @Test
+    fun catalogDescriptorIncludesParameterContractWithoutCommandBody() {
+        val tool = parameterizedTool()
+        val descriptor = tool.toJson()
+        assertEquals(tool.params, descriptor.getString("params"))
+        assertEquals("pkg,op,mode", descriptor.getString("required"))
+        assertTrue(!descriptor.has("cmd"))
+    }
+
+    @Test
+    fun generatedCommaSeparatedRequiredArgumentsCanBeCalled() {
+        val arguments = JSONObject()
+            .put("pkg", "com.openminis.linux")
+            .put("op", "android:camera")
+            .put("mode", "allow")
+        assertEquals(
+            "cmd appops set 'com.openminis.linux' 'android:camera' 'allow'",
+            buildCommand(parameterizedTool(), arguments),
+        )
+    }
+
+    @Test
+    fun legacyPipeSeparatedRequiredArgumentsStillWork() {
+        val arguments = JSONObject().put("pkg", "app").put("op", "camera").put("mode", "allow")
+        assertEquals(
+            "cmd appops set 'app' 'camera' 'allow'",
+            buildCommand(parameterizedTool().copy(required = "pkg|op|mode"), arguments),
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun missingGeneratedRequiredArgumentFailsBeforeExecution() {
+        buildCommand(parameterizedTool(), JSONObject().put("pkg", "app").put("op", "camera"))
+    }
+
+    private fun parameterizedTool() = LemonCatalog.Tool(
+        name = "appops_set",
+        desc = "Set an app operation",
+        cmd = "cmd appops set \$pkg \$op \$mode",
+        params = "pkg:string:Package|op:string:Operation|mode:string:Mode",
+        required = "pkg,op,mode",
+        timeoutMs = 15000,
+        domain = "D4",
+        risk = "medium",
+        readOnly = false,
+    )
+
     /** Allow-everything gate: these tests never reach the dispatcher. */
     private class AllowGate : SecurityGate {
         override fun setPermissionMode(mode: PermissionMode) {}

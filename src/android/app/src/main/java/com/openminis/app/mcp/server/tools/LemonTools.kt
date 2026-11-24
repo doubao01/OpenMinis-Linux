@@ -71,6 +71,8 @@ internal object LemonCatalog {
             put("domain", domain)
             put("risk", risk)
             put("ro", readOnly)
+            put("params", params)
+            put("required", required)
         }
     }
 
@@ -138,7 +140,7 @@ internal fun lemonTools(deps: McpToolDeps): List<McpToolSpec> = listOf(
         name = "lemon_list",
         description = "List the on-device tool catalog (lemon kernel: system, file, app, " +
             "network, kernel, debug, reverse, orchestration). Filter by domain, keyword or risk. " +
-            "Returns name, domain, risk and one-line description; call lemon_call to execute.",
+            "Returns name, domain, risk, description, params and required arguments; call lemon_call to execute.",
         schema = JSONObject().apply {
             put("type", "object")
             put("properties", JSONObject().apply {
@@ -271,7 +273,7 @@ private fun lemonCall(deps: McpToolDeps, arguments: JSONObject): McpServerCore.C
  * expanding to an empty string.
  */
 internal fun buildCommand(tool: LemonCatalog.Tool, argv: JSONObject): String {
-    val required = tool.required.split('|').map { it.trim() }.filter { it.isNotEmpty() }
+    val required = tool.required.split(Regex("[|,]")).map { it.trim() }.filter { it.isNotEmpty() }
     val missing = required.filter { argv.optString(it, "").isEmpty() }
     if (missing.isNotEmpty()) {
         throw IllegalArgumentException("missing required: ${missing.joinToString(", ")}")

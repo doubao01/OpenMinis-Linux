@@ -4,6 +4,10 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import com.openminis.app.mcp.client.BuiltinMcpServer
+import com.openminis.app.mcp.server.McpHttpServer
+import com.openminis.app.mcp.server.McpServerConfigStore
+import com.openminis.app.mcp.server.McpServerManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,7 +38,12 @@ import java.io.File
  * invocation); "recent" ordering falls back to recent-add (createdAt desc),
  * which is the best signal Android has locally.
  */
-class MCPRepository(private val context: Context) {
+class MCPRepository(
+    private val context: Context,
+    private val builtinConfigProvider: () -> McpServerConfigStore.Config? = {
+        McpServerManager.configStore()?.config?.value
+    },
+) {
 
     companion object {
         private const val TAG = "MCPRepository"
@@ -81,6 +90,7 @@ class MCPRepository(private val context: Context) {
         val oauth: com.openminis.app.mcp.oauth.MCPOAuthConfig? = null,
         /** Local-only: when this entry was first written, for recent-add ordering. */
         val createdAt: Long = System.currentTimeMillis(),
+        val isBuiltin: Boolean = false,
     ) {
         val isStdio: Boolean get() = !command.isNullOrBlank()
         /** Short transport descriptor for list rows: the URL or the command line. */
@@ -96,6 +106,16 @@ class MCPRepository(private val context: Context) {
 
     private val _servers = MutableStateFlow<List<MCPServerConfig>>(emptyList())
     val servers: StateFlow<List<MCPServerConfig>> = _servers.asStateFlow()
+
+    fun availableServers(configured: List<MCPServerConfig>? = null): List<MCPServerConfig> {
+        if (configured == null) ensureLoaded()
+        val builtin = builtinConfigProvider()
+        return BuiltinMcpServer.merge(
+            configured ?: _servers.value,
+            builtin?.enabled == true,
+            builtin?.port ?: McpHttpServer.DEFAULT_PORT,
+        )
+    }
 
     private val db: SQLiteDatabase by lazy {
         McpDbHelper(context).writableDatabase
@@ -441,6 +461,10 @@ class MCPRepository(private val context: Context) {
      */
     fun delete(id: String) {
         ensureLoaded()
+        if (availableServers().any { it.id == id && it.isBuiltin }) {
+            warmupScope.launch { McpServerManager.setEnabled(false) }
+            return
+        }
         _servers.update { list -> list.filter { it.id != id } }
         // [Wave3-fix-4] The override-row purge goes through [overrideStore] and
         // stays on the IO scope (its [SessionOverrideStore.revision] bump rides
@@ -462,6 +486,10 @@ class MCPRepository(private val context: Context) {
 
     fun setEnabled(id: String, enabled: Boolean) {
         ensureLoaded()
+        if (availableServers().any { it.id == id && it.isBuiltin }) {
+            McpServerManager.setEnabled(enabled)
+            return
+        }
         _servers.update { list ->
             list.map { if (it.id == id) it.copy(enabled = enabled) else it }
         }
@@ -470,7 +498,7 @@ class MCPRepository(private val context: Context) {
 
     fun toggle(id: String) {
         ensureLoaded()
-        val current = _servers.value.find { it.id == id } ?: return
+        val current = availableServers().find { it.id == id } ?: return
         setEnabled(id, !current.enabled)
     }
 
@@ -488,8 +516,12 @@ class MCPRepository(private val context: Context) {
      * Bulk-load all overrides for one session in a single query —
      * same pattern as [SkillRepository.sessionOverrideMap].
      */
-    fun sessionOverrideMap(sessionId: String): Map<String, Boolean> =
-        overrideStore.mapForSession(sessionId)
+    fun sessionOverrideMap(sessionId: String): Map<String, Boolean> {
+        val overrides = overrideStore.mapForSession(sessionId)
+        val builtin = availableServers().firstOrNull { it.isBuiltin } ?: return overrides
+        val value = overrides[BuiltinMcpServer.POLICY_ID] ?: return overrides
+        return overrides + (builtin.id to value)
+    }
 
     /**
      * [T-mcp-native] Effective per-server enabled state for a session:
@@ -499,13 +531,14 @@ class MCPRepository(private val context: Context) {
      */
     fun effectiveEnabledMap(sessionId: String): Map<String, Boolean> {
         val overrides = sessionOverrideMap(sessionId)
-        return _servers.value.associate { it.id to (overrides[it.id] ?: it.enabled) }
+        return availableServers().associate { it.id to (overrides[it.id] ?: it.enabled) }
     }
 
     fun isEnabledForSession(mcpId: String, sessionId: String): Boolean {
-        val override = overrideStore.storedValue(sessionId, mcpId)
+        val server = availableServers().find { it.id == mcpId } ?: return false
+        val override = overrideStore.storedValue(sessionId, BuiltinMcpServer.policyId(server))
         if (override != null) return override
-        return _servers.value.find { it.id == mcpId }?.enabled ?: false
+        return server.enabled
     }
 
     /**
@@ -518,8 +551,9 @@ class MCPRepository(private val context: Context) {
      * (override → global → false) in [isEnabledForSession] is unchanged.
      */
     fun setSessionOverride(sessionId: String, mcpId: String, enabled: Boolean) {
-        val globalEnabled = _servers.value.find { it.id == mcpId }?.enabled
-        overrideStore.set(sessionId, mcpId, enabled, globalEnabled)
+        val server = availableServers().find { it.id == mcpId }
+        val policyId = server?.let { BuiltinMcpServer.policyId(it) } ?: mcpId
+        overrideStore.set(sessionId, policyId, enabled, server?.enabled)
     }
 
     fun clearSessionOverrides(sessionId: String) {
@@ -631,16 +665,16 @@ class MCPRepository(private val context: Context) {
      * turn frequency.
      */
     fun mcpPromptFragment(sessionId: String): String? {
-        val servers = _servers.value
+        val servers = availableServers()
         if (sessionId == fragmentCacheSession &&
-            servers === fragmentCacheServers &&
+            servers == fragmentCacheServers &&
             overrideRevision == fragmentCacheRevision
         ) return fragmentCacheValue
 
         val overrides = sessionOverrideMap(sessionId)
         val enabled = servers
             .filter { overrides[it.id] ?: it.enabled }
-            .sortedByDescending { it.createdAt }
+            .sortedWith(compareByDescending<MCPServerConfig> { it.isBuiltin }.thenByDescending { it.createdAt })
         if (enabled.isEmpty()) {
             fragmentCacheSession = sessionId
             fragmentCacheServers = servers
